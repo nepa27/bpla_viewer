@@ -1,0 +1,203 @@
+/* Основные стили диаграммы */
+.brushable-bar-chart-container {
+  width: 100%;
+  overflow-x: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 0;
+}
+
+.brushable-bar-chart-svg {
+  min-width: 300px;
+  font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
+}
+
+/* Столбцы диаграммы */
+.bar {
+  fill: #64ffda;
+  opacity: 0.8;
+  transition: all 0.2s ease;
+  shape-rendering: geometricPrecision;
+}
+
+.bar:hover {
+  fill: #52c4b9 !important;
+  opacity: 1;
+  transform: scale(1.02);
+}
+
+/* Сетка */
+.grid line {
+  stroke: rgba(136, 146, 176, 0.3);
+  stroke-opacity: 0.3;
+  shape-rendering: crispEdges;
+}
+
+.grid path {
+  stroke-width: 0;
+}
+
+/* Оси */
+.x-axis line,
+.y-axis line {
+  stroke: rgba(136, 146, 176, 0.5);
+}
+
+.x-axis path,
+.y-axis path {
+  stroke: rgba(136, 146, 176, 0.5);
+}
+
+.axis-label {
+  fill: #ccd6f6;
+  font-size: 12px;
+  text-anchor: middle;
+  font-weight: 500;
+}
+
+.tick text {
+  fill: #8892b0;
+  font-size: 11px;
+  font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
+}
+
+/* Brush выделение */
+.brush .selection {
+  fill: rgba(100, 255, 218, 0.2);
+  stroke: #64ffda;
+  stroke-width: 1;
+  stroke-dasharray: 3, 3;
+}
+
+.brush .handle {
+  fill: #64ffda;
+  stroke: #64ffda;
+  stroke-width: 1;
+  rx: 2;
+  ry: 2;
+}
+
+/* Адаптивность для планшетов */
+@media (max-width: 1024px) {
+  .brushable-bar-chart-container {
+    padding: 8px 0;
+  }
+  
+  .axis-label {
+    font-size: 11px;
+  }
+  
+  .tick text {
+    font-size: 10px;
+  }
+  
+  .bar {
+    opacity: 0.7;
+  }
+}
+
+/* Адаптивность для телефонов */
+@media (max-width: 768px) {
+  .brushable-bar-chart-container {
+    padding: 6px 0;
+  }
+  
+  .axis-label {
+    font-size: 10px;
+  }
+  
+  .tick text {
+    font-size: 9px;
+  }
+  
+  .bar {
+    opacity: 0.6;
+  }
+  
+  .brush .selection {
+    fill: rgba(100, 255, 218, 0.15);
+  }
+}
+
+/* Адаптивность для маленьких телефонов */
+@media (max-width: 480px) {
+  .brushable-bar-chart-container {
+    padding: 5px 0;
+  }
+  
+  .axis-label {
+    font-size: 9px;
+  }
+  
+  .tick text {
+    font-size: 8px;
+  }
+  
+  .bar {
+    opacity: 0.5;
+  }
+}
+
+/* Высокий контраст */
+@media (prefers-contrast: high) {
+  .bar {
+    fill: #64ffda;
+    opacity: 1;
+  }
+  
+  .bar:hover {
+    fill: #52c4b9 !important;
+    stroke: #ffffff;
+    stroke-width: 1;
+  }
+  
+  .axis-label,
+  .tick text {
+    fill: #ffffff;
+  }
+  
+  .x-axis line,
+  .y-axis line,
+  .x-axis path,
+  .y-axis path {
+    stroke: #ffffff;
+  }
+}
+
+/* .bar {
+  transition: fill 0.2s;
+}
+
+.bar:hover {
+  fill: #45a049 !important;
+}
+
+.axis-label {
+  fill: white;
+  font-size: 12px;
+  text-anchor: middle;
+}
+
+.grid line {
+  stroke: #444;
+  stroke-opacity: 0.3;
+  shape-rendering: crispEdges;
+}
+
+.grid path {
+  stroke-width: 0;
+}
+
+.brush .selection {
+  fill: rgba(76, 175, 80, 0.3);
+  stroke: #4CAF50;
+  stroke-width: 1;
+}
+
+.x-axis line,
+.y-axis line,
+.x-axis path,
+.y-axis path {
+  stroke: #555;
+} */
