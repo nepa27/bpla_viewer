@@ -1,13 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
-export const useYandexMap = ({ 
-  containerRef, 
-  center, 
-  zoom, 
-  onReady, 
-  onError 
-}) => {
-  const [mapInstance, setMapInstance] = useState(null);
+export const useYandexMap = ({ containerRef, center, zoom, onReady, onError }) => {
   const [ymapsReady, setYmapsReady] = useState(false);
   const mapInstanceRef = useRef(null);
 
@@ -23,22 +16,21 @@ export const useYandexMap = ({
         const map = new ymapsInstance.Map(containerRef.current, {
           center,
           zoom,
-          controls: ['zoomControl']
+          controls: ['zoomControl'],
         });
-        
+
         // Явно удаляем ненужные элементы управления
         map.controls.remove('fullscreenControl');
         map.controls.remove('geolocationControl');
-        
+
         // Отключаем нежелательные поведения
         map.behaviors.disable([
           'dblClickZoom',
           'rightMouseButtonMagnifier',
           // 'scrollZoom'
         ]);
-        
+
         mapInstanceRef.current = map;
-        setMapInstance(map);
         setYmapsReady(true);
         onReady?.();
       } catch (err) {
@@ -67,21 +59,21 @@ export const useYandexMap = ({
           console.warn('Ошибка при уничтожении карты:', e);
         }
         mapInstanceRef.current = null;
-        setMapInstance(null);
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return { mapInstance: mapInstanceRef.current, ymapsReady };
 };
 //   import { useState, useEffect, useRef } from 'react';
 
-// export const useYandexMap = ({ 
-//   containerRef, 
-//   center, 
-//   zoom, 
-//   onReady, 
-//   onError 
+// export const useYandexMap = ({
+//   containerRef,
+//   center,
+//   zoom,
+//   onReady,
+//   onError
 // }) => {
 //   const [mapInstance, setMapInstance] = useState(null);
 //   const [ymapsReady, setYmapsReady] = useState(false);
@@ -90,10 +82,10 @@ export const useYandexMap = ({
 
 //   useEffect(() => {
 //     console.log('useYandexMap: начата инициализация');
-    
+
 //     const initializeMap = (ymapsInstance) => {
 //       console.log('useYandexMap: попытка создания карты, containerRef:', containerRef.current);
-      
+
 //       // Ждем, пока контейнер будет доступен
 //       if (!containerRef.current) {
 //         console.log('useYandexMap: нет контейнера, повторная попытка через 50ms');
@@ -115,17 +107,17 @@ export const useYandexMap = ({
 //           zoom,
 //           controls: ['zoomControl']
 //         });
-        
+
 //         map.behaviors.disable([
 //           'dblClickZoom',
 //           'rightMouseButtonMagnifier',
 //           'scrollZoom'
 //         ]);
-        
+
 //         mapInstanceRef.current = map;
 //         setMapInstance(map);
 //         initializedRef.current = true;
-        
+
 //         setYmapsReady(true);
 //         console.log('useYandexMap: карта создана успешно, вызываем onReady');
 //         onReady?.();
@@ -170,10 +162,10 @@ export const useYandexMap = ({
 //     };
 //   }, []);
 
-//   console.log('useYandexMap: возвращаем значения', { 
-//     mapInstance: !!mapInstanceRef.current, 
-//     ymapsReady, 
-//     mapInstanceRef: !!mapInstanceRef.current 
+//   console.log('useYandexMap: возвращаем значения', {
+//     mapInstance: !!mapInstanceRef.current,
+//     ymapsReady,
+//     mapInstanceRef: !!mapInstanceRef.current
 //   });
 
 //   return { mapInstance: mapInstanceRef.current, ymapsReady, mapInstanceRef };

@@ -1,26 +1,31 @@
-import { useEffect, useRef, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 
-export const useMapPolygons = ({ 
-  mapInstance, 
-  ymapsReady, 
-  regionsData, 
-  selectedRegion, 
-  onRegionClick 
+export const useMapPolygons = ({
+  mapInstance,
+  ymapsReady,
+  regionsData,
+  selectedRegion,
+  onRegionClick,
 }) => {
   const polygonsRef = useRef([]);
 
   // Мемоизируем ключ регионов чтобы избежать перерисовки при изменении selectedRegion
   const regionsKey = useMemo(() => {
-    return regionsData?.features?.map((region, index) => 
-      `${region.properties?.region || index}-${region.geometry?.type || 'unknown'}`
-    ).join('|') || '';
+    return (
+      regionsData?.features
+        ?.map(
+          (region, index) =>
+            `${region.properties?.region || index}-${region.geometry?.type || 'unknown'}`,
+        )
+        .join('|') || ''
+    );
   }, [regionsData]);
 
   useEffect(() => {
     if (!mapInstance || !ymapsReady || !regionsData?.features) return;
 
     // Очищаем предыдущие полигоны только при изменении данных регионов
-    polygonsRef.current.forEach(p => {
+    polygonsRef.current.forEach((p) => {
       if (p.setParent) p.setParent(null);
     });
     polygonsRef.current = [];
@@ -33,8 +38,8 @@ export const useMapPolygons = ({
 
       try {
         let polygonsToAdd = [];
-        
-        if (region.geometry.type === "MultiPolygon") {
+
+        if (region.geometry.type === 'MultiPolygon') {
           region.geometry.coordinates.forEach((polygonCoords, polyIndex) => {
             const polygon = new window.ymaps.Polygon(
               polygonCoords,
@@ -47,8 +52,8 @@ export const useMapPolygons = ({
                 strokeColor: '#000000',
                 strokeWidth: selectedRegion === region.properties?.region ? 2 : 1,
                 opacity: 0.7,
-                cursor: 'pointer'
-              }
+                cursor: 'pointer',
+              },
             );
 
             polygon.events.add('click', () => {
@@ -58,7 +63,7 @@ export const useMapPolygons = ({
 
             polygonsToAdd.push(polygon);
           });
-        } else if (region.geometry.type === "Polygon") {
+        } else if (region.geometry.type === 'Polygon') {
           const polygon = new window.ymaps.Polygon(
             region.geometry.coordinates,
             {
@@ -70,8 +75,8 @@ export const useMapPolygons = ({
               strokeColor: '#000000',
               strokeWidth: selectedRegion === region.properties?.region ? 2 : 1,
               opacity: 0.7,
-              cursor: 'pointer'
-            }
+              cursor: 'pointer',
+            },
           );
 
           polygon.events.add('click', () => {
@@ -82,11 +87,10 @@ export const useMapPolygons = ({
           polygonsToAdd.push(polygon);
         }
 
-        polygonsToAdd.forEach(polygon => {
+        polygonsToAdd.forEach((polygon) => {
           mapInstance.geoObjects.add(polygon);
           polygonsRef.current.push(polygon);
         });
-
       } catch (regionError) {
         console.warn(`Ошибка добавления региона ${index}:`, regionError);
       }
@@ -94,24 +98,24 @@ export const useMapPolygons = ({
 
     // Очистка при изменении данных регионов
     return () => {
-      polygonsRef.current.forEach(p => {
+      polygonsRef.current.forEach((p) => {
         if (p.setParent) p.setParent(null);
       });
       polygonsRef.current = [];
     };
-  }, [mapInstance, ymapsReady, regionsKey, onRegionClick, selectedRegion]); // Добавили selectedRegion
+  }, [mapInstance, ymapsReady, regionsKey, onRegionClick, selectedRegion, regionsData.features]);
 
   // Отдельный эффект для обновления стилей при изменении selectedRegion
   useEffect(() => {
     // Обновляем стили полигонов при изменении selectedRegion
-    polygonsRef.current.forEach(polygon => {
+    polygonsRef.current.forEach((polygon) => {
       try {
         const polygonName = polygon.properties.get('name');
         const isSelected = selectedRegion === polygonName;
-        
+
         polygon.options.set({
           fillColor: isSelected ? '#ff444499' : '#4488ff99',
-          strokeWidth: isSelected ? 2 : 1
+          strokeWidth: isSelected ? 2 : 1,
         });
       } catch (e) {
         console.warn('Ошибка обновления стиля полигона:', e);
@@ -123,18 +127,18 @@ export const useMapPolygons = ({
 };
 // import { useEffect, useRef, useMemo } from 'react';
 
-// export const useMapPolygons = ({ 
-//   mapInstance, 
-//   ymapsReady, 
-//   regionsData, 
-//   selectedRegion, 
-//   onRegionClick 
+// export const useMapPolygons = ({
+//   mapInstance,
+//   ymapsReady,
+//   regionsData,
+//   selectedRegion,
+//   onRegionClick
 // }) => {
 //   const polygonsRef = useRef([]);
 
 //   // Мемоизируем ключ регионов чтобы избежать перерисовки при изменении selectedRegion
 //   const regionsKey = useMemo(() => {
-//     return regionsData?.features?.map((region, index) => 
+//     return regionsData?.features?.map((region, index) =>
 //       `${region.properties?.region || index}-${region.geometry?.type || 'unknown'}`
 //     ).join('|') || '';
 //   }, [regionsData]);
@@ -156,7 +160,7 @@ export const useMapPolygons = ({
 
 //       try {
 //         let polygonsToAdd = [];
-        
+
 //         if (region.geometry.type === "MultiPolygon") {
 //           region.geometry.coordinates.forEach((polygonCoords, polyIndex) => {
 //             const polygon = new window.ymaps.Polygon(
@@ -234,11 +238,11 @@ export const useMapPolygons = ({
 
 // import { useEffect, useRef } from 'react';
 
-// export const useMapPolygons = ({ 
-//   mapInstance, 
-//   ymapsReady, 
-//   regionsData, 
-//   selectedRegion, 
+// export const useMapPolygons = ({
+//   mapInstance,
+//   ymapsReady,
+//   regionsData,
+//   selectedRegion,
 //   onRegionClick,
 //   mapLoadError = false
 // }) => {
@@ -274,7 +278,7 @@ export const useMapPolygons = ({
 
 //           try {
 //             let polygonsToAdd = [];
-            
+
 //             if (region.geometry.type === "MultiPolygon") {
 //               region.geometry.coordinates.forEach((polygonCoords, polyIndex) => {
 //                 const polygon = new window.ymaps.Polygon(

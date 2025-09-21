@@ -1,17 +1,16 @@
-// FallBackMap.jsx.jsx
-import { useState, useRef, useCallback } from 'react';
-import './FallBackMap.css';
-import MapVisualization from '../components/MapVisualization';
+/* eslint-disable no-unused-vars */
+import { useCallback, useRef, useState } from 'react';
 
-import { useMapData } from '../hooks/useMapData';
+import MapVisualization from '../components/MapVisualization';
 import { useFlightData } from '../hooks/useFlightData';
-import * as d3 from 'd3';
+import { useMapData } from '../hooks/useMapData';
+import './FallBackMap.css';
 
 const FallBackMap = ({ geoData, flightsData }) => {
   const svgRef = useRef();
   const [selectedRegion, setSelectedRegion] = useState(null);
   const [tooltip, setTooltip] = useState({ visible: false, content: '', x: 0, y: 0 });
-  
+
   const { mapData, loading } = useMapData(geoData);
   const { filteredFlights } = useFlightData(flightsData);
 
@@ -47,10 +46,7 @@ const FallBackMap = ({ geoData, flightsData }) => {
             tooltip={tooltip}
             setTooltip={setTooltip}
           />
-          
         </div>
-        
-      
       </div>
     </div>
   );

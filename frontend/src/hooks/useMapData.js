@@ -1,5 +1,5 @@
 // hooks/useMapData.js
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export const useMapData = (geoData) => {
   const [mapData, setMapData] = useState(null);

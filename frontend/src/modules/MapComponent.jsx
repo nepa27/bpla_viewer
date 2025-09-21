@@ -1,7 +1,9 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useYandexMap } from '../hooks/useYandexMap';
-import { useMapPolygons } from '../hooks/useMapPolygons';
+/* eslint-disable no-unused-vars */
+import { useCallback, useRef, useState } from 'react';
+
 import { useMapPoints } from '../hooks/useMapPoints';
+import { useMapPolygons } from '../hooks/useMapPolygons';
+import { useYandexMap } from '../hooks/useYandexMap';
 import FallBackMap from './FallBackMap';
 import './MapComponent.css';
 
@@ -29,7 +31,7 @@ const MapComponent = ({ regionsData, points = [], errorLoadYmaps }) => {
       console.error('Ошибка инициализации карты:', err);
       setError(`Ошибка инициализации карты: ${err.message}`);
       setIsLoading(false);
-    }
+    },
   });
 
   // Используем существующий хук для отрисовки полигонов с мемоизацией
@@ -38,24 +40,21 @@ const MapComponent = ({ regionsData, points = [], errorLoadYmaps }) => {
     ymapsReady,
     regionsData,
     selectedRegion,
-    onRegionClick: handleRegionClick
+    onRegionClick: handleRegionClick,
   });
 
   // Используем существующий хук для отрисовки точек
   const pointsRef = useMapPoints({
     mapInstance,
     ymapsReady,
-    points
+    points,
   });
 
   // Если есть ошибка загрузки Yandex Maps - показываем fallback
   if (errorLoadYmaps && regionsData) {
     return (
       <div className="map-container">
-        <FallBackMap 
-          geoData={regionsData}
-          flightsData={points}
-        />
+        <FallBackMap geoData={regionsData} flightsData={points} />
       </div>
     );
   }
@@ -64,36 +63,22 @@ const MapComponent = ({ regionsData, points = [], errorLoadYmaps }) => {
   if (error && regionsData) {
     return (
       <div className="map-container">
-        <FallBackMap 
-          geoData={regionsData}
-          flightsData={points}
-        />
+        <FallBackMap geoData={regionsData} flightsData={points} />
       </div>
     );
   }
 
   // Если есть ошибка, но нет данных для fallback
   if (error && !regionsData) {
-    return (
-      <div className="map-error">
-        Ошибка: {error}
-      </div>
-    );
+    return <div className="map-error">Ошибка: {error}</div>;
   }
 
   // Обычный рендер карты
   return (
     <div className="map-container">
-      {isLoading && (
-        <div className="map-loading">
-          Загрузка данных карты...
-        </div>
-      )}
-      
-      <div
-        ref={mapContainerRef}
-        className="map-element"
-      />
+      {isLoading && <div className="map-loading">Загрузка данных карты...</div>}
+
+      <div ref={mapContainerRef} className="map-element" />
     </div>
   );
 };
@@ -101,6 +86,7 @@ const MapComponent = ({ regionsData, points = [], errorLoadYmaps }) => {
 export default MapComponent;
 
 // Рабочий Вариант
+
 // import React, { useState, useEffect, useRef } from 'react';
 // import FallBackMap from './FallBackMap';
 // import './MapComponent.css';
@@ -167,7 +153,7 @@ export default MapComponent;
 
 //             try {
 //               let polygonsToAdd = [];
-              
+
 //               if (region.geometry.type === "MultiPolygon") {
 //                 region.geometry.coordinates.forEach((polygonCoords, polyIndex) => {
 //                   const polygon = new ymapsInstance.Polygon(
@@ -278,7 +264,7 @@ export default MapComponent;
 //   useEffect(() => {
 //     // Не обновляем точки если есть ошибка загрузки Yandex Maps
 //     if (errorLoadYmaps) return;
-    
+
 //     if (!mapInstanceRef.current || !window.ymaps) return;
 
 //     const ymaps = window.ymaps;
@@ -293,7 +279,7 @@ export default MapComponent;
 //     // Добавляем новые точки
 //     points.forEach((point, idx) => {
 //       if (point.lat == null || point.lng == null) return;
-      
+
 //       try {
 //         const placemark = new ymaps.Placemark(
 //           [point.lat, point.lng],
@@ -317,7 +303,7 @@ export default MapComponent;
 //   if ((errorLoadYmaps || error) && regionsData) {
 //     return (
 //       <div className="map-container">
-//         <FallBackMap 
+//         <FallBackMap
 //           geoData={regionsData}
 //           flightsData={points}
 //         />
@@ -342,7 +328,7 @@ export default MapComponent;
 //           Загрузка данных карты...
 //         </div>
 //       )}
-      
+
 //       <div
 //         ref={mapContainerRef}
 //         className="map-element"
@@ -352,7 +338,6 @@ export default MapComponent;
 // };
 
 // export default MapComponent;
-
 
 // import React, { useState, useEffect, useRef, useCallback } from 'react';
 // import FallBackMap from './FallBackMap';
@@ -372,16 +357,16 @@ export default MapComponent;
 //             zoom,
 //             controls: ['zoomControl']
 //           });
-          
+
 //           map.behaviors.disable([
 //             'dblClickZoom',
 //             'rightMouseButtonMagnifier',
 //             'scrollZoom'
 //           ]);
-          
+
 //           initializedRef.current = true;
 //           console.log('YandexMap: карта создана');
-          
+
 //           // Очистка при размонтировании
 //           return () => {
 //             try {
@@ -398,10 +383,10 @@ export default MapComponent;
 
 //     // Проверяем сразу
 //     initMap();
-    
+
 //     // И через небольшую задержку на случай, если DOM еще не готов
 //     const timer = setTimeout(initMap, 100);
-    
+
 //     return () => {
 //       clearTimeout(timer);
 //     };
@@ -441,7 +426,7 @@ export default MapComponent;
 //     console.log('MapComponent: ПОКАЗЫВАЕМ FALLBACK');
 //     return (
 //       <div style={{ width: '100%', height: '600px' }}>
-//         <FallBackMap 
+//         <FallBackMap
 //           geoData={regionsData}
 //           flightsData={points}
 //         />
@@ -454,7 +439,7 @@ export default MapComponent;
 //     console.log('MapComponent: ПОКАЗЫВАЕМ ОБЫЧНУЮ КАРТУ');
 //     return (
 //       <div className="map-container" key={key}>
-//         <YandexMap 
+//         <YandexMap
 //           containerRef={mapContainerRef}
 //           center={[70, 100]}
 //           zoom={3}
@@ -475,12 +460,12 @@ export default MapComponent;
 //           Загрузка данных карты...
 //         </div>
 //       )}
-      
+
 //       <div
 //         ref={mapContainerRef}
 //         className="map-element"
-//         style={{ 
-//           width: '100%', 
+//         style={{
+//           width: '100%',
 //           height: '100%'
 //         }}
 //       />
@@ -531,7 +516,7 @@ export default MapComponent;
 //     console.log('ПОКАЗЫВАЕМ FALLBACK ИЗ-ЗА ОШИБКИ');
 //     return (
 //       <div style={{ width: '100%', height: '600px' }}>
-//         <FallBackMap 
+//         <FallBackMap
 //           geoData={regionsData}
 //           flightsData={points}
 //         />
@@ -551,7 +536,6 @@ export default MapComponent;
 //     );
 //   }
 
-  
 //   // Во всех остальных случаях показываем загрузку
 //   return (
 //     <div className="map-container">
@@ -560,7 +544,7 @@ export default MapComponent;
 //           Загрузка данных карты...
 //         </div>
 //       )}
-      
+
 //       {hasError && !regionsData && (
 //         <div className="map-error">
 //           Ошибка загрузки карты. Данные недоступны.
@@ -628,7 +612,7 @@ export default MapComponent;
 
 //           try {
 //             let polygonsToAdd = [];
-            
+
 //             if (region.geometry.type === "MultiPolygon") {
 //               region.geometry.coordinates.forEach((polygonCoords, polyIndex) => {
 //                 const polygon = new ymapsInstance.Polygon(
@@ -752,7 +736,7 @@ export default MapComponent;
 //     // Добавляем новые точки
 //     points.forEach((point, idx) => {
 //       if (point.lat == null || point.lng == null) return;
-      
+
 //       try {
 //         const placemark = new ymaps.Placemark(
 //           [point.lat, point.lng],
@@ -774,12 +758,12 @@ export default MapComponent;
 
 //   if (error) {
 //     return (
-//       <div style={{ 
-//         width: '100%', 
-//         height: '600px', 
-//         display: 'flex', 
-//         alignItems: 'center', 
-//         justifyContent: 'center', 
+//       <div style={{
+//         width: '100%',
+//         height: '600px',
+//         display: 'flex',
+//         alignItems: 'center',
+//         justifyContent: 'center',
 //         color: 'red',
 //         border: '1px solid #ccc'
 //       }}>
@@ -791,15 +775,15 @@ export default MapComponent;
 //   return (
 //     <div style={{ width: '100%', height: '600px', position: 'relative' }}>
 //       {isLoading && (
-//         <div style={{ 
-//           position: 'absolute', 
+//         <div style={{
+//           position: 'absolute',
 //           top: 0,
 //           left: 0,
-//           width: '100%', 
-//           height: '100%', 
-//           display: 'flex', 
-//           alignItems: 'center', 
-//           justifyContent: 'center', 
+//           width: '100%',
+//           height: '100%',
+//           display: 'flex',
+//           alignItems: 'center',
+//           justifyContent: 'center',
 //           backgroundColor: 'rgba(255, 255, 255, 0.8)',
 //           zIndex: 1000,
 //           fontSize: '18px'
@@ -807,7 +791,7 @@ export default MapComponent;
 //           Загрузка данных карты...
 //         </div>
 //       )}
-      
+
 //       <div
 //         ref={mapContainerRef}
 //         style={{ width: '100%', height: '100%' }}

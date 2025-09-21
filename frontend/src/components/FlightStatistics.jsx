@@ -1,20 +1,16 @@
-
+/* eslint-disable no-unused-vars */
 import { BrushableBarChart } from './BrushableBarChart';
 
 const FlightStatistics = ({ dailyFlights, onDateRangeChange }) => {
   return (
     <div className="chart-container">
       <h3 className="chart-title">Количество полетов по регионам</h3>
-      <BrushableBarChart 
-        data={dailyFlights}
-        onBrush={onDateRangeChange}
-      />
+      <BrushableBarChart data={dailyFlights} onBrush={onDateRangeChange} />
     </div>
   );
 };
 
 export default FlightStatistics;
-
 
 // // FlightStatistics.jsx
 // import { BrushableBarChart } from './BrushableBarChartUniversal/BrushableBarChart';
@@ -34,7 +30,7 @@ export default FlightStatistics;
 //   return (
 //     <div className="chart-container">
 //       <h3 className="chart-title">Статистика полетов за год</h3>
-//       <BrushableBarChart 
+//       <BrushableBarChart
 //         data={chartData}
 //         onBrush={onDateRangeChange} // Просто передаем напрямую
 //         orientation="vertical" // или "horizontal"

@@ -1,6 +1,4 @@
-
-
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const MapComponent = ({ regionsData, points = [] }) => {
   const [isLoading, setIsLoading] = useState(true);
@@ -36,7 +34,7 @@ const MapComponent = ({ regionsData, points = [] }) => {
           const map = new ymapsInstance.Map(mapContainerRef.current, {
             center: [60, 100],
             zoom: 3,
-            controls: ['zoomControl', 'fullscreenControl', 'geolocationControl']
+            controls: ['zoomControl', 'fullscreenControl', 'geolocationControl'],
           });
           mapInstanceRef.current = map;
         }
@@ -44,7 +42,7 @@ const MapComponent = ({ regionsData, points = [] }) => {
         const map = mapInstanceRef.current;
 
         // Очищаем предыдущие полигоны
-        polygonsRef.current.forEach(p => {
+        polygonsRef.current.forEach((p) => {
           if (p.setParent) p.setParent(null);
         });
         polygonsRef.current = [];
@@ -57,8 +55,8 @@ const MapComponent = ({ regionsData, points = [] }) => {
 
           try {
             let polygonsToAdd = [];
-            
-            if (region.geometry.type === "MultiPolygon") {
+
+            if (region.geometry.type === 'MultiPolygon') {
               region.geometry.coordinates.forEach((polygonCoords, polyIndex) => {
                 const polygon = new ymapsInstance.Polygon(
                   polygonCoords,
@@ -67,12 +65,13 @@ const MapComponent = ({ regionsData, points = [] }) => {
                     hintContent: region.properties?.region || `Регион ${index}-${polyIndex}`,
                   },
                   {
-                    fillColor: selectedRegion === region.properties?.region ? '#ff444499' : '#4488ff99',
+                    fillColor:
+                      selectedRegion === region.properties?.region ? '#ff444499' : '#4488ff99',
                     strokeColor: '#000000',
                     strokeWidth: selectedRegion === region.properties?.region ? 2 : 1,
                     opacity: 0.7,
-                    cursor: 'pointer'
-                  }
+                    cursor: 'pointer',
+                  },
                 );
 
                 polygon.events.add('click', () => {
@@ -84,7 +83,7 @@ const MapComponent = ({ regionsData, points = [] }) => {
 
                 polygonsToAdd.push(polygon);
               });
-            } else if (region.geometry.type === "Polygon") {
+            } else if (region.geometry.type === 'Polygon') {
               const polygon = new ymapsInstance.Polygon(
                 region.geometry.coordinates,
                 {
@@ -92,12 +91,13 @@ const MapComponent = ({ regionsData, points = [] }) => {
                   hintContent: region.properties?.region || `Регион ${index}`,
                 },
                 {
-                  fillColor: selectedRegion === region.properties?.region ? '#ff444499' : '#4488ff99',
+                  fillColor:
+                    selectedRegion === region.properties?.region ? '#ff444499' : '#4488ff99',
                   strokeColor: '#000000',
                   strokeWidth: selectedRegion === region.properties?.region ? 2 : 1,
                   opacity: 0.7,
-                  cursor: 'pointer'
-                }
+                  cursor: 'pointer',
+                },
               );
 
               polygon.events.add('click', () => {
@@ -110,11 +110,10 @@ const MapComponent = ({ regionsData, points = [] }) => {
               polygonsToAdd.push(polygon);
             }
 
-            polygonsToAdd.forEach(polygon => {
+            polygonsToAdd.forEach((polygon) => {
               map.geoObjects.add(polygon);
               polygonsRef.current.push(polygon);
             });
-
           } catch (regionError) {
             console.warn(`Ошибка добавления региона ${index}:`, regionError);
           }
@@ -154,11 +153,11 @@ const MapComponent = ({ regionsData, points = [] }) => {
         }
         mapInstanceRef.current = null;
       }
-      polygonsRef.current.forEach(p => {
+      polygonsRef.current.forEach((p) => {
         if (p.setParent) p.setParent(null);
       });
       polygonsRef.current = [];
-      pointsRef.current.forEach(p => {
+      pointsRef.current.forEach((p) => {
         if (p.setParent) p.setParent(null);
       });
       pointsRef.current = [];
@@ -173,7 +172,7 @@ const MapComponent = ({ regionsData, points = [] }) => {
     const map = mapInstanceRef.current;
 
     // Очищаем старые точки
-    pointsRef.current.forEach(point => {
+    pointsRef.current.forEach((point) => {
       if (point.setParent) point.setParent(null);
     });
     pointsRef.current = [];
@@ -181,17 +180,17 @@ const MapComponent = ({ regionsData, points = [] }) => {
     // Добавляем новые точки
     points.forEach((point, idx) => {
       if (point.lat == null || point.lng == null) return;
-      
+
       try {
         const placemark = new ymaps.Placemark(
           [point.lat, point.lng],
           {
             hintContent: `${point.type || 'Точка'} ${idx + 1}`,
-            balloonContent: `<b>Дата:</b> ${point.date}<br><b>Тип:</b> ${point.type}`
+            balloonContent: `<b>Дата:</b> ${point.date}<br><b>Тип:</b> ${point.type}`,
           },
           {
-            preset: 'islands#redCircleIcon'
-          }
+            preset: 'islands#redCircleIcon',
+          },
         );
         map.geoObjects.add(placemark);
         pointsRef.current.push(placemark);
@@ -203,15 +202,17 @@ const MapComponent = ({ regionsData, points = [] }) => {
 
   if (error) {
     return (
-      <div style={{ 
-        width: '100%', 
-        height: '600px', 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'center', 
-        color: 'red',
-        border: '1px solid #ccc'
-      }}>
+      <div
+        style={{
+          width: '100%',
+          height: '600px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: 'red',
+          border: '1px solid #ccc',
+        }}
+      >
         Ошибка: {error}
       </div>
     );
@@ -220,27 +221,26 @@ const MapComponent = ({ regionsData, points = [] }) => {
   return (
     <div style={{ width: '100%', height: '600px', position: 'relative' }}>
       {isLoading && (
-        <div style={{ 
-          position: 'absolute', 
-          top: 0,
-          left: 0,
-          width: '100%', 
-          height: '100%', 
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'center', 
-          backgroundColor: 'rgba(255, 255, 255, 0.8)',
-          zIndex: 1000,
-          fontSize: '18px'
-        }}>
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: 'rgba(255, 255, 255, 0.8)',
+            zIndex: 1000,
+            fontSize: '18px',
+          }}
+        >
           Загрузка данных карты...
         </div>
       )}
-      
-      <div
-        ref={mapContainerRef}
-        style={{ width: '100%', height: '100%' }}
-      />
+
+      <div ref={mapContainerRef} style={{ width: '100%', height: '100%' }} />
     </div>
   );
 };
@@ -296,7 +296,7 @@ export default MapComponent;
 
 //             try {
 //               let polygonsToAdd = [];
-              
+
 //               if (region.geometry.type === "MultiPolygon") {
 //                 // Для MultiPolygon создаем несколько Polygon
 //                 region.geometry.coordinates.forEach((polygonCoords, polyIndex) => {
@@ -386,7 +386,7 @@ export default MapComponent;
 //       window.addEventListener('loadYmaps', (event) => {
 //         initializeMap(event.detail);
 //       });
-      
+
 //       // Если событие уже было, но переменная не установлена
 //       if (window.ymapsLoaded) {
 //         initializeMap(window.ymaps);
@@ -420,7 +420,7 @@ export default MapComponent;
 //     // Добавляем новые точки
 //     points.forEach((point, idx) => {
 //       if (point.lat == null || point.lng == null) return;
-      
+
 //       try {
 //         const placemark = new ymaps.Placemark(
 //           [point.lat, point.lng],
@@ -442,12 +442,12 @@ export default MapComponent;
 
 //   if (error) {
 //     return (
-//       <div style={{ 
-//         width: '100%', 
-//         height: '600px', 
-//         display: 'flex', 
-//         alignItems: 'center', 
-//         justifyContent: 'center', 
+//       <div style={{
+//         width: '100%',
+//         height: '600px',
+//         display: 'flex',
+//         alignItems: 'center',
+//         justifyContent: 'center',
 //         color: 'red',
 //         border: '1px solid #ccc'
 //       }}>
@@ -459,15 +459,15 @@ export default MapComponent;
 //   return (
 //     <div style={{ width: '100%', height: '600px', position: 'relative' }}>
 //       {isLoading && (
-//         <div style={{ 
-//           position: 'absolute', 
+//         <div style={{
+//           position: 'absolute',
 //           top: 0,
 //           left: 0,
-//           width: '100%', 
-//           height: '100%', 
-//           display: 'flex', 
-//           alignItems: 'center', 
-//           justifyContent: 'center', 
+//           width: '100%',
+//           height: '100%',
+//           display: 'flex',
+//           alignItems: 'center',
+//           justifyContent: 'center',
 //           backgroundColor: 'rgba(255, 255, 255, 0.8)',
 //           zIndex: 1000,
 //           fontSize: '18px'
@@ -475,7 +475,7 @@ export default MapComponent;
 //           Загрузка данных карты...
 //         </div>
 //       )}
-      
+
 //       <div
 //         ref={mapContainerRef}
 //         style={{ width: '100%', height: '100%' }}
@@ -538,7 +538,7 @@ export default MapComponent;
 
 //             try {
 //               let polygonsToAdd = [];
-              
+
 //               if (region.geometry.type === "MultiPolygon") {
 //                 // Для MultiPolygon создаем несколько Polygon
 //                 region.geometry.coordinates.forEach((polygonCoords, polyIndex) => {
@@ -628,7 +628,7 @@ export default MapComponent;
 //       window.addEventListener('loadYmaps', (event) => {
 //         initializeMap(event.detail);
 //       });
-      
+
 //       // Если событие уже было, но переменная не установлена
 //       if (window.ymapsLoaded) {
 //         initializeMap(window.ymaps);
@@ -663,7 +663,7 @@ export default MapComponent;
 //     points.forEach((point, idx) => {
 //       // ИСПРАВЛЕНО: проверяем lat и lng (а не lon)
 //       if (point.lat == null || point.lng == null) return;
-      
+
 //       try {
 //         const placemark = new ymaps.Placemark(
 //           [point.lat, point.lng], // ИСПРАВЛЕНО: используем lng
@@ -685,12 +685,12 @@ export default MapComponent;
 
 //   if (error) {
 //     return (
-//       <div style={{ 
-//         width: '100%', 
-//         height: '600px', 
-//         display: 'flex', 
-//         alignItems: 'center', 
-//         justifyContent: 'center', 
+//       <div style={{
+//         width: '100%',
+//         height: '600px',
+//         display: 'flex',
+//         alignItems: 'center',
+//         justifyContent: 'center',
 //         color: 'red',
 //         border: '1px solid #ccc'
 //       }}>
@@ -702,15 +702,15 @@ export default MapComponent;
 //   return (
 //     <div style={{ width: '100%', height: '600px', position: 'relative' }}>
 //       {isLoading && (
-//         <div style={{ 
-//           position: 'absolute', 
+//         <div style={{
+//           position: 'absolute',
 //           top: 0,
 //           left: 0,
-//           width: '100%', 
-//           height: '100%', 
-//           display: 'flex', 
-//           alignItems: 'center', 
-//           justifyContent: 'center', 
+//           width: '100%',
+//           height: '100%',
+//           display: 'flex',
+//           alignItems: 'center',
+//           justifyContent: 'center',
 //           backgroundColor: 'rgba(255, 255, 255, 0.8)',
 //           zIndex: 1000,
 //           fontSize: '18px'
@@ -718,7 +718,7 @@ export default MapComponent;
 //           Загрузка данных карты...
 //         </div>
 //       )}
-      
+
 //       <div
 //         ref={mapContainerRef}
 //         style={{ width: '100%', height: '100%' }}
@@ -777,7 +777,7 @@ export default MapComponent;
 
 //           try {
 //             let polygonsToAdd = [];
-            
+
 //             if (region.geometry.type === "MultiPolygon") {
 //               // Для MultiPolygon создаем несколько Polygon
 //               region.geometry.coordinates.forEach((polygonCoords, polyIndex) => {
@@ -809,7 +809,7 @@ export default MapComponent;
 //                 polygonsToAdd.push(polygon);
 //               });
 //             } else if (region.geometry.type === "Polygon") {
-             
+
 //               // Для Polygon создаем один Polygon
 //               const polygon = new ymapsInstance.Polygon(
 //                 region.geometry.coordinates,
@@ -853,7 +853,7 @@ export default MapComponent;
 //         // Добавление точек
 //         points.forEach((point, idx) => {
 //           if (point.lat == null || point.lon == null) return;
-          
+
 //           try {
 //             const placemark = new ymapsInstance.Placemark(
 //               [point.lat, point.lon], // Проверьте порядок координат!
@@ -887,7 +887,7 @@ export default MapComponent;
 //       window.addEventListener('loadYmaps', (event) => {
 //         initializeMap(event.detail);
 //       });
-      
+
 //       // Если событие уже было, но переменная не установлена
 //       if (window.ymapsLoaded) {
 //         initializeMap(window.ymaps);
@@ -907,12 +907,12 @@ export default MapComponent;
 
 //   if (error) {
 //     return (
-//       <div style={{ 
-//         width: '100%', 
-//         height: '600px', 
-//         display: 'flex', 
-//         alignItems: 'center', 
-//         justifyContent: 'center', 
+//       <div style={{
+//         width: '100%',
+//         height: '600px',
+//         display: 'flex',
+//         alignItems: 'center',
+//         justifyContent: 'center',
 //         color: 'red',
 //         border: '1px solid #ccc'
 //       }}>
@@ -924,15 +924,15 @@ export default MapComponent;
 //   return (
 //     <div style={{ width: '100%', height: '600px', position: 'relative' }}>
 //       {isLoading && (
-//         <div style={{ 
-//           position: 'absolute', 
+//         <div style={{
+//           position: 'absolute',
 //           top: 0,
 //           left: 0,
-//           width: '100%', 
-//           height: '100%', 
-//           display: 'flex', 
-//           alignItems: 'center', 
-//           justifyContent: 'center', 
+//           width: '100%',
+//           height: '100%',
+//           display: 'flex',
+//           alignItems: 'center',
+//           justifyContent: 'center',
 //           backgroundColor: 'rgba(255, 255, 255, 0.8)',
 //           zIndex: 1000,
 //           fontSize: '18px'
@@ -940,7 +940,7 @@ export default MapComponent;
 //           Загрузка данных карты...
 //         </div>
 //       )}
-      
+
 //       <div
 //         ref={mapContainerRef}
 //         style={{ width: '100%', height: '100%' }}

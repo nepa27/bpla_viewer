@@ -1,11 +1,16 @@
 // BrushableBarChart.jsx
-import { memo, useEffect, useRef } from 'react';
 import * as d3 from 'd3';
+
+import { memo, useEffect, useRef } from 'react';
+
 // Предполагается, что AxisBottom и AxisLeft теперь отвечают за правильную ориентацию
-import { AxisBottom } from './AxisBottomHorizontal'; // Новый файл для оси X (внизу)
-import { AxisLeft } from './AxisLeftHorizontal';     // Новый файл для оси Y (слева)
-import { Marks } from './MarksHorizontal';           // Новый файл для отрисовки горизонтальных столбцов
+import { AxisBottom } from './AxisBottomHorizontal';
+// Новый файл для оси X (внизу)
+import { AxisLeft } from './AxisLeftHorizontal';
+// Новый файл для отрисовки горизонтальных столбцов
 import './BrushableBarChart.css';
+// Новый файл для оси Y (слева)
+import { Marks } from './MarksHorizontal';
 
 export const BrushableBarChart = memo(({ data, onBrush }) => {
   const svgRef = useRef();
@@ -15,7 +20,7 @@ export const BrushableBarChart = memo(({ data, onBrush }) => {
     // Улучшенная проверка на существование данных
     if (!data || !Array.isArray(data) || data.length === 0 || !svgRef.current) {
       if (svgRef.current) {
-         d3.select(svgRef.current).selectAll("*").remove();
+        d3.select(svgRef.current).selectAll('*').remove();
       }
       return;
     }
@@ -24,51 +29,57 @@ export const BrushableBarChart = memo(({ data, onBrush }) => {
     const width = 900 - margin.left - margin.right;
     const height = 300 - margin.top - margin.bottom; // Может потребоваться увеличить высоту для вертикальных меток
 
-    d3.select(svgRef.current).selectAll("*").remove();
+    d3.select(svgRef.current).selectAll('*').remove();
 
-    const svg = d3.select(svgRef.current)
-      .attr("width", width + margin.left + margin.right)
-      .attr("height", height + margin.top + margin.bottom);
+    const svg = d3
+      .select(svgRef.current)
+      .attr('width', width + margin.left + margin.right)
+      .attr('height', height + margin.top + margin.bottom);
 
-    const g = svg.append("g")
-      .attr("transform", `translate(${margin.left},${margin.top})`);
+    const g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`);
 
     // --- ИЗМЕНЕНИЕ 1: Шкалы ---
     // Линейная шкала для оси X (количество)
-    const x = d3.scaleLinear()
-      .domain([0, d3.max(data, d => d.count)])
+    const x = d3
+      .scaleLinear()
+      .domain([0, d3.max(data, (d) => d.count)])
       .nice()
       .range([0, width]); // От 0 до ширины
 
     // Категориальная шкала для оси Y (даты)
-    const y = d3.scaleBand()
-      .domain(data.map(d => d.date.getTime()))
+    const y = d3
+      .scaleBand()
+      .domain(data.map((d) => d.date.getTime()))
       .range([0, height]) // От 0 до высоты
       .padding(0.1);
 
     // --- ИЗМЕНЕНИЕ 2: Сетка ---
     // Горизонтальная сетка (линии от оси X влево до правого края)
-    g.append("g")
-      .attr("class", "grid")
-      .call(d3.axisLeft(y) // Используем ось Y для создания горизонтальных линий сетки
-        .tickSize(-width) // Линии тянутся на всю ширину влево
-        .tickFormat("")   // Без подписей
+    g.append('g')
+      .attr('class', 'grid')
+      .call(
+        d3
+          .axisLeft(y) // Используем ось Y для создания горизонтальных линий сетки
+          .tickSize(-width) // Линии тянутся на всю ширину влево
+          .tickFormat(''), // Без подписей
       )
-      .selectAll("line")
-      .attr("stroke", "#444")
-      .attr("stroke-opacity", 0.3);
+      .selectAll('line')
+      .attr('stroke', '#444')
+      .attr('stroke-opacity', 0.3);
 
     // Вертикальная сетка (линии от оси X вниз до нижнего края)
-    g.append("g")
-      .attr("class", "grid")
-      .attr("transform", `translate(0,${height})`) // Перемещаем вниз
-      .call(d3.axisBottom(x) // Используем ось X для создания вертикальных линий сетки
-        .tickSize(-height)   // Линии тянутся вверх на всю высоту
-        .tickFormat("")      // Без подписей
+    g.append('g')
+      .attr('class', 'grid')
+      .attr('transform', `translate(0,${height})`) // Перемещаем вниз
+      .call(
+        d3
+          .axisBottom(x) // Используем ось X для создания вертикальных линий сетки
+          .tickSize(-height) // Линии тянутся вверх на всю высоту
+          .tickFormat(''), // Без подписей
       )
-      .selectAll("line")
-      .attr("stroke", "#444")
-      .attr("stroke-opacity", 0.3);
+      .selectAll('line')
+      .attr('stroke', '#444')
+      .attr('stroke-opacity', 0.3);
 
     // --- ИЗМЕНЕНИЕ 3: Оси ---
     // Ось X (внизу)
@@ -78,36 +89,38 @@ export const BrushableBarChart = memo(({ data, onBrush }) => {
 
     // --- ИЗМЕНЕНИЕ 4: Подписи осей ---
     // Подпись оси X
-    g.append("text")
-      .attr("transform", `translate(${width / 2}, ${height + margin.bottom - 10})`)
-      .attr("class", "axis-label")
-      .attr("text-anchor", "middle")
-      .attr("fill", "white")
-      .text("Количество полетов");
+    g.append('text')
+      .attr('transform', `translate(${width / 2}, ${height + margin.bottom - 10})`)
+      .attr('class', 'axis-label')
+      .attr('text-anchor', 'middle')
+      .attr('fill', 'white')
+      .text('Количество полетов');
 
     // Подпись оси Y (поворот на 90 градусов)
-    g.append("text")
-      .attr("transform", "rotate(-90)")
-      .attr("y", 0 - margin.left + 20)
-      .attr("x", 0 - (height / 2))
-      .attr("dy", "1em")
-      .attr("class", "axis-label")
-      .attr("text-anchor", "middle")
-      .attr("fill", "white")
-      .text("Дата");
+    g.append('text')
+      .attr('transform', 'rotate(-90)')
+      .attr('y', 0 - margin.left + 20)
+      .attr('x', 0 - height / 2)
+      .attr('dy', '1em')
+      .attr('class', 'axis-label')
+      .attr('text-anchor', 'middle')
+      .attr('fill', 'white')
+      .text('Дата');
 
     // --- ИЗМЕНЕНИЕ 5: Столбцы ---
     Marks(g, data, x, y, width); // Передаем width, хотя он может не понадобиться
 
     // --- ИЗМЕНЕНИЕ 6: Brush ---
     // Используем brushY для вертикальной кисти
-    const brush = d3.brushY()
-      .extent([[0, 0], [width, height]]) // Область кисти
-      .on("brush end", brushed);
+    const brush = d3
+      .brushY()
+      .extent([
+        [0, 0],
+        [width, height],
+      ]) // Область кисти
+      .on('brush end', brushed);
 
-    const brushGroup = g.append("g")
-      .attr("class", "brush")
-      .call(brush);
+    const brushGroup = g.append('g').attr('class', 'brush').call(brush);
 
     function brushed(event) {
       if (!event.selection) {
@@ -116,7 +129,7 @@ export const BrushableBarChart = memo(({ data, onBrush }) => {
       }
 
       const [y0, y1] = event.selection; // y0, y1 для вертикальной кисти
-      const dates = data.map(d => d.date.getTime());
+      const dates = data.map((d) => d.date.getTime());
 
       // Пересчитываем индексы на основе высоты и выбора по оси Y
       const startIndex = Math.floor((y0 / height) * dates.length);
@@ -133,11 +146,22 @@ export const BrushableBarChart = memo(({ data, onBrush }) => {
 
       onBrush && onBrush([new Date(startDate), new Date(endDate)]);
     }
-
+    return () => {
+      brushGroup.on('brush end', null);
+    };
   }, [data, onBrush]);
 
   return (
-    <div ref={containerRef} style={{ width: '100%', overflowX: 'auto', display:'flex', alignItems:'center', justifyContent:'center' }}>
+    <div
+      ref={containerRef}
+      style={{
+        width: '100%',
+        overflowX: 'auto',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
       <svg ref={svgRef}></svg>
     </div>
   );

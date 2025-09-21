@@ -44,16 +44,19 @@
 
 .russia-map-container {
   background-color: #201e1e;
-  /* background-color: #1a1a1a; */
   color: white;
   min-height: 100vh;
   padding: 20px;
   font-family: 'Arial', sans-serif;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .map-content {
   max-width: 1200px;
   margin: 0 auto;
+  width: 100%;
+  height: 100%;
 }
 
 .map-wrapper {
@@ -62,10 +65,17 @@
   padding: 20px;
   margin-bottom: 20px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  height: 600px;
+  display: flex;
+  flex-direction: column;
 }
 
 .map-visualization {
   position: relative;
+  width: 100%;
+  height: 100%;
+  flex: 1;
 }
 
 .svg-container {
@@ -74,11 +84,16 @@
   border-radius: 8px;
   overflow: hidden;
   position: relative;
+  width: 100%;
+  height: 100%;
 }
 
 .russia-map-svg {
   display: block;
-  margin: 0 auto;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
 }
 
 .region {
@@ -161,6 +176,15 @@
   margin-bottom: 4px;
 }
 
+/* Стили для городов */
+.city circle {
+  transition: r 0.2s ease;
+}
+
+.city-label {
+  font-family: Arial, sans-serif;
+}
+
 /* Стили для загрузки */
 .russia-map-loading {
   display: flex;
@@ -168,6 +192,7 @@
   align-items: center;
   height: 100vh;
   background-color: #1a1a1a;
+  width: 100%;
 }
 
 .loading-content {
@@ -194,8 +219,12 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* Адаптивность */
@@ -203,19 +232,31 @@
   .russia-map-container {
     padding: 10px;
   }
-  
+
   .map-wrapper {
     padding: 15px;
+    height: 400px;
   }
-  
+
   .russia-map-svg {
     width: 100%;
-    height: auto;
+    height: 100%;
   }
-  
+
   .region-info-panel {
     padding: 15px;
   }
 }
 
+@media (max-width: 480px) {
+  .map-wrapper {
+    height: 300px;
+    padding: 10px;
+  }
 
+  .custom-tooltip {
+    font-size: 11px;
+    padding: 6px 10px;
+    max-width: 150px;
+  }
+}

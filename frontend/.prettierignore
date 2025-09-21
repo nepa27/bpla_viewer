@@ -3,6 +3,8 @@ node_modules/
 dist/
 build/
 
+russia_regions.geo.json
+
 # Logs
 *.log
 npm-debug.log*

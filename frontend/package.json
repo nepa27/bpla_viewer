@@ -38,20 +38,20 @@
     "prettier": "^3.6.2",
     "vite": "^7.1.2"
   },
- "lint-staged": {
-  "src/**/*.{js,jsx,ts,tsx}": [
-    "eslint --fix",
-    "prettier --write"
-  ],
-  "src/**/*.{css,scss}": [
-    "prettier --write"
-  ],
-  "*.{js,jsx}": [
-    "prettier --write"
-  ],
-  "vite.config.js": [
-    "eslint --fix",
-    "prettier --write"
-  ]
-}
+  "lint-staged": {
+    "src/**/*.{js,jsx,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "src/**/*.{css,scss}": [
+      "prettier --write"
+    ],
+    "*.{js,jsx}": [
+      "prettier --write"
+    ],
+    "vite.config.js": [
+      "eslint --fix",
+      "prettier --write"
+    ]
+  }
 }

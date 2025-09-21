@@ -1,20 +1,18 @@
-// useRussianAtlas.js
-import { useState, useEffect } from 'react';
-import { json } from 'd3';
-import jsonData from '../utils/russia_regions.geo.json';
+import { useEffect, useState } from 'react';
+
+// import jsonData from '../utils/russia_regions.geo.json';
+import jsonData from '../utils/russia_regions_cap.geo.json';
 
 export const useRegions = () => {
   const [data, setData] = useState(null);
 
   useEffect(() => {
     // json(jsonUrl).then(setData);
-    setData( jsonData);
+    setData(jsonData);
   }, []);
 
   return data;
 };
-
-
 
 // // useRussianAtlas.js (Второй вариант, исправленный)
 // import { useEffect, useState } from 'react';

@@ -1,5 +1,6 @@
+import { select, zoom, zoomIdentity } from 'd3';
+
 import { useCallback } from 'react';
-import * as d3 from 'd3';
 
 const useMapZoom = () => {
   // Функция для инициализации зума
@@ -9,30 +10,27 @@ const useMapZoom = () => {
       return null;
     }
 
-    const zoom = d3.zoom()
+    const zoomEv = zoom()
       .scaleExtent([1, 8])
       .on('zoom', (event) => {
-        d3.select(gElement).attr("transform", event.transform);
+        select(gElement).attr('transform', event.transform);
       });
 
-    d3.select(svgElement).call(zoom);
-    
-    return zoom;
+    select(svgElement).call(zoomEv);
+
+    return zoomEv;
   }, []);
 
   // Функция для сброса зума
   const resetZoom = useCallback((svgElement, zoomBehavior) => {
     if (svgElement && zoomBehavior) {
-      d3.select(svgElement)
-        .transition()
-        .duration(750)
-        .call(zoomBehavior.transform, d3.zoomIdentity);
+      select(svgElement).transition().duration(750).call(zoomBehavior.transform, zoomIdentity);
     }
   }, []);
 
   return {
     initializeZoom,
-    resetZoom
+    resetZoom,
   };
 };
 
@@ -61,7 +59,7 @@ export default useMapZoom;
 
 //     d3.select(svgElement).call(zoom);
 //     zoomRef.current = zoom;
-    
+
 //     return zoom;
 //   }, []);
 
