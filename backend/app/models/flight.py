@@ -1,6 +1,10 @@
-from sqlalchemy import Column, Integer, String, Date, Time, DateTime, Interval, ForeignKey, func
-from sqlalchemy.orm import relationship
 from geoalchemy2 import Geometry
+from sqlalchemy import (
+    Column, Integer, String, Date, Time,
+    DateTime, Interval, ForeignKey, func
+)
+from sqlalchemy.orm import relationship
+
 from app.database import Base
 
 
