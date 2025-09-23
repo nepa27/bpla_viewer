@@ -4,7 +4,6 @@ from pydantic import BaseModel
 
 
 class FlightResponse(BaseModel):
-    id: int
     flight_id: str
     drone_type: str
     takeoff_lat: Optional[float] = None
