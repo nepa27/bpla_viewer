@@ -1,0 +1,249 @@
+import csv
+from datetime import timedelta
+import gzip
+import os
+import tempfile
+from typing import List, Dict, Any, Tuple
+
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select, func
+
+from app.models.flight import Flight
+
+
+class FlightService:
+    @staticmethod
+    async def get_all_flights(
+            db: AsyncSession,
+            skip: int = 0,
+            limit: int = 100
+    ) -> Tuple[List[Dict[str, Any]], int]:
+        """Получить все полеты из всех регионов с пагинацией"""
+        total_count_result = await db.execute(select(func.count(Flight.id)))
+        total_count = total_count_result.scalar()
+
+        result = await db.execute(
+            select(
+                Flight.id,
+                Flight.flight_id,
+                Flight.drone_type,
+                func.ST_Y(Flight.takeoff_coordinates).label('takeoff_lat'),
+                func.ST_X(Flight.takeoff_coordinates).label('takeoff_lon'),
+                func.ST_Y(Flight.landing_coordinates).label('landing_lat'),
+                func.ST_X(Flight.landing_coordinates).label('landing_lon'),
+                Flight.flight_date,
+                Flight.takeoff_time,
+                Flight.landing_time,
+                Flight.flight_duration,
+                Flight.region_id
+            )
+            .order_by(Flight.id)
+            .offset(skip)
+            .limit(limit)
+        )
+        flights = result.all()
+
+        formatted_flights = []
+        for flight in flights:
+            formatted_flights.append({
+                "id": flight.id,
+                "flight_id": flight.flight_id,
+                "drone_type": flight.drone_type,
+                "takeoff_lat": float(flight.takeoff_lat) if flight.takeoff_lat else None,
+                "takeoff_lon": float(flight.takeoff_lon) if flight.takeoff_lon else None,
+                "landing_lat": float(flight.landing_lat) if flight.landing_lat else None,
+                "landing_lon": float(flight.landing_lon) if flight.landing_lon else None,
+                "flight_date": flight.flight_date.strftime("%d.%m.%Y") if flight.flight_date else None,
+                "takeoff_time": flight.takeoff_time.strftime("%H:%M:%S") if flight.takeoff_time else None,
+                "landing_time": flight.landing_time.strftime("%H:%M:%S") if flight.landing_time else None,
+                "flight_duration": FlightService._format_duration(flight.flight_duration),
+                "region_id": flight.region_id
+            })
+
+        return formatted_flights, total_count
+
+    @staticmethod
+    async def get_flights_by_region(
+            db: AsyncSession,
+            region_id: int,
+            skip: int = 0,
+            limit: int = 100
+    ) -> Tuple[List[Dict[str, Any]], int]:
+        """Получить все полеты в конкретном регионе с пагинацией"""
+        total_count_result = await db.execute(
+            select(func.count(Flight.id))
+            .where(Flight.region_id == region_id)
+        )
+        total_count = total_count_result.scalar()
+
+        result = await db.execute(
+            select(
+                Flight.id,
+                Flight.flight_id,
+                Flight.drone_type,
+                func.ST_Y(Flight.takeoff_coordinates).label('takeoff_lat'),
+                func.ST_X(Flight.takeoff_coordinates).label('takeoff_lon'),
+                func.ST_Y(Flight.landing_coordinates).label('landing_lat'),
+                func.ST_X(Flight.landing_coordinates).label('landing_lon'),
+                Flight.flight_date,
+                Flight.takeoff_time,
+                Flight.landing_time,
+                Flight.flight_duration,
+                Flight.region_id
+            )
+            .where(Flight.region_id == region_id)
+            .order_by(Flight.id)
+            .offset(skip)
+            .limit(limit)
+        )
+        flights = result.all()
+
+        formatted_flights = []
+        for flight in flights:
+            formatted_flights.append({
+                "id": flight.id,
+                "flight_id": flight.flight_id,
+                "drone_type": flight.drone_type,
+                "takeoff_lat": float(flight.takeoff_lat) if flight.takeoff_lat else None,
+                "takeoff_lon": float(flight.takeoff_lon) if flight.takeoff_lon else None,
+                "landing_lat": float(flight.landing_lat) if flight.landing_lat else None,
+                "landing_lon": float(flight.landing_lon) if flight.landing_lon else None,
+                "flight_date": flight.flight_date.strftime("%d.%m.%Y") if flight.flight_date else None,
+                "takeoff_time": flight.takeoff_time.strftime("%H:%M:%S") if flight.takeoff_time else None,
+                "landing_time": flight.landing_time.strftime("%H:%M:%S") if flight.landing_time else None,
+                "flight_duration": FlightService._format_duration(flight.flight_duration),
+                "region_id": flight.region_id
+            })
+
+        return formatted_flights, total_count
+
+    @staticmethod
+    def _format_csv_value(value):
+        """Форматирует значение для CSV"""
+        if value is None:
+            return "Нет данных"
+        return str(value)
+
+    @staticmethod
+    def _format_coordinates(lat, lon):
+        """Форматирует координаты в строку 'lat lon'"""
+        if lat is None or lon is None:
+            return "Нет данных"
+        return f"{lat} {lon}"
+
+    @staticmethod
+    def _format_date_for_csv(flight_date):
+        """Форматирует дату в DD.MM.YY для CSV"""
+        if not flight_date:
+            return "Нет данных"
+        return flight_date.strftime("%d.%m.%y")
+
+    @staticmethod
+    def _format_time_for_csv(time_obj):
+        """Форматирует время в HH:MM для CSV"""
+        if not time_obj:
+            return "Нет данных"
+        return time_obj.strftime("%H:%M")
+
+    @staticmethod
+    def _format_duration(duration: timedelta):
+        """Форматирует продолжительность в HH:MM для CSV"""
+        if not duration:
+            return "Нет данных"
+        total_seconds = int(duration.total_seconds())
+        hours = total_seconds // 3600
+        minutes = (total_seconds % 3600) // 60
+        return f"{hours:01d}:{minutes:02d}"
+
+    @staticmethod
+    async def get_all_flights_for_csv(db: AsyncSession) -> List[Dict[str, Any]]:
+        """Получить все полеты для CSV выгрузки"""
+        result = await db.execute(
+            select(
+                Flight.flight_id,
+                Flight.drone_type,
+                func.ST_Y(Flight.takeoff_coordinates).label('takeoff_lat'),
+                func.ST_X(Flight.takeoff_coordinates).label('takeoff_lon'),
+                func.ST_Y(Flight.landing_coordinates).label('landing_lat'),
+                func.ST_X(Flight.landing_coordinates).label('landing_lon'),
+                Flight.flight_date,
+                Flight.takeoff_time,
+                Flight.landing_time,
+                Flight.flight_duration,
+                Flight.region_id
+            ).order_by(Flight.id)
+        )
+        return result.all()
+
+    @staticmethod
+    async def get_flights_by_region_for_csv(db: AsyncSession, region_id: int) -> List[Dict[str, Any]]:
+        """Получить полеты по региону для CSV выгрузки"""
+        result = await db.execute(
+            select(
+                Flight.flight_id,
+                Flight.drone_type,
+                func.ST_Y(Flight.takeoff_coordinates).label('takeoff_lat'),
+                func.ST_X(Flight.takeoff_coordinates).label('takeoff_lon'),
+                func.ST_Y(Flight.landing_coordinates).label('landing_lat'),
+                func.ST_X(Flight.landing_coordinates).label('landing_lon'),
+                Flight.flight_date,
+                Flight.takeoff_time,
+                Flight.landing_time,
+                Flight.flight_duration,
+                Flight.region_id
+            )
+            .where(Flight.region_id == region_id)
+            .order_by(Flight.id)
+        )
+        return result.all()
+
+    @staticmethod
+    def create_csv_gzip(flights_data) -> bytes:
+        """Создает CSV и сжимает его с помощью внешней утилиты gzip для максимального сжатия"""
+
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as csv_file:
+            writer = csv.writer(csv_file)
+
+            writer.writerow([
+                'flight_id', 'drone_type', 'takeoff_coords', 'landing_coords',
+                'flight_date', 'takeoff_time', 'landing_time', 'flight_duration', 'region_id'
+            ])
+
+            for flight in flights_data:
+                takeoff_coords = FlightService._format_coordinates(
+                    float(flight.takeoff_lat) if flight.takeoff_lat else None,
+                    float(flight.takeoff_lon) if flight.takeoff_lon else None
+                )
+
+                landing_coords = FlightService._format_coordinates(
+                    float(flight.landing_lat) if flight.landing_lat else None,
+                    float(flight.landing_lon) if flight.landing_lon else None
+                )
+
+                writer.writerow([
+                    FlightService._format_csv_value(flight.flight_id),
+                    FlightService._format_csv_value(flight.drone_type),
+                    takeoff_coords,
+                    landing_coords,
+                    FlightService._format_date_for_csv(flight.flight_date),
+                    FlightService._format_time_for_csv(flight.takeoff_time),
+                    FlightService._format_time_for_csv(flight.landing_time),
+                    FlightService._format_duration(flight.flight_duration),
+                    FlightService._format_csv_value(flight.region_id)
+                ])
+
+            csv_filename = csv_file.name
+
+        try:
+            gz_filename = csv_filename + '.gz'
+            with open(csv_filename, 'rb') as f_in:
+                with gzip.open(gz_filename, 'wb', compresslevel=9) as f_out:
+                    f_out.writelines(f_in)
+
+            with open(gz_filename, 'rb') as f:
+                return f.read()
+
+        finally:
+            for temp_file in [csv_filename, gz_filename]:
+                if os.path.exists(temp_file):
+                    os.unlink(temp_file)
