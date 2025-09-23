@@ -6,10 +6,12 @@ from app.database import get_db
 from app.schemas.flight import FlightResponse, PaginatedFlightResponse
 from app.services.flight_service import FlightService
 
+
 router = APIRouter(
     prefix="/flights",
     tags=["Полеты БПЛА"]
 )
+
 
 @router.get("/regions/", response_model=PaginatedFlightResponse)
 async def get_all_flights(
@@ -34,6 +36,7 @@ async def get_all_flights(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error retrieving flights: {str(e)}"
         )
+
 
 @router.get("/regions/{region_id}", response_model=PaginatedFlightResponse)
 async def get_flights_by_region(
@@ -67,6 +70,7 @@ async def get_flights_by_region(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error retrieving flights for region {region_id}: {str(e)}"
         )
+
 
 @router.get("/regions_gzip/", responses=get_all_flights_gzip_responses)
 async def get_all_flights_gzip(db: AsyncSession = Depends(get_db)):
