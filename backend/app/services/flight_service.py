@@ -42,23 +42,7 @@ class FlightService:
             .limit(limit)
         )
         flights = result.all()
-
-        formatted_flights = []
-        for flight in flights:
-            formatted_flights.append({
-                "id": flight.id,
-                "flight_id": flight.flight_id,
-                "drone_type": flight.drone_type,
-                "takeoff_lat": float(flight.takeoff_lat) if flight.takeoff_lat else None,
-                "takeoff_lon": float(flight.takeoff_lon) if flight.takeoff_lon else None,
-                "landing_lat": float(flight.landing_lat) if flight.landing_lat else None,
-                "landing_lon": float(flight.landing_lon) if flight.landing_lon else None,
-                "flight_date": flight.flight_date.strftime("%d.%m.%Y") if flight.flight_date else None,
-                "takeoff_time": flight.takeoff_time.strftime("%H:%M:%S") if flight.takeoff_time else None,
-                "landing_time": flight.landing_time.strftime("%H:%M:%S") if flight.landing_time else None,
-                "flight_duration": FlightService._format_duration(flight.flight_duration),
-                "region_id": flight.region_id
-            })
+        formatted_flights = FlightService._format_flights_data(flights)
 
         return formatted_flights, total_count
 
@@ -97,23 +81,7 @@ class FlightService:
             .limit(limit)
         )
         flights = result.all()
-
-        formatted_flights = []
-        for flight in flights:
-            formatted_flights.append({
-                "id": flight.id,
-                "flight_id": flight.flight_id,
-                "drone_type": flight.drone_type,
-                "takeoff_lat": float(flight.takeoff_lat) if flight.takeoff_lat else None,
-                "takeoff_lon": float(flight.takeoff_lon) if flight.takeoff_lon else None,
-                "landing_lat": float(flight.landing_lat) if flight.landing_lat else None,
-                "landing_lon": float(flight.landing_lon) if flight.landing_lon else None,
-                "flight_date": flight.flight_date.strftime("%d.%m.%Y") if flight.flight_date else None,
-                "takeoff_time": flight.takeoff_time.strftime("%H:%M:%S") if flight.takeoff_time else None,
-                "landing_time": flight.landing_time.strftime("%H:%M:%S") if flight.landing_time else None,
-                "flight_duration": FlightService._format_duration(flight.flight_duration),
-                "region_id": flight.region_id
-            })
+        formatted_flights = FlightService._format_flights_data(flights)
 
         return formatted_flights, total_count
 
@@ -154,6 +122,27 @@ class FlightService:
         hours = total_seconds // 3600
         minutes = (total_seconds % 3600) // 60
         return f"{hours:01d}:{minutes:02d}"
+
+    @staticmethod
+    def _format_flights_data(flights: list) -> list:
+        formatted_flights: list = []
+        for flight in flights:
+            formatted_flights.append({
+                "id": flight.id,
+                "flight_id": flight.flight_id,
+                "drone_type": flight.drone_type,
+                "takeoff_lat": float(flight.takeoff_lat) if flight.takeoff_lat else None,
+                "takeoff_lon": float(flight.takeoff_lon) if flight.takeoff_lon else None,
+                "landing_lat": float(flight.landing_lat) if flight.landing_lat else None,
+                "landing_lon": float(flight.landing_lon) if flight.landing_lon else None,
+                "flight_date": flight.flight_date.strftime("%d.%m.%Y") if flight.flight_date else None,
+                "takeoff_time": flight.takeoff_time.strftime("%H:%M:%S") if flight.takeoff_time else None,
+                "landing_time": flight.landing_time.strftime("%H:%M:%S") if flight.landing_time else None,
+                "flight_duration": FlightService._format_duration(flight.flight_duration),
+                "region_id": flight.region_id
+            })
+
+        return formatted_flights
 
     @staticmethod
     async def get_all_flights_for_csv(db: AsyncSession) -> List[Dict[str, Any]]:
