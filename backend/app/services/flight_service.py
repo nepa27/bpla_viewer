@@ -3,10 +3,10 @@ from datetime import timedelta
 import gzip
 import os
 import tempfile
-from typing import List, Dict, Any, Tuple
+from typing import List, Dict, Any, Tuple, Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func
+from sqlalchemy import select, func, engine
 
 from app.models.flight import Flight
 
@@ -22,25 +22,8 @@ class FlightService:
         total_count_result = await db.execute(select(func.count(Flight.id)))
         total_count = total_count_result.scalar()
 
-        result = await db.execute(
-            select(
-                Flight.id,
-                Flight.flight_id,
-                Flight.drone_type,
-                func.ST_Y(Flight.takeoff_coordinates).label('takeoff_lat'),
-                func.ST_X(Flight.takeoff_coordinates).label('takeoff_lon'),
-                func.ST_Y(Flight.landing_coordinates).label('landing_lat'),
-                func.ST_X(Flight.landing_coordinates).label('landing_lon'),
-                Flight.flight_date,
-                Flight.takeoff_time,
-                Flight.landing_time,
-                Flight.flight_duration,
-                Flight.region_id
-            )
-            .order_by(Flight.id)
-            .offset(skip)
-            .limit(limit)
-        )
+        result = await FlightService._get_data(db, skip, limit)
+
         flights = result.all()
         formatted_flights = FlightService._format_flights_data(flights)
 
@@ -60,26 +43,7 @@ class FlightService:
         )
         total_count = total_count_result.scalar()
 
-        result = await db.execute(
-            select(
-                Flight.id,
-                Flight.flight_id,
-                Flight.drone_type,
-                func.ST_Y(Flight.takeoff_coordinates).label('takeoff_lat'),
-                func.ST_X(Flight.takeoff_coordinates).label('takeoff_lon'),
-                func.ST_Y(Flight.landing_coordinates).label('landing_lat'),
-                func.ST_X(Flight.landing_coordinates).label('landing_lon'),
-                Flight.flight_date,
-                Flight.takeoff_time,
-                Flight.landing_time,
-                Flight.flight_duration,
-                Flight.region_id
-            )
-            .where(Flight.region_id == region_id)
-            .order_by(Flight.id)
-            .offset(skip)
-            .limit(limit)
-        )
+        result = await FlightService._get_data(db, skip, limit, region_id)
         flights = result.all()
         formatted_flights = FlightService._format_flights_data(flights)
 
@@ -143,6 +107,34 @@ class FlightService:
             })
 
         return formatted_flights
+
+    @staticmethod
+    async def _get_data(
+            db: AsyncSession,
+            skip: int,
+            limit: int,
+            region_id: Optional[int] = None
+    ) -> engine.result.ChunkedIteratorResult:
+        query = select(
+            Flight.id,
+            Flight.flight_id,
+            Flight.drone_type,
+            func.ST_Y(Flight.takeoff_coordinates).label('takeoff_lat'),
+            func.ST_X(Flight.takeoff_coordinates).label('takeoff_lon'),
+            func.ST_Y(Flight.landing_coordinates).label('landing_lat'),
+            func.ST_X(Flight.landing_coordinates).label('landing_lon'),
+            Flight.flight_date,
+            Flight.takeoff_time,
+            Flight.landing_time,
+            Flight.flight_duration,
+            Flight.region_id
+        ).order_by(Flight.id).offset(skip).limit(limit)
+
+        if region_id is not None:
+            query = query.where(Flight.region_id == region_id)
+
+        result = await db.execute(query)
+        return result
 
     @staticmethod
     async def get_all_flights_for_csv(db: AsyncSession) -> List[Dict[str, Any]]:
