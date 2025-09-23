@@ -19,8 +19,7 @@ class FlightService:
             limit: int = 100
     ) -> Tuple[List[Dict[str, Any]], int]:
         """Получить все полеты из всех регионов с пагинацией"""
-        total_count_result = await db.execute(select(func.count(Flight.id)))
-        total_count = total_count_result.scalar()
+        total_count = await FlightService._get_count(db)
 
         result = await FlightService._get_data(db, skip, limit)
 
@@ -37,11 +36,7 @@ class FlightService:
             limit: int = 100
     ) -> Tuple[List[Dict[str, Any]], int]:
         """Получить все полеты в конкретном регионе с пагинацией"""
-        total_count_result = await db.execute(
-            select(func.count(Flight.id))
-            .where(Flight.region_id == region_id)
-        )
-        total_count = total_count_result.scalar()
+        total_count = await FlightService._get_count(db, region_id)
 
         result = await FlightService._get_data(db, skip, limit, region_id)
         flights = result.all()
@@ -92,7 +87,6 @@ class FlightService:
         formatted_flights: list = []
         for flight in flights:
             formatted_flights.append({
-                "id": flight.id,
                 "flight_id": flight.flight_id,
                 "drone_type": flight.drone_type,
                 "takeoff_lat": float(flight.takeoff_lat) if flight.takeoff_lat else None,
@@ -116,7 +110,6 @@ class FlightService:
             region_id: Optional[int] = None
     ) -> engine.result.ChunkedIteratorResult:
         query = select(
-            Flight.id,
             Flight.flight_id,
             Flight.drone_type,
             func.ST_Y(Flight.takeoff_coordinates).label('takeoff_lat'),
@@ -128,7 +121,7 @@ class FlightService:
             Flight.landing_time,
             Flight.flight_duration,
             Flight.region_id
-        ).order_by(Flight.id).offset(skip).limit(limit)
+        ).order_by(Flight.flight_date).offset(skip).limit(limit)
 
         if region_id is not None:
             query = query.where(Flight.region_id == region_id)
@@ -152,9 +145,17 @@ class FlightService:
                 Flight.landing_time,
                 Flight.flight_duration,
                 Flight.region_id
-            ).order_by(Flight.id)
+            ).order_by(Flight.flight_date)
         )
         return result.all()
+
+    @staticmethod
+    async def _get_count(db: AsyncSession, region_id: Optional[int] = None) -> int:
+        query = select(func.count(Flight.flight_id))
+        if region_id is not None:
+            query = query.where(Flight.region_id == region_id)
+        total_count_result = await db.execute(query)
+        return total_count_result.scalar()
 
     @staticmethod
     async def get_flights_by_region_for_csv(db: AsyncSession, region_id: int) -> List[Dict[str, Any]]:
