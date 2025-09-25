@@ -5,13 +5,13 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import relationship
 
-from app.database import Base
+from backend.app.database import Base
 
 
 class Flight(Base):
     __tablename__ = "flights"
 
-    id = Column(Integer, primary_key=True, index=True, nullable=True)
+    id = Column(Integer, primary_key=True, index=True, unique=True)
     flight_id = Column(String, unique=True, index=True, nullable=True)
     drone_type = Column(String, nullable=True)
     takeoff_coordinates = Column(Geometry('POINT', srid=4326), nullable=True)
@@ -21,7 +21,7 @@ class Flight(Base):
     landing_time = Column(Time, nullable=True)
     flight_duration = Column(Interval, nullable=True)
 
-    region_id = Column(Integer, ForeignKey("regions.id"), nullable=False, index=True)
+    region_id = Column(Integer, ForeignKey("regions.region_id"), nullable=False, index=True)
 
     region_rel = relationship("Region", back_populates="flights")
 
