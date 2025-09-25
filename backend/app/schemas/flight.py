@@ -14,7 +14,7 @@ class FlightResponse(BaseModel):
     takeoff_time: Optional[str] = None
     landing_time: Optional[str] = None
     flight_duration: Optional[str] = None
-    region_id: int
+    region_name: Optional[str] = None
 
     class Config:
         from_attributes = True
