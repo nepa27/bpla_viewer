@@ -8,8 +8,8 @@ from typing import List, Dict, Any, Tuple, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, engine
 
-from app.models.flight import Flight
-from app.models.region import Region
+from backend.app.models.flight import Flight
+from backend.app.models.region import Region
 
 
 class FlightService:
@@ -122,7 +122,7 @@ class FlightService:
             Flight.landing_time,
             Flight.flight_duration,
             Region.name.label('region_name')
-        ).join(Region, Flight.region_id == Region.id, isouter=True)
+        ).join(Region, Flight.region_id == Region.region_id, isouter=True)
         ).order_by(Flight.flight_date)
         # )
         if skip:

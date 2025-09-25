@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Query, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.responses import get_all_flights_gzip_responses, get_flights_by_region_gzip_responses
-from app.database import get_db
-from app.schemas.flight import FlightResponse, PaginatedFlightResponse
-from app.services.flight_service import FlightService
+from backend.app.api.responses import get_all_flights_gzip_responses, get_flights_by_region_gzip_responses
+from backend.app.database import get_db
+from backend.app.schemas.flight import FlightResponse, PaginatedFlightResponse
+from backend.app.services.flight_service import FlightService
 
 
 router = APIRouter(
@@ -76,7 +76,7 @@ async def get_flights_by_region(
 async def get_all_flights_gzip(db: AsyncSession = Depends(get_db)):
     """Получить все полеты в виде GZIP с CSV"""
     try:
-        flights_data = await FlightService.get_all_flights_for_csv(db)
+        flights_data = await FlightService.get_data(db)
 
         if not flights_data:
             raise HTTPException(
@@ -107,7 +107,7 @@ async def get_all_flights_gzip(db: AsyncSession = Depends(get_db)):
 async def get_flights_by_region_gzip(region_id: int, db: AsyncSession = Depends(get_db)):
     """Получить полеты региона в виде GZIP с CSV"""
     try:
-        flights_data = await FlightService.get_flights_by_region_for_csv(db, region_id)
+        flights_data = await FlightService.get_data(db, region_id)
 
         if not flights_data:
             raise HTTPException(
