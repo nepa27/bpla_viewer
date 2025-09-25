@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, engine
 
 from app.models.flight import Flight
+from app.models.region import Region
 
 
 class FlightService:
@@ -97,7 +98,7 @@ class FlightService:
                 "takeoff_time": flight.takeoff_time.strftime("%H:%M:%S") if flight.takeoff_time else None,
                 "landing_time": flight.landing_time.strftime("%H:%M:%S") if flight.landing_time else None,
                 "flight_duration": FlightService._format_duration(flight.flight_duration),
-                "region_id": flight.region_id
+                "region_name": flight.region_name
             })
 
         return formatted_flights
@@ -109,7 +110,7 @@ class FlightService:
             limit: Optional[int] = None,
             region_id: Optional[int] = None
     ) -> engine.result.ChunkedIteratorResult:
-        query = select(
+        query = (select(
             Flight.flight_id,
             Flight.drone_type,
             func.ST_Y(Flight.takeoff_coordinates).label('takeoff_lat'),
@@ -120,8 +121,10 @@ class FlightService:
             Flight.takeoff_time,
             Flight.landing_time,
             Flight.flight_duration,
-            Flight.region_id
+            Region.name.label('region_name')
+        ).join(Region, Flight.region_id == Region.id, isouter=True)
         ).order_by(Flight.flight_date)
+        # )
         if skip:
             query = query.offset(skip)
         if limit:
@@ -149,7 +152,7 @@ class FlightService:
 
             writer.writerow([
                 'flight_id', 'drone_type', 'takeoff_coords', 'landing_coords',
-                'flight_date', 'takeoff_time', 'landing_time', 'flight_duration', 'region_id'
+                'flight_date', 'takeoff_time', 'landing_time', 'flight_duration', 'region_name'
             ])
 
             for flight in flights_data:
@@ -172,7 +175,7 @@ class FlightService:
                     FlightService._format_time_for_csv(flight.takeoff_time),
                     FlightService._format_time_for_csv(flight.landing_time),
                     FlightService._format_duration(flight.flight_duration),
-                    FlightService._format_csv_value(flight.region_id)
+                    FlightService._format_csv_value(flight.region_name)
                 ])
 
             csv_filename = csv_file.name
