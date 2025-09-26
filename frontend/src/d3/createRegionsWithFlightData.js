@@ -19,7 +19,7 @@ export const createRegionsWithFlightData = ({
     .selectAll('path.region')
     .data(
       dataToRender.features || [dataToRender],
-      (d) => d.properties?.['hc-key'] || d.properties?.region || d.properties?.name,
+      (d) => d.properties?.region_id || d.properties?.region || d.properties?.name,
     )
     .enter()
     .append('path')
@@ -40,7 +40,7 @@ export const createRegionsWithFlightData = ({
       const regionName =
         d.properties?.region ||
         d.properties?.name ||
-        d.properties?.['hc-key'] ||
+        d.properties?.region_id ||
         'Неизвестный регион';
       const flightCount = flightsByRegion?.get(regionName) || 0;
       const content = `${regionName}<br/>Полетов: ${flightCount}`;
@@ -63,11 +63,7 @@ export const createRegionsWithFlightData = ({
       setTooltip({ visible: false, content: '', x: 0, y: 0 });
     })
     .on('click', function (event, d) {
-      setSelectedRegion({
-        id: d.properties?.['hc-key'] || d.properties?.region,
-        name: d.properties?.region || d.properties?.name || d.properties?.['hc-key'],
-        ...d.properties,
-      });
+      setSelectedRegion({ ...d.properties });
     });
 
   if (!isSingleRegion) {

@@ -14,7 +14,7 @@ export const createRegions = ({
     .selectAll('path.region')
     .data(
       dataToRender.features || [dataToRender],
-      (d) => d.properties?.['hc-key'] || d.properties?.region || d.properties?.name,
+      (d) => d.properties?.region_id || d.properties?.region || d.properties?.name,
     )
     .enter()
     .append('path')
@@ -32,7 +32,7 @@ export const createRegions = ({
         content:
           d.properties?.region ||
           d.properties?.name ||
-          d.properties?.['hc-key'] ||
+          d.properties?.region_id ||
           'Неизвестный регион',
         x: x,
         y: y,
@@ -49,8 +49,8 @@ export const createRegions = ({
     })
     .on('click', function (event, d) {
       setSelectedRegion({
-        id: d.properties?.['hc-key'] || d.properties?.region,
-        name: d.properties?.region || d.properties?.name || d.properties?.['hc-key'],
+        id: d.properties?.region_id || d.properties?.region,
+        name: d.properties?.region || d.properties?.name || d.properties?.region_id,
         ...d.properties,
       });
     });

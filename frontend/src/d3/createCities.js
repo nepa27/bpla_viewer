@@ -36,7 +36,7 @@ export const createCities = ({ mapGroup, mapData, path, setTooltip, isSingleRegi
         name: capitalName || 'Столица',
         type: 'Столица',
         coordinates: [capitalCoords[1], capitalCoords[0]], // [lng, lat] -> [lat, lng]
-        regionId: props['hc-key'] || props.region,
+        regionId: props.region_id || props.region,
         feature,
       });
     }
