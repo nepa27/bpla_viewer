@@ -260,3 +260,44 @@
     max-width: 150px;
   }
 }
+
+.map-legend {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 10px;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  font-size: 12px;
+  z-index: 10;
+  color: #333;
+}
+
+.map-legend h4 {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  text-align: center;
+}
+
+.legend-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.legend-step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.legend-color-box {
+  width: 20px;
+  height: 15px;
+  border: 1px solid #ccc;
+}
+
+.legend-label {
+  white-space: nowrap;
+}

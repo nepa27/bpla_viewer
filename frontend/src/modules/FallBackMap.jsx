@@ -1,18 +1,44 @@
+// components/FallBackMap/FallBackMap.jsx
 /* eslint-disable no-unused-vars */
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import MapVisualization from '../components/MapVisualization';
-import { useFlightData } from '../hooks/useFlightData';
+// Добавлен useEffect для отладки
+
+import { useFlightDataFallBack } from '../hooks/useFlightDataFallBack';
 import { useMapData } from '../hooks/useMapData';
+import { generateLegendSteps, getColorForValue } from '../utils/colorScale';
 import './FallBackMap.css';
 
 const FallBackMap = ({ geoData, flightsData }) => {
   const svgRef = useRef();
   const [selectedRegion, setSelectedRegion] = useState(null);
-  const [tooltip, setTooltip] = useState({ visible: false, content: '', x: 0, y: 0 });
 
   const { mapData, loading } = useMapData(geoData);
-  const { filteredFlights } = useFlightData(flightsData);
+  const { filteredFlights, flightsByRegion } = useFlightDataFallBack(flightsData);
+
+  // // --- Отладка: Выводим данные flightsByRegion ---
+  // useEffect(() => {
+  //   console.log('FallBackMap: flightsByRegion updated:', flightsByRegion);
+  //   console.log('FallBackMap: flightsByRegion entries:', Array.from(flightsByRegion.entries()));
+  //   // Также выведем несколько регионов из geoData для сравнения
+  //   if (geoData?.features) {
+  //      console.log('FallBackMap: Sample geoData region names (first 3):',
+  //        geoData.features.slice(0, 3).map(f => f.properties?.region)
+  //      );
+  //   }
+  // }, [flightsByRegion, geoData]);
+  // // --- Конец отладки ---
+
+  const maxFlightsInRegion = useMemo(() => {
+    if (flightsByRegion.size === 0) {
+      return 1;
+    }
+    const max = Math.max(...flightsByRegion.values());
+    return max;
+  }, [flightsByRegion]);
+
+  const legendSteps = useMemo(() => generateLegendSteps(5), []);
 
   const handleRegionSelect = useCallback((region) => {
     setSelectedRegion(region);
@@ -32,6 +58,7 @@ const FallBackMap = ({ geoData, flightsData }) => {
     );
   }
 
+  // --- Отладка: Передаем отладочные пропсы ---
   return (
     <div className="russia-map-container">
       <div className="map-content">
@@ -40,16 +67,85 @@ const FallBackMap = ({ geoData, flightsData }) => {
             ref={svgRef}
             mapData={mapData}
             selectedRegion={selectedRegion}
-            filteredFlights={filteredFlights}
+            flightsByRegion={flightsByRegion}
+            maxFlightsInRegion={maxFlightsInRegion}
             onRegionSelect={handleRegionSelect}
             onResetRegion={handleResetRegion}
-            tooltip={tooltip}
-            setTooltip={setTooltip}
           />
+        </div>
+        <div className="map-legend">
+          <h4>Количество полетов</h4>
+          <div className="legend-steps">
+            {legendSteps.map((step, index) => (
+              <div key={index} className="legend-step">
+                <div className="legend-color-box" style={{ backgroundColor: step.color }}></div>
+                <span className="legend-label">
+                  {index === 0 ? '0' : `${Math.round(step.value * maxFlightsInRegion)}`}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
   );
+  // --- Конец отладки ---
 };
 
 export default FallBackMap;
+
+// /* eslint-disable no-unused-vars */
+// import { useCallback, useRef, useState } from 'react';
+
+// import MapVisualization from '../components/MapVisualization';
+// import { useFlightData } from '../hooks/useFlightData';
+// import { useMapData } from '../hooks/useMapData';
+// import './FallBackMap.css';
+
+// const FallBackMap = ({ geoData, flightsData }) => {
+//   const svgRef = useRef();
+//   const [selectedRegion, setSelectedRegion] = useState(null);
+//   const [tooltip, setTooltip] = useState({ visible: false, content: '', x: 0, y: 0 });
+
+//   const { mapData, loading } = useMapData(geoData);
+//   const { filteredFlights } = useFlightData(flightsData);
+
+//   const handleRegionSelect = useCallback((region) => {
+//     setSelectedRegion(region);
+//   }, []);
+
+//   const handleResetRegion = useCallback(() => {
+//     setSelectedRegion(null);
+//   }, []);
+
+//   if (loading) {
+//     return (
+//       <div className="russia-map-loading">
+//         <div className="loading-content">
+//           <p>Загрузка карты России...</p>
+//         </div>
+//       </div>
+//     );
+//   }
+
+//   return (
+//     <div className="russia-map-container">
+//       <div className="map-content">
+//         <div className="map-wrapper">
+//           <MapVisualization
+//             ref={svgRef}
+//             mapData={mapData}
+//             selectedRegion={selectedRegion}
+//             filteredFlights={filteredFlights}
+//             onRegionSelect={handleRegionSelect}
+//             onResetRegion={handleResetRegion}
+//             tooltip={tooltip}
+//             setTooltip={setTooltip}
+//           />
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default FallBackMap;
