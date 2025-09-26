@@ -2,33 +2,24 @@
 /* eslint-disable no-unused-vars */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
+import { useNavigate } from 'react-router';
+
 import MapVisualization from '../components/MapVisualization';
 // Добавлен useEffect для отладки
 
 import { useFlightDataFallBack } from '../hooks/useFlightDataFallBack';
 import { useMapData } from '../hooks/useMapData';
 import { generateLegendSteps, getColorForValue } from '../utils/colorScale';
+import ROUTES from '../utils/routes';
 import './FallBackMap.css';
 
 const FallBackMap = ({ geoData, flightsData }) => {
   const svgRef = useRef();
   const [selectedRegion, setSelectedRegion] = useState(null);
+  const navigate = useNavigate();
 
   const { mapData, loading } = useMapData(geoData);
   const { filteredFlights, flightsByRegion } = useFlightDataFallBack(flightsData);
-
-  // // --- Отладка: Выводим данные flightsByRegion ---
-  // useEffect(() => {
-  //   console.log('FallBackMap: flightsByRegion updated:', flightsByRegion);
-  //   console.log('FallBackMap: flightsByRegion entries:', Array.from(flightsByRegion.entries()));
-  //   // Также выведем несколько регионов из geoData для сравнения
-  //   if (geoData?.features) {
-  //      console.log('FallBackMap: Sample geoData region names (first 3):',
-  //        geoData.features.slice(0, 3).map(f => f.properties?.region)
-  //      );
-  //   }
-  // }, [flightsByRegion, geoData]);
-  // // --- Конец отладки ---
 
   const maxFlightsInRegion = useMemo(() => {
     if (flightsByRegion.size === 0) {
@@ -40,9 +31,14 @@ const FallBackMap = ({ geoData, flightsData }) => {
 
   const legendSteps = useMemo(() => generateLegendSteps(5), []);
 
-  const handleRegionSelect = useCallback((region) => {
-    setSelectedRegion(region);
-  }, []);
+  const handleRegionSelect = useCallback(
+    (region) => {
+      setSelectedRegion(region);
+
+      navigate(`${ROUTES.REGIONS}/${region.region_id}`);
+    },
+    [navigate],
+  );
 
   const handleResetRegion = useCallback(() => {
     setSelectedRegion(null);
