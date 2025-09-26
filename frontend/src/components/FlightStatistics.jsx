@@ -1,16 +1,44 @@
+// components/FlightStatistics.jsx
 /* eslint-disable no-unused-vars */
 import { BrushableBarChart } from './BrushableBarChart';
+import { RegionDurationChart } from './RegionDurationChart/RegionDurationChart';
+import { RegionFlightsChart } from './RegionFlightsChart/RegionFlightsChart';
 
-const FlightStatistics = ({ dailyFlights, onDateRangeChange }) => {
+const FlightStatistics = ({
+  dailyFlights,
+  flightsByRegion,
+  flightsDurationByRegion,
+  onDateRangeChange,
+}) => {
   return (
     <div className="chart-container">
-      <h3 className="chart-title">Количество полетов по регионам</h3>
+      <h3 className="chart-title">Количество полетов по датам</h3>
       <BrushableBarChart data={dailyFlights} onBrush={onDateRangeChange} />
+
+      <h3 className="chart-title">Количество полетов по регионам</h3>
+      <RegionFlightsChart data={flightsByRegion} />
+
+      <h3 className="chart-title">Суммарная длительность полетов по регионам</h3>
+      <RegionDurationChart data={flightsDurationByRegion} />
     </div>
   );
 };
 
 export default FlightStatistics;
+
+// /* eslint-disable no-unused-vars */
+// import { BrushableBarChart } from './BrushableBarChart';
+
+// const FlightStatistics = ({ dailyFlights, onDateRangeChange }) => {
+//   return (
+//     <div className="chart-container">
+//       <h3 className="chart-title">Количество полетов по регионам</h3>
+//       <BrushableBarChart data={dailyFlights} onBrush={onDateRangeChange} />
+//     </div>
+//   );
+// };
+
+// export default FlightStatistics;
 
 // // FlightStatistics.jsx
 // import { BrushableBarChart } from './BrushableBarChartUniversal/BrushableBarChart';
