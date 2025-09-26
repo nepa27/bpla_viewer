@@ -3,6 +3,10 @@ import { useEffect, useState } from 'react';
 // import jsonData from '../utils/russia_regions.geo.json';
 import jsonData from '../utils/russia_regions_cap.geo.json';
 
+// let str = Array.from(jsonData.features).map(f => f.properties.region).join(', ');
+
+// console.log('TUT ' , str)
+
 export const useRegions = () => {
   const [data, setData] = useState(null);
 
