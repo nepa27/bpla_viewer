@@ -37,9 +37,6 @@ export const RegionFlightsChart = memo(({ data, onBrush = null }) => {
 
     let sortedData = data.slice(); // [...data];
 
-    console.log('====================================');
-    console.log(sortedData);
-    console.log('====================================');
 
     switch (selectedOption) {
       case SORT_OPTIONS_KEY.desc:

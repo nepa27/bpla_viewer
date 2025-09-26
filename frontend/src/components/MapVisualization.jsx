@@ -1,5 +1,5 @@
 // components/MapVisualization/MapVisualization.jsx
-import { geoIdentity, geoPath, select, zoom, zoomIdentity } from 'd3';
+import { geoIdentity, geoPath, select } from 'd3';
 
 import { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
 
@@ -7,6 +7,7 @@ import { createCities } from '../d3/createCities';
 import { createRegionsWithFlightData } from '../d3/createRegionsWithFlightData';
 import { resetRegionButton } from '../d3/resetRegionButton';
 import { resetZoomButton } from '../d3/resetZoomButton';
+import { useMapZoom } from '../d3/useMapZoom';
 import { swapMapDataCoordinates } from '../utils/swapMapDataCoordinates';
 
 const MapVisualization = forwardRef(
@@ -15,16 +16,15 @@ const MapVisualization = forwardRef(
     ref,
   ) => {
     const [tooltip, setTooltip] = useState({ visible: false, content: '', x: 0, y: 0 });
-    const mapGroupRef = useRef(null); // Для хранения группы карты
-    const zoomBehaviorRef = useRef(null); // Для хранения поведения зума
-    const svgRef = useRef(null); // Для хранения SVG
-    const [zoomLevel, setZoomLevel] = useState(1);
+    const mapGroupRef = useRef(null); 
+    const svgRef = useRef(null); 
+    const { initializeZoom, resetZoom, currentScale } = useMapZoom();
 
     const renderMap = useCallback(
       (dataToRender, isSingleRegion = false) => {
         const svg = select(ref.current);
-        svgRef.current = svg.node(); // Сохраняем ссылку на SVG
-        // Полностью очищаем SVG при каждом рендере
+        svgRef.current = svg.node(); 
+        
         svg.selectAll('*').remove();
 
         const width = 1200;
@@ -37,6 +37,8 @@ const MapVisualization = forwardRef(
           .attr('style', 'max-width: 100%; background-color: #2c3e50;');
 
         const projection = geoIdentity().reflectY(true).fitSize([width, height], dataToRender);
+
+        console.log('currentScale > ', currentScale);
 
         if (!isSingleRegion) {
           const currentScale = projection.scale();
@@ -54,7 +56,7 @@ const MapVisualization = forwardRef(
 
         const path = geoPath().projection(projection);
         const mapGroup = svg.append('g').attr('class', 'map-group');
-        mapGroupRef.current = mapGroup.node(); // Сохраняем ссылку на группу
+        mapGroupRef.current = mapGroup.node(); 
 
         // Создаем регионы
         createRegionsWithFlightData({
@@ -80,29 +82,7 @@ const MapVisualization = forwardRef(
           height,
         });
 
-        // Создаем и сохраняем поведение зума
-        const zoomBehavior = zoom()
-          .scaleExtent([1, 100])
-          .on('zoom', (event) => {
-            mapGroup.attr('transform', event.transform);
-            // Обновляем уровень зума для управления видимостью элементов
-            setZoomLevel(event.transform.k);
-          });
-
-        svg.call(zoomBehavior);
-        zoomBehaviorRef.current = zoomBehavior; // Сохраняем поведение зума
-
-        // Кнопки управления
-        resetZoomButton(svg, () => {
-          // Функция сброса зума
-          if (svgRef.current && zoomBehaviorRef.current) {
-            select(svgRef.current)
-              .transition()
-              .duration(750)
-              .call(zoomBehaviorRef.current.transform, zoomIdentity);
-            setZoomLevel(1); // Обновляем состояние
-          }
-        });
+        resetZoomButton(svg, mapGroup, initializeZoom, resetZoom);
         resetRegionButton(svg, onResetRegion);
       },
       [ref, onRegionSelect, onResetRegion, setTooltip, flightsByRegion, maxFlightsInRegion],
@@ -117,7 +97,7 @@ const MapVisualization = forwardRef(
       if (selectedRegion) {
         const foundFeature = swappedMapData.features.find(
           (feature) =>
-            feature.properties?.['hc-key'] === selectedRegion.id ||
+            feature.properties?.region_id === selectedRegion.id ||
             feature.properties?.region === selectedRegion.id,
         );
 

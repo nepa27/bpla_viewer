@@ -1,4 +1,5 @@
-import { memo } from 'react';
+// components/common/ChartSortSelect.jsx
+import { memo, useMemo } from 'react';
 
 import { SORT_OPTIONS_CHART } from '../utils/constant';
 import './ChartSortSelect.css';
