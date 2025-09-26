@@ -1,3 +1,4 @@
+//Тестовый
 /* eslint-disable no-unused-vars */
 import { useCallback, useRef, useState } from 'react';
 
@@ -84,6 +85,94 @@ const MapComponent = ({ regionsData, points = [], errorLoadYmaps }) => {
 };
 
 export default MapComponent;
+
+// Рабочий
+// /* eslint-disable no-unused-vars */
+// import { useCallback, useRef, useState } from 'react';
+
+// import { useMapPoints } from '../hooks/useMapPoints';
+// import { useMapPolygons } from '../hooks/useMapPolygons';
+// import { useYandexMap } from '../hooks/useYandexMap';
+// import FallBackMap from './FallBackMap';
+// import './MapComponent.css';
+
+// const MapComponent = ({ regionsData, points = [], errorLoadYmaps }) => {
+//   const mapContainerRef = useRef(null);
+//   const [isLoading, setIsLoading] = useState(true);
+//   const [error, setError] = useState(null);
+//   const [selectedRegion, setSelectedRegion] = useState(null);
+
+//   const handleRegionClick = useCallback((region) => {
+//     alert(`Вы выбрали регион: ${region}`);
+//     setSelectedRegion(region);
+//   }, []);
+
+//   // Используем существующий хук для инициализации карты
+//   const { mapInstance, ymapsReady } = useYandexMap({
+//     containerRef: mapContainerRef,
+//     center: [69, 100],
+//     zoom: 3,
+//     onReady: () => {
+//       setIsLoading(false);
+//       setError(null);
+//     },
+//     onError: (err) => {
+//       console.error('Ошибка инициализации карты:', err);
+//       setError(`Ошибка инициализации карты: ${err.message}`);
+//       setIsLoading(false);
+//     },
+//   });
+
+//   // Используем существующий хук для отрисовки полигонов с мемоизацией
+//   const polygonsRef = useMapPolygons({
+//     mapInstance,
+//     ymapsReady,
+//     regionsData,
+//     selectedRegion,
+//     onRegionClick: handleRegionClick,
+//   });
+
+//   // Используем существующий хук для отрисовки точек
+//   const pointsRef = useMapPoints({
+//     mapInstance,
+//     ymapsReady,
+//     points,
+//   });
+
+//   // Если есть ошибка загрузки Yandex Maps - показываем fallback
+//   if (errorLoadYmaps && regionsData) {
+//     return (
+//       <div className="map-container">
+//         <FallBackMap geoData={regionsData} flightsData={points} />
+//       </div>
+//     );
+//   }
+
+//   // Если есть ошибка карты и есть данные - показываем fallback
+//   if (error && regionsData) {
+//     return (
+//       <div className="map-container">
+//         <FallBackMap geoData={regionsData} flightsData={points} />
+//       </div>
+//     );
+//   }
+
+//   // Если есть ошибка, но нет данных для fallback
+//   if (error && !regionsData) {
+//     return <div className="map-error">Ошибка: {error}</div>;
+//   }
+
+//   // Обычный рендер карты
+//   return (
+//     <div className="map-container">
+//       {isLoading && <div className="map-loading">Загрузка данных карты...</div>}
+
+//       <div ref={mapContainerRef} className="map-element" />
+//     </div>
+//   );
+// };
+
+// export default MapComponent;
 
 // Рабочий Вариант
 
