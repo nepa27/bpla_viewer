@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 
+// import jsonData from '../utils/russia_regions_cap.geo.json';
 // import jsonData from '../utils/russia_regions.geo.json';
-import jsonData from '../utils/russia_regions_cap.geo.json';
+import jsonData from '../utils/russia_regions_id.geo.json';
 
 // let str = Array.from(jsonData.features).map(f => f.properties.region).join(', ');
 
