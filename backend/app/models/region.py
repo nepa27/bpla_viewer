@@ -12,3 +12,6 @@ class Region(Base):
     region_id = Column(Integer, primary_key=True, index=True, unique=True)
 
     flights = relationship("Flight", back_populates="region_rel")
+
+    def __str__(self):
+        return self.name
