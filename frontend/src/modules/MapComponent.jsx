@@ -1,29 +1,51 @@
-//Тестовый
-/* eslint-disable no-unused-vars */
+// src/modules/MapComponent.jsx
 import { useCallback, useRef, useState } from 'react';
+
+import { useNavigate } from 'react-router';
 
 import { useMapPoints } from '../hooks/useMapPoints';
 import { useMapPolygons } from '../hooks/useMapPolygons';
 import { useYandexMap } from '../hooks/useYandexMap';
+import ROUTES from '../utils/routes';
 import FallBackMap from './FallBackMap';
 import './MapComponent.css';
 
-const MapComponent = ({ regionsData, points = [], errorLoadYmaps }) => {
+const MapComponent = ({
+  regionsData,
+  points = [],
+  errorLoadYmaps,
+  center = [69, 100],
+  zoom = 3,
+}) => {
   const mapContainerRef = useRef(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedRegion, setSelectedRegion] = useState(null);
+  const navigate = useNavigate();
 
-  const handleRegionClick = useCallback((region) => {
-    alert(`Вы выбрали регион: ${region}`);
-    setSelectedRegion(region);
-  }, []);
+  const handleRegionClick = useCallback(
+    (region) => {
+      // region - это GeoJSON Feature объект
+      const regionName = region.properties?.region;
+      const regionId = region.properties?.region_id;
+
+      alert(`Вы выбрали регион: ${regionName || regionId || 'Неизвестный регион'}`);
+      setSelectedRegion(region);
+
+      if (regionId) {
+        navigate(`${ROUTES.REGIONS}/${regionId}`, { state: region });
+      } else {
+        console.warn('region_id отсутствует в свойствах региона:', region);
+      }
+    },
+    [navigate],
+  );
 
   // Используем существующий хук для инициализации карты
   const { mapInstance, ymapsReady } = useYandexMap({
     containerRef: mapContainerRef,
-    center: [69, 100],
-    zoom: 3,
+    center,
+    zoom,
     onReady: () => {
       setIsLoading(false);
       setError(null);
@@ -78,13 +100,120 @@ const MapComponent = ({ regionsData, points = [], errorLoadYmaps }) => {
   return (
     <div className="map-container">
       {isLoading && <div className="map-loading">Загрузка данных карты...</div>}
-
       <div ref={mapContainerRef} className="map-element" />
     </div>
   );
 };
 
 export default MapComponent;
+
+// /* eslint-disable no-unused-vars */
+// import { useCallback, useRef, useState } from 'react';
+
+// import { useNavigate } from 'react-router';
+
+// import { useMapPoints } from '../hooks/useMapPoints';
+// import { useMapPolygons } from '../hooks/useMapPolygons';
+// import { useYandexMap } from '../hooks/useYandexMap';
+// import ROUTES from '../utils/routes';
+// import FallBackMap from './FallBackMap';
+// import './MapComponent.css';
+
+// const MapComponent = ({
+//   regionsData,
+//   points = [],
+//   errorLoadYmaps,
+//   center = [69, 100],
+//   zoom = 3,
+// }) => {
+//   const mapContainerRef = useRef(null);
+//   const [isLoading, setIsLoading] = useState(true);
+//   const [error, setError] = useState(null);
+//   const [selectedRegion, setSelectedRegion] = useState(null);
+//   const navigate = useNavigate();
+
+//   const handleRegionClick = useCallback(
+//     (region) => {
+//       // region - это GeoJSON Feature объект
+//       const regionName = region.properties?.region;
+//       const regionId = region.properties?.region_id;
+
+//       alert(`Вы выбрали регион: ${regionName || regionId || 'Неизвестный регион'}`);
+//       setSelectedRegion(region);
+
+//       if (regionId) {
+//         navigate(`${ROUTES.REGIONS}/${regionId}`, { state: region });
+//       } else {
+//         console.warn('region_id отсутствует в свойствах региона:', region);
+//       }
+//     },
+//     [navigate],
+//   );
+
+//   // Используем существующий хук для инициализации карты
+//   const { mapInstance, ymapsReady } = useYandexMap({
+//     containerRef: mapContainerRef,
+//     center,
+//     zoom,
+//     onReady: () => {
+//       setIsLoading(false);
+//       setError(null);
+//     },
+//     onError: (err) => {
+//       console.error('Ошибка инициализации карты:', err);
+//       setError(`Ошибка инициализации карты: ${err.message}`);
+//       setIsLoading(false);
+//     },
+//   });
+
+//   // Используем существующий хук для отрисовки полигонов с мемоизацией
+//   const polygonsRef = useMapPolygons({
+//     mapInstance,
+//     ymapsReady,
+//     regionsData,
+//     onRegionClick: handleRegionClick,
+//   });
+
+//   // Используем существующий хук для отрисовки точек
+//   const pointsRef = useMapPoints({
+//     mapInstance,
+//     ymapsReady,
+//     points,
+//   });
+
+//   // Если есть ошибка загрузки Yandex Maps - показываем fallback
+//   if (errorLoadYmaps && regionsData) {
+//     return (
+//       <div className="map-container">
+//         <FallBackMap geoData={regionsData} flightsData={points} />
+//       </div>
+//     );
+//   }
+
+//   // Если есть ошибка карты и есть данные - показываем fallback
+//   if (error && regionsData) {
+//     return (
+//       <div className="map-container">
+//         <FallBackMap geoData={regionsData} flightsData={points} />
+//       </div>
+//     );
+//   }
+
+//   // Если есть ошибка, но нет данных для fallback
+//   if (error && !regionsData) {
+//     return <div className="map-error">Ошибка: {error}</div>;
+//   }
+
+//   // Обычный рендер карты
+//   return (
+//     <div className="map-container">
+//       {isLoading && <div className="map-loading">Загрузка данных карты...</div>}
+//       <div ref={mapContainerRef} className="map-element" />
+//     </div>
+//   );
+// };
+
+// export default MapComponent;
 
 // Рабочий
 // /* eslint-disable no-unused-vars */
