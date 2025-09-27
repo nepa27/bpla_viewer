@@ -1,4 +1,4 @@
-// pages/RussianMapPage.jsx
+// src/pages/RussianMapPage.jsx
 import { useEffect, useState } from 'react';
 
 import FlightStatistics from '../components/FlightStatistics';
@@ -8,7 +8,6 @@ import { useRegions } from '../hooks/useRegions';
 import MapComponent from '../modules/MapComponent';
 import { loadYmapsScript } from '../utils/loadYmaps';
 
-// Улучшенная версия с оптимизацией рендеринга
 const RussianMapPage = () => {
   const { data: flightData, loading, error } = useData();
   const regionsPolygons = useRegions();
@@ -45,7 +44,6 @@ const RussianMapPage = () => {
     };
   }, []);
 
-  // Оптимизированное условие загрузки
   if (ymapsLoading || loading) {
     return (
       <div className="main">
@@ -64,7 +62,6 @@ const RussianMapPage = () => {
     );
   }
 
-  // Проверка наличия необходимых данных
   if (!flightData || !regionsPolygons) {
     return (
       <div className="main">
@@ -90,6 +87,7 @@ const RussianMapPage = () => {
         regionsData={regionsPolygons}
         points={filteredFlights}
         errorLoadYmaps={errorLoadYmaps}
+        isRussiaView={true}
       />
       <FlightStatistics
         dailyFlights={dailyFlights}
@@ -102,6 +100,111 @@ const RussianMapPage = () => {
 };
 
 export default RussianMapPage;
+
+// // pages/RussianMapPage.jsx
+// import { useEffect, useState } from 'react';
+
+// import FlightStatistics from '../components/FlightStatistics';
+// import { useData } from '../hooks/useData';
+// import { useFlightData } from '../hooks/useFlightData';
+// import { useRegions } from '../hooks/useRegions';
+// import MapComponent from '../modules/MapComponent';
+// import { loadYmapsScript } from '../utils/loadYmaps';
+
+// // Улучшенная версия с оптимизацией рендеринга
+// const RussianMapPage = () => {
+//   const { data: flightData, loading, error } = useData();
+//   const regionsPolygons = useRegions();
+//   const [errorLoadYmaps, setErrorLoadYmaps] = useState(false);
+//   const [ymapsLoading, setYmapsLoading] = useState(true);
+
+//   const { filteredFlights, dailyFlights, flightsByRegion, flightsDurationByRegion, setDateRange } =
+//     useFlightData(flightData);
+
+//   useEffect(() => {
+//     let isMounted = true;
+
+//     setYmapsLoading(true);
+//     loadYmapsScript()
+//       .then(() => {
+//         if (isMounted) {
+//           setErrorLoadYmaps(false);
+//         }
+//       })
+//       .catch((error) => {
+//         console.error('Ошибка загрузки Yandex Maps API:', error);
+//         if (isMounted) {
+//           setErrorLoadYmaps(true);
+//         }
+//       })
+//       .finally(() => {
+//         if (isMounted) {
+//           setYmapsLoading(false);
+//         }
+//       });
+
+//     return () => {
+//       isMounted = false;
+//     };
+//   }, []);
+
+//   // Оптимизированное условие загрузки
+//   if (ymapsLoading || loading) {
+//     return (
+//       <div className="main">
+//         <h1>Карта России</h1>
+//         <div
+//           style={{
+//             height: '600px',
+//             display: 'flex',
+//             alignItems: 'center',
+//             justifyContent: 'center',
+//           }}
+//         >
+//           {error ? `Ошибка: ${error}` : 'Загрузка данных...'}
+//         </div>
+//       </div>
+//     );
+//   }
+
+//   // Проверка наличия необходимых данных
+//   if (!flightData || !regionsPolygons) {
+//     return (
+//       <div className="main">
+//         <h1>Карта России</h1>
+//         <div
+//           style={{
+//             height: '600px',
+//             display: 'flex',
+//             alignItems: 'center',
+//             justifyContent: 'center',
+//           }}
+//         >
+//           Нет данных для отображения
+//         </div>
+//       </div>
+//     );
+//   }
+
+//   return (
+//     <div className="main">
+//       <h1>Карта России</h1>
+//       <MapComponent
+//         regionsData={regionsPolygons}
+//         points={filteredFlights}
+//         errorLoadYmaps={errorLoadYmaps}
+//       />
+//       <FlightStatistics
+//         dailyFlights={dailyFlights}
+//         flightsByRegion={flightsByRegion}
+//         flightsDurationByRegion={flightsDurationByRegion}
+//         onDateRangeChange={setDateRange}
+//       />
+//     </div>
+//   );
+// };
+
+// export default RussianMapPage;
 
 // const RussianMapPage = () => {
 //   const { data: flightData, loading, error } = useData();
