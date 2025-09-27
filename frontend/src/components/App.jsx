@@ -33,14 +33,3 @@ const App = () => {
 };
 
 export default App;
-
-// /* eslint-disable no-unused-vars */
-// import OneRegionMapPage from '../pages/OneRegionMapPage';
-// import RussianMapPage from '../pages/RussianMapPage';
-// import './App.css';
-
-// const App = () => {
-//   return <RussianMapPage />;
-// };
-
-// export default App;

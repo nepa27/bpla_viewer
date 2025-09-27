@@ -1,9 +1,8 @@
 // hooks/useMapPoints.js
 import { useEffect, useRef } from 'react';
-
 import { hasDataChanged } from './utils/hashUtils';
-import { getClusterHash } from './utils/hashUtils';
 import { updateMapPoints } from './utils/mapPointsProcessor';
+import { getClusterHash } from './utils/hashUtils';
 
 export const useMapPoints = ({ mapInstance, ymapsReady, points }) => {
   const pointsRef = useRef([]);
@@ -422,7 +421,7 @@ export const useMapPoints = ({ mapInstance, ymapsReady, points }) => {
 //                       Группировка по близким координатам взлета
 //                     </div>
 //                   </div>
-
+                  
 //                   <div>
 //                     <h4 style="margin: 0 0 15px 0; color: #333; border-bottom: 2px solid #eee; padding-bottom: 8px;">
 //                       Полеты по датам:
@@ -638,7 +637,7 @@ export const useMapPoints = ({ mapInstance, ymapsReady, points }) => {
 //                           Группировка по близким координатам взлета
 //                         </div>
 //                       </div>
-
+                      
 //                       <div>
 //                         <h4 style="margin: 0 0 15px 0; color: #333; border-bottom: 2px solid #eee; padding-bottom: 8px;">
 //                           Полеты по датам:

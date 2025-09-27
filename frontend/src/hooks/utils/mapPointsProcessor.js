@@ -8,11 +8,11 @@ export const processPoints = (pointsArray, zoomLevel) => {
 
   const clustered = clusterPoints(pointsArray, zoomLevel);
 
-  const totalCount = clustered.reduce((sum, cluster) => sum + cluster.count, 0);
+//   const totalCount = clustered.reduce((sum, cluster) => sum + cluster.count, 0);
 
-  console.log(
-    `Кластеризовано ${pointsArray.length} точек -> ${clustered.length} кластеров (${totalCount} полетов)`,
-  );
+//   console.log(
+//     `Кластеризовано ${pointsArray.length} точек -> ${clustered.length} кластеров (${totalCount} полетов)`,
+//   );
 
   return clustered;
 };

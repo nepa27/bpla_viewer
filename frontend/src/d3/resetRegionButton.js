@@ -6,7 +6,7 @@ export const resetRegionButton = (svg, setSelectedRegion) => {
     .attr('transform', `translate(20, 60)`)
     .style('cursor', 'pointer')
     .on('click', () => {
-      setSelectedRegion(null);
+      setSelectedRegion();
     });
 
   Button.append('rect')
