@@ -10,7 +10,7 @@ export const useMapZoom = () => {
       if (!svgElement || !gElement) return null;
 
       const zoomEv = zoom()
-        .scaleExtent([1, 100])
+        .scaleExtent([-1, 100])
         .on('zoom', (event) => {
           select(gElement).attr('transform', event.transform);
           setCurrentScale(event.transform.k); // Обновляем текущий масштаб
