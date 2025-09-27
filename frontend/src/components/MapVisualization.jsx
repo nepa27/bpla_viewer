@@ -3,11 +3,14 @@ import { geoIdentity, geoPath, select } from 'd3';
 
 import { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
 
+import { useNavigate } from 'react-router';
+
 import { createCities } from '../d3/createCities';
 import { createRegionsWithFlightData } from '../d3/createRegionsWithFlightData';
 import { resetRegionButton } from '../d3/resetRegionButton';
 import { resetZoomButton } from '../d3/resetZoomButton';
 import { useMapZoom } from '../d3/useMapZoom';
+import ROUTES from '../utils/routes';
 import { swapMapDataCoordinates } from '../utils/swapMapDataCoordinates';
 
 const MapVisualization = forwardRef(
@@ -16,15 +19,16 @@ const MapVisualization = forwardRef(
     ref,
   ) => {
     const [tooltip, setTooltip] = useState({ visible: false, content: '', x: 0, y: 0 });
-    const mapGroupRef = useRef(null); 
-    const svgRef = useRef(null); 
+    const mapGroupRef = useRef(null);
+    const svgRef = useRef(null);
     const { initializeZoom, resetZoom, currentScale } = useMapZoom();
+    const navigate = useNavigate();
 
     const renderMap = useCallback(
       (dataToRender, isSingleRegion = false) => {
         const svg = select(ref.current);
-        svgRef.current = svg.node(); 
-        
+        svgRef.current = svg.node();
+
         svg.selectAll('*').remove();
 
         const width = 1200;
@@ -56,7 +60,7 @@ const MapVisualization = forwardRef(
 
         const path = geoPath().projection(projection);
         const mapGroup = svg.append('g').attr('class', 'map-group');
-        mapGroupRef.current = mapGroup.node(); 
+        mapGroupRef.current = mapGroup.node();
 
         // Создаем регионы
         createRegionsWithFlightData({
@@ -82,8 +86,12 @@ const MapVisualization = forwardRef(
           height,
         });
 
+        const handleResetRegion = () => {
+          navigate(`${ROUTES.REGIONS}`);
+        };
+
         resetZoomButton(svg, mapGroup, initializeZoom, resetZoom);
-        resetRegionButton(svg, onResetRegion);
+        resetRegionButton(svg, handleResetRegion);
       },
       [ref, onRegionSelect, onResetRegion, setTooltip, flightsByRegion, maxFlightsInRegion],
     );
