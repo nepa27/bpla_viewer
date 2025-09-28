@@ -1,7 +1,6 @@
 import {
   axisBottom,
   axisLeft,
-  brushX,
   extent,
   line,
   max,
@@ -46,133 +45,119 @@ timeFormatDefaultLocale({
   shortMonths: ['янв', 'фев', 'мар', 'апр', 'май', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'],
 });
 
-export const PeakHourlyFlightsChart = memo(({ flightData, onBrush }) => {
+export const PeakHourlyFlightsChart = memo(({ peakHourlyFlightsData, onBrush }) => {
   const svgRef = useRef();
   const containerRef = useRef();
 
   useEffect(() => {
-    if (!flightData?.length || !svgRef.current) return;
-
-    // Адаптивные размеры
-    const containerWidth = containerRef.current?.clientWidth || 900;
-    const isMobile = containerWidth < 768;
-    const isTablet = containerWidth >= 768 && containerWidth < 1024;
-
-    const margin = {
-      top: isMobile ? 20 : 30,
-      right: isMobile ? 20 : 40,
-      bottom: isMobile ? 60 : 70,
-      left: isMobile ? 60 : 80,
-    };
-
-    const width = Math.max(300, containerWidth - margin.left - margin.right);
-    const height = isMobile ? 250 : isTablet ? 300 : 350;
-
-    // Очищаем предыдущий SVG
-    select(svgRef.current).selectAll('*').remove();
-
-    const svg = select(svgRef.current)
-      .attr('class', 'peak-hourly-flights-chart-svg')
-      .attr('width', width + margin.left + margin.right)
-      .attr('height', height + margin.top + margin.bottom);
-
-    const g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`);
-
-    // Подготовка данных: группировка по часу и подсчёт полётов
-    const flightsByHour = new Map();
-
-    for (const flight of flightData) {
-      const flightDate = new Date(flight.date);
-      const hourKey = new Date(
-        flightDate.getFullYear(),
-        flightDate.getMonth(),
-        flightDate.getDate(),
-        flightDate.getHours(),
-      ).toISOString();
-
-      if (!flightsByHour.has(hourKey)) {
-        flightsByHour.set(hourKey, { date: new Date(hourKey), count: 0 });
-      }
-      flightsByHour.get(hourKey).count += 1;
+    if (!peakHourlyFlightsData?.length || !svgRef.current) {
+      console.log('Early return: no data or no svg ref');
+      return;
     }
 
-    const chartData = Array.from(flightsByHour.values()).sort((a, b) => a.date - b.date);
+    // ✅ Используем requestAnimationFrame для гарантии, что DOM обновился
+    const drawChart = () => {
+      // Адаптивные размеры
+      const containerWidth = containerRef.current?.clientWidth || 900;
+      const isMobile = containerWidth < 768;
+      const isTablet = containerWidth >= 768 && containerWidth < 1024;
 
-    if (chartData.length === 0) return;
+      const margin = {
+        top: isMobile ? 20 : 30,
+        right: isMobile ? 20 : 40,
+        bottom: isMobile ? 60 : 70,
+        left: isMobile ? 60 : 80,
+      };
 
-    // Шкалы
-    const x = scaleTime()
-      .domain(extent(chartData, (d) => d.date))
-      .range([0, width]);
+      const width = Math.max(300, containerWidth - margin.left - margin.right);
+      const height = isMobile ? 250 : isTablet ? 300 : 350;
 
-    const y = scaleLinear()
-      .domain([0, max(chartData, (d) => d.count)])
-      .nice()
-      .range([height, 0]);
+      // Очищаем предыдущий SVG
+      select(svgRef.current).selectAll('*').remove();
 
-    // Добавляем сетку
-    g.append('g')
-      .attr('class', 'grid')
-      .attr('transform', `translate(0,${height})`)
-      .call(axisBottom(x).tickSize(-height).tickFormat(''));
+      const svg = select(svgRef.current)
+        .attr('class', 'peak-hourly-flights-chart-svg')
+        .attr('width', width + margin.left + margin.right)
+        .attr('height', height + margin.top + margin.bottom);
 
-    g.append('g').attr('class', 'grid').call(axisLeft(y).tickSize(-width).tickFormat(''));
+      const g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`);
 
-    // Ось X
-    PeakHourlyFlightsAxisBottom(g, x, height, width);
+      // Подготовка данных: преобразуем date в Date
+      const chartData = peakHourlyFlightsData
+        .map((item) => {
+          // ✅ Корректное преобразование дат
+          const date = new Date(item.date);
+          const peakHour = new Date(item.peakHour);
 
-    // Ось Y
-    PeakHourlyFlightsAxisLeft(g, y);
+          // Проверяем валидность дат
+          if (isNaN(date.getTime()) || isNaN(peakHour.getTime())) {
+            console.warn('Invalid date found:', item);
+            return null;
+          }
 
-    // Подписи осей
-    g.append('text')
-      .attr('transform', 'rotate(-90)')
-      .attr('y', 0 - margin.left + 20)
-      .attr('x', 0 - height / 2)
-      .attr('dy', '1em')
-      .attr('class', 'axis-label')
-      .text('Количество полётов за час');
+          return {
+            ...item,
+            date,
+            peakHour,
+          };
+        })
+        .filter(Boolean) // Убираем null значения
+        .sort((a, b) => a.date - b.date);
 
-    g.append('text')
-      .attr('transform', `translate(${width / 2}, ${height + margin.bottom - 20})`)
-      .attr('class', 'axis-label')
-      .text('Дата и час');
-
-    // Рендер точек и линии
-    PeakHourlyFlightsMarks(g, chartData, x, y, height, width, isMobile);
-
-    // Brush
-    const brush = brushX()
-      .extent([
-        [0, 0],
-        [width, height],
-      ])
-      .on('brush end', brushed);
-
-    const brushGroup = g.append('g').attr('class', 'brush').call(brush);
-
-    function brushed(event) {
-      if (!event.selection) {
-        onBrush?.(null);
+      if (chartData.length === 0) {
+        console.warn('No valid data to display');
         return;
       }
 
-      const [x0, x1] = event.selection;
-      const dates = chartData.map((d) => d.date.getTime());
+      // Шкалы
+      const x = scaleTime()
+        .domain(extent(chartData, (d) => d.date))
+        .range([0, width]);
 
-      const startIndex = Math.floor((x0 / width) * dates.length);
-      const endIndex = Math.ceil((x1 / width) * dates.length);
+      const y = scaleLinear()
+        .domain([0, max(chartData, (d) => d.maxFlights)])
+        .nice()
+        .range([height, 0]);
 
-      const startDate = new Date(dates[Math.max(0, startIndex)]);
-      const endDate = new Date(dates[Math.min(dates.length - 1, endIndex)]);
+      // Добавляем сетку
+      g.append('g')
+        .attr('class', 'grid')
+        .attr('transform', `translate(0,${height})`)
+        .call(axisBottom(x).tickSize(-height).tickFormat(''));
 
-      onBrush?.([startDate, endDate]);
-    }
+      g.append('g').attr('class', 'grid').call(axisLeft(y).tickSize(-width).tickFormat(''));
+
+      // Ось X
+      PeakHourlyFlightsAxisBottom(g, x, height, width);
+
+      // Ось Y
+      PeakHourlyFlightsAxisLeft(g, y);
+
+      // Подписи осей
+      g.append('text')
+        .attr('transform', 'rotate(-90)')
+        .attr('y', 0 - margin.left + 20)
+        .attr('x', 0 - height / 2)
+        .attr('dy', '1em')
+        .attr('class', 'axis-label')
+        .text('Максимальное количество полётов за час');
+
+      g.append('text')
+        .attr('transform', `translate(${width / 2}, ${height + margin.bottom - 20})`)
+        .attr('class', 'axis-label')
+        .text('Дата');
+
+      // Рендер точек и линии
+      PeakHourlyFlightsMarks(g, chartData, x, y, height, width, isMobile);
+    };
+
+    // ✅ Используем requestAnimationFrame для гарантии, что DOM обновился
+    const frameId = requestAnimationFrame(drawChart);
 
     return () => {
-      brushGroup.on('brush end', null);
+      cancelAnimationFrame(frameId);
     };
-  }, [flightData, onBrush]);
+  }, [peakHourlyFlightsData]); // Убрана зависимость onBrush и параметр больше не используется
 
   return (
     <div ref={containerRef} className="peak-hourly-flights-chart-container">

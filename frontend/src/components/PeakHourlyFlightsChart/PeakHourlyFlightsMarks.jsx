@@ -4,8 +4,8 @@ export const PeakHourlyFlightsMarks = (g, data, x, y, height, width, isMobile) =
   // Линия (сглаженная)
   const lineGenerator = line()
     .x((d) => x(d.date))
-    .y((d) => y(d.count))
-    .curve(curveMonotoneX); // ✅ Исправлено
+    .y((d) => y(d.maxFlights))
+    .curve(curveMonotoneX);
 
   g.append('path')
     .datum(data)
@@ -26,7 +26,7 @@ export const PeakHourlyFlightsMarks = (g, data, x, y, height, width, isMobile) =
     .enter()
     .append('g')
     .attr('class', 'dot-group')
-    .attr('transform', (d) => `translate(${x(d.date)},${y(d.count)})`);
+    .attr('transform', (d) => `translate(${x(d.date)},${y(d.maxFlights)})`);
 
   dots
     .append('path')
@@ -36,6 +36,9 @@ export const PeakHourlyFlightsMarks = (g, data, x, y, height, width, isMobile) =
     .attr('stroke-width', 1.5)
     .on('mouseover', function (event, d) {
       select(this).attr('fill', '#ff6b6b');
+
+      // Форматируем peakHour
+      const peakHourFormatted = timeFormat('%d.%m.%Y %H:00')(d.peakHour);
 
       const tooltip = select('body')
         .append('div')
@@ -50,7 +53,7 @@ export const PeakHourlyFlightsMarks = (g, data, x, y, height, width, isMobile) =
         .style('z-index', '1000')
         .style('left', event.pageX + 10 + 'px')
         .style('top', event.pageY - 28 + 'px')
-        .text(`${timeFormat('%d.%m.%Y %H:00')(d.date)}: ${d.count} полётов`);
+        .text(`${d.maxFlights} полётов\nПик: ${peakHourFormatted}`);
 
       select(this.parentNode).raise();
     })
