@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from sqladmin import Admin
 
-from backend.app.admin.admin import FlightAdmin, RegionAdmin
+from backend.app.admin.admin import FlightAdmin, RegionAdmin, UploadView, UploadFileView
 from .database import create_tables, async_engine
 from backend.app.api.flights import router as flight_router
 
@@ -39,6 +39,8 @@ admin = Admin(
     engine=async_engine,
     title="Flight Admin",
 )
+admin.add_view(UploadView)
+admin.add_view(UploadFileView)
 admin.add_view(FlightAdmin)
 admin.add_view(RegionAdmin)
 
