@@ -1,25 +1,179 @@
 // components/FlightStatistics.jsx
 /* eslint-disable no-unused-vars */
+import { useState } from 'react';
+
+import { useData } from '../hooks/useData';
+import { useFlightData } from '../hooks/useFlightData';
+// ✅ Добавлено
 import { BrushableBarChart } from './BrushableBarChart';
+import { FlightDurationChart } from './FlightDurationChart/FlightDurationChart';
+import { PieChart } from './PieChart/PieChart';
+import TableInfoChart from './TableInfoChart/TableInfoChart';
 
 const FlightStatisticsOneReg = ({
+  dateRange,
   dailyFlights,
   flightsByRegion,
   flightsDurationByRegion,
   onDateRangeChange,
+  flightsByTimeOfDay,
 }) => {
+  const stats = {
+    averageFlightDuration: flightsDurationByRegion
+      ? (
+          flightsDurationByRegion.reduce((sum, flight) => sum + flight.totalDurationMinutes, 0) /
+          flightsDurationByRegion.length
+        ).toFixed(2)
+      : 0,
+    daysWithoutFlights: dailyFlights ? dailyFlights.filter((day) => day.count === 0).length : 0,
+    totalFlights: dailyFlights ? dailyFlights.reduce((sum, day) => sum + day.count, 0) : 0,
+  };
+
+  const { data: flightData, loading, error } = useData();
+
+  // ✅ Используем useFlightData для получения обновлённых данных по диапазону
+  // const [dateRange, setDateRange] = useState(null);
+  // const { flightsByTimeOfDay } = useFlightData(flightData, dateRange); // ✅
+
+  if (loading) {
+    return (
+      <div className="chart-container">
+        <div>Загрузка графиков...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="chart-container">
+        <div>Ошибка: {error}</div>
+      </div>
+    );
+  }
+
+  if (!flightData) {
+    return (
+      <div className="chart-container">
+        <div>Нет данных для отображения</div>
+      </div>
+    );
+  }
+
   return (
     <div className="chart-container">
+      <TableInfoChart data={stats} />
       <h3 className="chart-title">Количество полетов по датам</h3>
       <BrushableBarChart data={dailyFlights} onBrush={onDateRangeChange} />
-
-
+      <h3 className="chart-title">Суммарная длительность полетов по датам</h3>
+      <FlightDurationChart flightData={flightData} dateRange={dateRange} />
+      <h3 className="chart-title">Распределение полетов по часам</h3>
+      <PieChart data={flightsByTimeOfDay} /> {/* ✅ Теперь обновляется при брашинге */}
     </div>
   );
 };
 
 export default FlightStatisticsOneReg;
 
+// // components/FlightStatistics.jsx
+// /* eslint-disable no-unused-vars */
+// import { useState } from 'react';
+
+// import { useData } from '../hooks/useData';
+// import { BrushableBarChart } from './BrushableBarChart';
+// import { FlightDurationChart } from './FlightDurationChart/FlightDurationChart';
+// import { PeakHourlyFlightsChart } from './PeakHourlyFlightsChart/PeakHourlyFlightsChart';
+// import { PieChart } from './PieChart/PieChart';
+// import TableInfoChart from './TableInfoChart/TableInfoChart';
+
+// const FlightStatisticsOneReg = ({
+//   dailyFlights,
+//   flightsByRegion,
+//   flightsDurationByRegion,
+//   flightsByTimeOfDay,
+//   onDateRangeChange,
+// }) => {
+//   const stats = {
+//     averageFlightDuration: flightsDurationByRegion
+//       ? (
+//           flightsDurationByRegion.reduce((sum, flight) => sum + flight.totalDurationMinutes, 0) /
+//           flightsDurationByRegion.length
+//         ).toFixed(2)
+//       : 0,
+//     daysWithoutFlights: dailyFlights ? dailyFlights.filter((day) => day.count === 0).length : 0,
+//     totalFlights: dailyFlights ? dailyFlights.reduce((sum, day) => sum + day.count, 0) : 0,
+//   };
+
+//   const { data: flightData, loading, error } = useData();
+
+//   // ✅ Добавим состояние для dateRange
+//   const [dateRange, setDateRange] = useState(null);
+//   return (
+//     <div className="chart-container">
+//       <TableInfoChart data={stats} />
+//       <h3 className="chart-title">Количество полетов по датам</h3>
+//       <BrushableBarChart data={dailyFlights} onBrush={setDateRange} />
+//       <h3 className="chart-title">Суммарная длительность полетов по датам</h3>
+//       <FlightDurationChart flightData={flightData} dateRange={dateRange} />
+//       <h3 className="chart-title">Распределение полетов по часам</h3>
+//       <PieChart data={flightsByTimeOfDay} />
+//     </div>
+//   );
+// };
+
+// export default FlightStatisticsOneReg;
+// // components/FlightStatistics.jsx
+// /* eslint-disable no-unused-vars */
+// import { useState } from 'react';
+
+// import { useData } from '../hooks/useData';
+// import { BrushableBarChart } from './BrushableBarChart';
+// import { FlightDurationChart } from './FlightDurationChart/FlightDurationChart';
+// import { PeakHourlyFlightsChart } from './PeakHourlyFlightsChart/PeakHourlyFlightsChart';
+// import { PieChart } from './PieChart/PieChart';
+// import TableInfoChart from './TableInfoChart/TableInfoChart';
+
+// const FlightStatisticsOneReg = ({
+//   dailyFlights,
+//   flightsByRegion,
+//   flightsDurationByRegion,
+//   flightsByTimeOfDay,
+//   onDateRangeChange,
+// }) => {
+//   const stats = {
+//     averageFlightDuration: flightsDurationByRegion
+//       ? (
+//           flightsDurationByRegion.reduce((sum, flight) => sum + flight.totalDurationMinutes, 0) /
+//           flightsDurationByRegion.length
+//         ).toFixed(2)
+//       : 0,
+//     daysWithoutFlights: dailyFlights ? dailyFlights.filter((day) => day.count === 0).length : 0,
+//     totalFlights: dailyFlights ? dailyFlights.reduce((sum, day) => sum + day.count, 0) : 0,
+//   };
+
+//   const pieData = [
+//     { label: 'Утро', value: 35 },
+//     { label: 'День', value: 40 },
+//     { label: 'Вечер', value: 25 },
+//   ];
+
+//   const { data: flightData, loading, error } = useData();
+
+//   // ✅ Добавим состояние для dateRange
+//   const [dateRange, setDateRange] = useState(null);
+//   return (
+//     <div className="chart-container">
+//       <TableInfoChart data={stats} />
+//       <h3 className="chart-title">Количество полетов по датам</h3>
+//       <BrushableBarChart data={dailyFlights} onBrush={setDateRange} />
+//       <h3 className="chart-title">Суммарная длительность полетов по датам</h3>
+//       <FlightDurationChart flightData={flightData} dateRange={dateRange} />
+//       <h3 className="chart-title">Распределение полетов по часам</h3>
+//       <PieChart data={pieData} />
+//     </div>
+//   );
+// };
+
+// export default FlightStatisticsOneReg;
 // /* eslint-disable no-unused-vars */
 // import { BrushableBarChart } from './BrushableBarChart';
 
