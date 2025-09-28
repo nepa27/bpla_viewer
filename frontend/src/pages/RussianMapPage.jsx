@@ -13,9 +13,12 @@ const RussianMapPage = () => {
   const regionsPolygons = useRegions();
   const [errorLoadYmaps, setErrorLoadYmaps] = useState(false);
   const [ymapsLoading, setYmapsLoading] = useState(true);
+  const [dateRange, setDateRange] = useState(null);
 
-  const { filteredFlights, dailyFlights, flightsByRegion, flightsDurationByRegion, setDateRange } =
-    useFlightData(flightData);
+  const { filteredFlights, dailyFlights, flightsByRegion, flightsDurationByRegion } = useFlightData(
+    flightData,
+    dateRange,
+  );
 
   useEffect(() => {
     let isMounted = true;
@@ -94,6 +97,7 @@ const RussianMapPage = () => {
         flightsByRegion={flightsByRegion}
         flightsDurationByRegion={flightsDurationByRegion}
         onDateRangeChange={setDateRange}
+        dateRange={dateRange}
       />
     </div>
   );

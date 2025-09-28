@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 
 import { useParams } from 'react-router';
 
+import ButtonGoBack from '../components/ButtonGoBack';
 import FlightStatisticsOneReg from '../components/FlightStatisticsOneReg';
 import { useData } from '../hooks/useData';
 import { useFlightData } from '../hooks/useFlightData';
@@ -15,18 +16,25 @@ const OneRegionMapPage = () => {
   const [errorLoadYmaps, setErrorLoadYmaps] = useState(false);
   const [ymapsLoading, setYmapsLoading] = useState(true);
   const { data: flightData, loading, error } = useData();
-  const regionsPolygons = useRegions(); // Это может быть null/undefined до загрузки
+  const regionsPolygons = useRegions();
+  const [dateRange, setDateRange] = useState(null);
 
-  const { filteredFlights, dailyFlights, flightsByRegion, flightsDurationByRegion, setDateRange } =
-    useFlightData(flightData);
-
-  // Найдите регион ТОЛЬКО когда regionsPolygons станет доступен
+  const {
+    filteredFlights,
+    dailyFlights,
+    peakHourlyFlightsData,
+    peakHourlyFlights,
+    flightsByRegion,
+    flightsDurationByRegion,
+    flightsByTimeOfDay,
+    // setDateRange,
+  } = useFlightData(flightData, dateRange);
+  // console.log('filteredFlights OneRegionMapPage ', filteredFlights);
+  // } = useFlightData(flightData, dateRange);
   const oneRegionData = regionsPolygons?.features?.find(
-    (obj) => String(obj.properties?.region_id) === String(id)
+    (obj) => String(obj.properties?.region_id) === String(id),
   );
-
-  // Вычислите центр региона ТОЛЬКО если он найден
-  const regionCenter = oneRegionData?.properties?.center || [69, 100]; // Центр России по умолчанию
+  const regionCenter = oneRegionData?.properties?.center || [69, 100];
 
   useEffect(() => {
     let isMounted = true;
@@ -55,11 +63,16 @@ const OneRegionMapPage = () => {
     };
   }, []);
 
-  // Проверка загрузки общих данных
   if (loading || !flightData) {
     return (
       <div className="main">
-        <h1>Загрузка региона...</h1>
+        <div className="btn-back-container">
+          <ButtonGoBack />
+          <div className="header-region">
+            <h1>Загрузка региона...</h1>
+          </div>
+        </div>
+
         <div
           style={{
             height: '600px',
@@ -74,11 +87,16 @@ const OneRegionMapPage = () => {
     );
   }
 
-  // Проверка загрузки геоданных регионов
   if (!regionsPolygons) {
     return (
       <div className="main">
-        <h1>Загрузка карты...</h1>
+        <div className="btn-back-container">
+          <ButtonGoBack />
+          <div className="header-region">
+            <h1>Загрузка карты...</h1>
+          </div>
+        </div>
+
         <div
           style={{
             height: '600px',
@@ -93,11 +111,16 @@ const OneRegionMapPage = () => {
     );
   }
 
-  // Проверка, найден ли регион по ID
   if (!oneRegionData) {
     return (
       <div className="main">
-        <h1>Регион не найден</h1>
+        <div className="btn-back-container">
+          <ButtonGoBack />
+          <div className="header-region">
+            <h1>Регион не найден</h1>
+          </div>
+        </div>
+
         <div
           style={{
             height: '600px',
@@ -112,11 +135,15 @@ const OneRegionMapPage = () => {
     );
   }
 
-  // Оптимизированное условие загрузки Яндекс.Карт
   if (ymapsLoading) {
     return (
       <div className="main">
-        <h1>{oneRegionData?.properties?.region || 'Регион России'}</h1>
+        <div className="btn-back-container">
+          <ButtonGoBack />
+          <div className="header-region">
+            <h1>{oneRegionData?.properties?.region || 'Регион России'}</h1>
+          </div>
+        </div>
         <div
           style={{
             height: '600px',
@@ -131,30 +158,15 @@ const OneRegionMapPage = () => {
     );
   }
 
-  // // Проверка ошибки загрузки Яндекс.Карт
-  // if (errorLoadYmaps) {
-  //   return (
-  //     <div className="main">
-  //       <h1>{oneRegionData?.properties?.region || 'Регион России'}</h1>
-  //       <div
-  //         style={{
-  //           height: '600px',
-  //           display: 'flex',
-  //           alignItems: 'center',
-  //           justifyContent: 'center',
-  //         }}
-  //       >
-  //         Ошибка загрузки Яндекс.Карт
-  //       </div>
-  //     </div>
-  //   );
-  // }
-
-  // Проверка ошибки загрузки данных полетов
   if (error) {
     return (
       <div className="main">
-        <h1>{oneRegionData?.properties?.region || 'Регион России'}</h1>
+        <div className="btn-back-container">
+          <ButtonGoBack />
+          <div className="header-region">
+            <h1>{oneRegionData?.properties?.region || 'Регион России'}</h1>
+          </div>
+        </div>
         <div
           style={{
             height: '600px',
@@ -171,15 +183,29 @@ const OneRegionMapPage = () => {
 
   return (
     <div className="main">
-      <h1>{oneRegionData?.properties?.region || 'Регион России'}</h1>
+      <div className="btn-back-container">
+        <ButtonGoBack />
+        <div className="header-region">
+          <h1>{oneRegionData?.properties?.region || 'Регион России'}</h1>
+        </div>
+      </div>
+
       <MapComponent
         regionsData={oneRegionData}
         points={filteredFlights}
         errorLoadYmaps={errorLoadYmaps}
-        center={regionCenter} // Передаем центр региона
-        zoom={6} // Увеличим масштаб для одного региона
+        center={regionCenter}
+        zoom={6}
       />
-      <FlightStatisticsOneReg dailyFlights={dailyFlights} onDateRangeChange={setDateRange} />
+
+      <FlightStatisticsOneReg
+        dailyFlights={dailyFlights}
+        flightsData={flightData}
+        onDateRangeChange={setDateRange}
+        peakHourlyFlightsData={peakHourlyFlightsData}
+        flightsByTimeOfDay={flightsByTimeOfDay}
+        dateRange={dateRange}
+      />
     </div>
   );
 };
