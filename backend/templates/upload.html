@@ -56,6 +56,21 @@
             border: 1px solid #c3e6cb;
             border-radius: 5px;
         }
+        .progress {
+            position: relative;
+        }
+        .progress-percent {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-weight: bold;
+            font-size: 12px;
+            color: #000;
+        }
+        .progress-info {
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -87,18 +102,35 @@
                             </div>
                         </div>
 
-                        <!-- Прогресс бар -->
-                        <div class="progress-container" id="progressContainer">
-                            <div class="d-flex align-items-center justify-content-center mb-3">
-                                <div class="spinner-border spinner-border-custom text-primary me-3" role="status"></div>
-                                <span class="fs-5">Обрабатываем файл...</span>
-                            </div>
-                            <div class="progress">
-                                <div class="progress-bar progress-bar-striped progress-bar-animated"
-                                     role="progressbar" style="width: 100%"></div>
-                            </div>
-                            <small class="text-muted mt-2 d-block">Пожалуйста, не закрывайте страницу</small>
-                        </div>
+<!-- Прогресс бар -->
+<div class="progress-container" id="progressContainer">
+    <div class="d-flex align-items-center justify-content-center mb-3">
+        <div class="spinner-border spinner-border-custom text-primary me-3" role="status"></div>
+        <div>
+            <span class="fs-5">Обрабатываем файл...</span>
+            <div class="progress-info mt-1">
+                <small class="text-muted" id="progressText">Подготовка к загрузке...</small>
+            </div>
+        </div>
+    </div>
+    <div class="progress" style="height: 20px;">
+        <div class="progress-bar progress-bar-striped progress-bar-animated"
+             role="progressbar"
+             id="progressBar"
+             style="width: 0%"
+             aria-valuenow="0"
+             aria-valuemin="0"
+             aria-valuemax="100">
+            <span class="progress-percent" id="progressPercent">0%</span>
+        </div>
+    </div>
+    <div class="mt-2">
+        <small class="text-muted">
+            <i class="fas fa-info-circle me-1"></i>
+            <span id="progressDetails">Пожалуйста, не закрывайте страницу</span>
+        </small>
+    </div>
+</div>
 
                         <!-- Результаты обработки -->
                         <div class="results" id="results">
@@ -233,7 +265,13 @@
             progressContainer.style.display = 'block';
             results.style.display = 'none';
 
+            // Сбрасываем прогресс
+            updateProgress(0, 'Начинаем загрузку файла...');
+
             try {
+                // Эмулируем прогресс во время загрузки
+                simulateProgress();
+
                 const response = await fetch('/admin/upload-file', {
                     method: 'POST',
                     body: formData
@@ -241,14 +279,25 @@
 
                 const result = await response.json();
 
+                // Завершаем прогресс
+                updateProgress(100, 'Обработка завершена!');
+
+                // Небольшая задержка чтобы пользователь увидел 100%
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
                 // Скрываем прогресс
                 progressContainer.style.display = 'none';
                 buttonContainer.style.display = 'block';
 
                 if (result.success) {
-                    // Показываем детальные результаты
                     showResults(result);
                     showNotification('Успех!', result.message, 'success');
+
+                    // УБИРАЕМ АВТОМАТИЧЕСКИЙ РЕДИРЕКТ
+                    // setTimeout(() => {
+                    //     window.location.href = '/admin/flight/list';
+                    // }, 3000);
+
                 } else {
                     showNotification('Ошибка', result.message, 'danger');
                 }
@@ -260,15 +309,68 @@
             }
         });
 
-        // Показ результатов обработки
+        // Функция для обновления прогресса
+        function updateProgress(percent, text) {
+            const progressBar = document.getElementById('progressBar');
+            const progressPercent = document.getElementById('progressPercent');
+            const progressText = document.getElementById('progressText');
+            const progressDetails = document.getElementById('progressDetails');
+
+            const roundedPercent = Math.round(percent);
+
+            progressBar.style.width = roundedPercent + '%';
+            progressBar.setAttribute('aria-valuenow', roundedPercent);
+            progressPercent.textContent = roundedPercent + '%';
+            progressText.textContent = text;
+
+            if (roundedPercent < 30) {
+                progressDetails.textContent = 'Читаем файл...';
+            } else if (roundedPercent < 60) {
+                progressDetails.textContent = 'Парсим данные...';
+            } else if (roundedPercent < 90) {
+                progressDetails.textContent = 'Валидируем данные...';
+            } else {
+                progressDetails.textContent = 'Загружаем в базу данных...';
+            }
+        }
+
+        // Эмуляция прогресса
+        function simulateProgress() {
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 2;
+                if (progress >= 90) {
+                    progress = 90; // Останавливаемся на 90% до получения ответа
+                    clearInterval(interval);
+                }
+                updateProgress(Math.min(progress, 90), 'Обрабатываем файл...');
+            }, 500);
+        }
+
         function showResults(result) {
-            resultsContent.innerHTML = `
+            let resultsHtml = `
                 <p><strong>Файл:</strong> ${result.file_info.filename}</p>
-                <p><strong>Обработано записей:</strong> ${result.processed_records}</p>
+                <p><strong>Обработано записей:</strong> ${result.processed_records || 'информация недоступна'}</p>
                 <p><strong>Размер файла:</strong> ${result.file_info.size}</p>
                 <p><strong>Тип файла:</strong> ${result.file_info.type}</p>
             `;
+
+            // Добавляем дополнительные поля если они есть
+            if (result.file_info.columns) {
+                resultsHtml += `<p><strong>Колонки:</strong> ${result.file_info.columns.join(', ')}</p>`;
+            }
+
+            resultsContent.innerHTML = resultsHtml;
             results.style.display = 'block';
+
+            // Добавляем кнопку для просмотра результатов
+            const viewResultsBtn = document.createElement('button');
+            viewResultsBtn.className = 'btn btn-success mt-3';
+            viewResultsBtn.innerHTML = '<i class="fas fa-eye me-2"></i>Посмотреть загруженные данные';
+            viewResultsBtn.onclick = () => {
+                window.location.href = '/admin/flight/list';
+            };
+            resultsContent.appendChild(viewResultsBtn);
         }
 
         // Очистка выбранного файла
