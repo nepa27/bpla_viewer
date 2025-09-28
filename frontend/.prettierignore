@@ -4,6 +4,7 @@ dist/
 build/
 
 russia_regions.geo.json
+russia_regions_id.geo.json
 
 # Logs
 *.log

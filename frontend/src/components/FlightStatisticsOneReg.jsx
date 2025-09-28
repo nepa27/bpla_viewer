@@ -18,7 +18,7 @@ const FlightStatisticsOneReg = ({
   flightsDurationByRegion,
   onDateRangeChange,
   flightsByTimeOfDay,
-  peakHourlyFlights, 
+  peakHourlyFlights,
 }) => {
   const stats = {
     averageFlightDuration: flightsDurationByRegion
