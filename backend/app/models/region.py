@@ -7,9 +7,8 @@ from backend.app.database import Base
 class Region(Base):
     __tablename__ = "regions"
 
-    id = Column(Integer, index=True)
+    region_id = Column(Integer, primary_key=True, index=True, unique=True, autoincrement=True)
     name = Column(String, unique=True, index=True, nullable=True)
-    region_id = Column(Integer, primary_key=True, index=True, unique=True)
 
     flights = relationship("Flight", back_populates="region_rel")
 
