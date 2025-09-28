@@ -26,10 +26,8 @@ const MapComponent = ({
   const handleRegionClick = useCallback(
     (region) => {
       // region - это GeoJSON Feature объект
-      const regionName = region.properties?.region;
       const regionId = region.properties?.region_id;
 
-      alert(`Вы выбрали регион: ${regionName || regionId || 'Неизвестный регион'}`);
       setSelectedRegion(region);
 
       if (regionId) {
