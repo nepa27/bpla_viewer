@@ -1,0 +1,46 @@
+/* .peak-hourly-flights-chart-container {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.peak-hourly-flights-chart-svg {
+  width: 100%;
+}
+
+.line {
+  fill: none;
+  stroke: #ff6b6b;
+  stroke-width: 2px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.dot-group {
+  cursor: pointer;
+}
+
+.axis-label {
+  fill: #333;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.grid .tick line {
+  stroke: #e0e0e0;
+  stroke-opacity: 0.5;
+}
+
+.grid path {
+  stroke-width: 0;
+}
+
+.tooltip {
+  position: absolute;
+  padding: 6px 12px;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  border-radius: 4px;
+  pointer-events: none;
+  font-size: 12px;
+  z-index: 1000;
+} */
