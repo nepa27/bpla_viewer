@@ -1,8 +1,67 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
-export const useFlightData = (flightsData) => {
-  const [dateRange, setDateRange] = useState(null);
+export const useFlightData = (flightsData, dateRange = null) => {
   const [filteredFlights, setFilteredFlights] = useState([]);
+
+  // ✅ Фильтрация полётов по диапазону дат
+  useEffect(() => {
+    if (!flightsData?.length) {
+      setFilteredFlights([]);
+      return;
+    }
+
+    if (!dateRange) {
+      setFilteredFlights(flightsData);
+      return;
+    }
+
+    const [startDate, endDate] = dateRange;
+    const startCompareDate = new Date(startDate);
+    const endCompareDate = new Date(endDate);
+
+    startCompareDate.setHours(0, 0, 0, 0);
+    endCompareDate.setHours(23, 59, 59, 999);
+
+    const filtered = flightsData.filter((flight) => {
+      const flightDate = new Date(flight.date);
+      const compareDate = new Date(flightDate);
+      compareDate.setHours(0, 0, 0, 0);
+      return compareDate >= startCompareDate && compareDate <= endCompareDate;
+    });
+
+    setFilteredFlights(filtered);
+  }, [flightsData, dateRange]);
+
+  // ✅ Вычисление полётов по времени суток (на основе takeoff_time)
+  const flightsByTimeOfDay = useMemo(() => {
+    if (!filteredFlights?.length) return [];
+
+    const timeOfDayCounts = {
+      Утро: 0, // 5:00 - 11:59
+      День: 0, // 12:00 - 17:59
+      Вечер: 0, // 18:00 - 23:59
+      Ночь: 0, // 00:00 - 4:59
+    };
+
+    for (const flight of filteredFlights) {
+      // ✅ Используем takeoff_time (например, "00:00")
+      const [hours, minutes] = flight.takeoff_time.split(':').map(Number);
+
+      if (hours >= 5 && hours < 12) {
+        timeOfDayCounts['Утро']++;
+      } else if (hours >= 12 && hours < 18) {
+        timeOfDayCounts['День']++;
+      } else if (hours >= 18 && hours < 24) {
+        timeOfDayCounts['Вечер']++;
+      } else {
+        timeOfDayCounts['Ночь']++;
+      }
+    }
+
+    return Object.entries(timeOfDayCounts)
+      .map(([label, value]) => ({ label, value }))
+      .filter((item) => item.value > 0);
+  }, [filteredFlights]);
 
   // Оптимизированное вычисление ежедневных полетов
   const dailyFlights = useMemo(() => {
@@ -10,7 +69,6 @@ export const useFlightData = (flightsData) => {
 
     const flightsByDate = new Map();
 
-    // Используем for...of для лучшей читаемости
     for (const flight of flightsData) {
       const date = flight.date;
       flightsByDate.set(date, (flightsByDate.get(date) || 0) + 1);
@@ -46,7 +104,6 @@ export const useFlightData = (flightsData) => {
 
     const durationByRegion = new Map();
 
-    // Один проход для сбора данных
     for (const flight of filteredFlights) {
       const region = flight.region || 'Не определен';
       const duration = flight.durationMinutes || 0;
@@ -54,7 +111,6 @@ export const useFlightData = (flightsData) => {
       durationByRegion.set(region, currentDuration + duration);
     }
 
-    // Преобразуем в массив и сортируем
     return Array.from(durationByRegion.entries())
       .map(([region, totalDurationMinutes]) => ({
         region,
@@ -63,47 +119,456 @@ export const useFlightData = (flightsData) => {
       .sort((a, b) => b.totalDurationMinutes - a.totalDurationMinutes);
   }, [filteredFlights]);
 
-  // Оптимизированная фильтрация полетов
-  const filterFlights = useCallback(() => {
-    if (!flightsData?.length) {
-      setFilteredFlights([]);
-      return;
-    }
+  // Вычисление пиковой нагрузки: максимальное число полетов за час
+  const peakHourlyFlights = useMemo(() => {
+    if (!filteredFlights?.length) return { maxFlights: 0, peakHour: null };
 
-    if (!dateRange) {
-      setFilteredFlights(flightsData);
-      return;
-    }
+    const flightsByHour = new Map();
 
-    const [startDate, endDate] = dateRange;
-    const startCompareDate = new Date(startDate);
-    const endCompareDate = new Date(endDate);
-
-    startCompareDate.setHours(0, 0, 0, 0);
-    endCompareDate.setHours(23, 59, 59, 999);
-
-    const filtered = flightsData.filter((flight) => {
+    for (const flight of filteredFlights) {
       const flightDate = new Date(flight.date);
-      const compareDate = new Date(flightDate);
-      compareDate.setHours(0, 0, 0, 0);
-      return compareDate >= startCompareDate && compareDate <= endCompareDate;
-    });
+      const hourKey = new Date(
+        flightDate.getFullYear(),
+        flightDate.getMonth(),
+        flightDate.getDate(),
+        flightDate.getHours(),
+      ).toISOString();
 
-    setFilteredFlights(filtered);
-  }, [flightsData, dateRange]);
+      flightsByHour.set(hourKey, (flightsByHour.get(hourKey) || 0) + 1);
+    }
 
-  useEffect(() => {
-    filterFlights();
-  }, [filterFlights]);
+    let maxFlights = 0;
+    let peakHour = null;
 
+    for (const [hour, count] of flightsByHour.entries()) {
+      if (count > maxFlights) {
+        maxFlights = count;
+        peakHour = new Date(hour);
+      }
+    }
+
+    return { maxFlights, peakHour };
+  }, [filteredFlights]);
+
+  // console.log(filteredFlights)
   return {
     filteredFlights,
     dailyFlights,
     flightsByRegion,
     flightsDurationByRegion,
-    setDateRange,
+    peakHourlyFlights,
+    flightsByTimeOfDay,
   };
 };
+
+// import { useCallback, useEffect, useMemo, useState } from 'react';
+
+// export const useFlightData = (flightsData) => {
+//   const [dateRange, setDateRange] = useState(null);
+//   const [filteredFlights, setFilteredFlights] = useState([]);
+
+//   // ✅ Фильтрация полётов по диапазону дат
+//   const filterFlights = useCallback(() => {
+//     if (!flightsData?.length) {
+//       setFilteredFlights([]);
+//       return;
+//     }
+
+//     if (!dateRange) {
+//       setFilteredFlights(flightsData);
+//       return;
+//     }
+
+//     const [startDate, endDate] = dateRange;
+//     const startCompareDate = new Date(startDate);
+//     const endCompareDate = new Date(endDate);
+
+//     startCompareDate.setHours(0, 0, 0, 0);
+//     endCompareDate.setHours(23, 59, 59, 999);
+
+//     const filtered = flightsData.filter((flight) => {
+//       const flightDate = new Date(flight.date);
+//       const compareDate = new Date(flightDate);
+//       compareDate.setHours(0, 0, 0, 0);
+//       return compareDate >= startCompareDate && compareDate <= endCompareDate;
+//     });
+
+//     setFilteredFlights(filtered);
+//   }, [flightsData, dateRange]);
+
+//   useEffect(() => {
+//     filterFlights();
+//   }, [filterFlights]);
+
+//   // ✅ Вычисление полётов по времени суток (на основе takeoff_time)
+//   const flightsByTimeOfDay = useMemo(() => {
+//     if (!flightsData?.length) return [];
+
+//     const timeOfDayCounts = {
+//       Утро: 0, // 5:00 - 11:59
+//       День: 0, // 12:00 - 17:59
+//       Вечер: 0, // 18:00 - 23:59
+//       Ночь: 0, // 00:00 - 4:59
+//     };
+
+//     for (const flight of flightsData) {
+//       // ✅ Используем takeoff_time (например, "00:00")
+//       const [hours, minutes] = flight.takeoff_time.split(':').map(Number);
+
+//       if (hours >= 5 && hours < 12) {
+//         timeOfDayCounts['Утро']++;
+//       } else if (hours >= 12 && hours < 18) {
+//         timeOfDayCounts['День']++;
+//       } else if (hours >= 18 && hours < 24) {
+//         timeOfDayCounts['Вечер']++;
+//       } else {
+//         timeOfDayCounts['Ночь']++;
+//       }
+//     }
+
+//     return Object.entries(timeOfDayCounts)
+//       .map(([label, value]) => ({ label, value }))
+//       .filter((item) => item.value > 0);
+//   }, [flightsData]);
+
+//   // Оптимизированное вычисление ежедневных полетов
+//   const dailyFlights = useMemo(() => {
+//     if (!flightsData?.length) return [];
+
+//     const flightsByDate = new Map();
+
+//     for (const flight of flightsData) {
+//       const date = flight.date;
+//       flightsByDate.set(date, (flightsByDate.get(date) || 0) + 1);
+//     }
+
+//     return Array.from(flightsByDate.entries())
+//       .map(([date, count]) => ({
+//         date: new Date(date),
+//         count,
+//       }))
+//       .sort((a, b) => a.date - b.date);
+//   }, [flightsData]);
+
+//   // Вычисление количества полетов по регионам
+//   const flightsByRegion = useMemo(() => {
+//     if (!filteredFlights?.length) return [];
+
+//     const regionCounts = new Map();
+
+//     for (const flight of filteredFlights) {
+//       const region = flight.region || 'Не определен';
+//       regionCounts.set(region, (regionCounts.get(region) || 0) + 1);
+//     }
+
+//     return Array.from(regionCounts.entries())
+//       .map(([region, count]) => ({ region, count }))
+//       .sort((a, b) => b.count - a.count);
+//   }, [filteredFlights]);
+
+//   // Вычисление суммарной длительности полетов по регионам
+//   const flightsDurationByRegion = useMemo(() => {
+//     if (!filteredFlights?.length) return [];
+
+//     const durationByRegion = new Map();
+
+//     for (const flight of filteredFlights) {
+//       const region = flight.region || 'Не определен';
+//       const duration = flight.durationMinutes || 0;
+//       const currentDuration = durationByRegion.get(region) || 0;
+//       durationByRegion.set(region, currentDuration + duration);
+//     }
+
+//     return Array.from(durationByRegion.entries())
+//       .map(([region, totalDurationMinutes]) => ({
+//         region,
+//         totalDurationMinutes,
+//       }))
+//       .sort((a, b) => b.totalDurationMinutes - a.totalDurationMinutes);
+//   }, [filteredFlights]);
+
+//   // Вычисление пиковой нагрузки: максимальное число полетов за час
+//   const peakHourlyFlights = useMemo(() => {
+//     if (!filteredFlights?.length) return { maxFlights: 0, peakHour: null };
+
+//     const flightsByHour = new Map();
+
+//     for (const flight of filteredFlights) {
+//       const flightDate = new Date(flight.date);
+//       const hourKey = new Date(
+//         flightDate.getFullYear(),
+//         flightDate.getMonth(),
+//         flightDate.getDate(),
+//         flightDate.getHours(),
+//       ).toISOString();
+
+//       flightsByHour.set(hourKey, (flightsByHour.get(hourKey) || 0) + 1);
+//     }
+
+//     let maxFlights = 0;
+//     let peakHour = null;
+
+//     for (const [hour, count] of flightsByHour.entries()) {
+//       if (count > maxFlights) {
+//         maxFlights = count;
+//         peakHour = new Date(hour);
+//       }
+//     }
+
+//     return { maxFlights, peakHour };
+//   }, [filteredFlights]);
+
+//   return {
+//     filteredFlights,
+//     dailyFlights,
+//     flightsByRegion,
+//     flightsDurationByRegion,
+//     peakHourlyFlights,
+//     flightsByTimeOfDay, // ✅ Добавлено
+//     setDateRange,
+//   };
+// };
+// import { useCallback, useEffect, useMemo, useState } from 'react';
+
+// export const useFlightData = (flightsData) => {
+//   const [dateRange, setDateRange] = useState(null);
+//   const [filteredFlights, setFilteredFlights] = useState([]);
+
+//   // Оптимизированное вычисление ежедневных полетов
+//   const dailyFlights = useMemo(() => {
+//     if (!flightsData?.length) return [];
+
+//     const flightsByDate = new Map();
+
+//     for (const flight of flightsData) {
+//       const date = flight.date;
+//       flightsByDate.set(date, (flightsByDate.get(date) || 0) + 1);
+//     }
+
+//     return Array.from(flightsByDate.entries())
+//       .map(([date, count]) => ({
+//         date: new Date(date),
+//         count,
+//       }))
+//       .sort((a, b) => a.date - b.date);
+//   }, [flightsData]);
+
+//   // Вычисление количества полетов по регионам
+//   const flightsByRegion = useMemo(() => {
+//     if (!filteredFlights?.length) return [];
+
+//     const regionCounts = new Map();
+
+//     for (const flight of filteredFlights) {
+//       const region = flight.region || 'Не определен';
+//       regionCounts.set(region, (regionCounts.get(region) || 0) + 1);
+//     }
+
+//     return Array.from(regionCounts.entries())
+//       .map(([region, count]) => ({ region, count }))
+//       .sort((a, b) => b.count - a.count);
+//   }, [filteredFlights]);
+
+//   // Вычисление суммарной длительности полетов по регионам
+//   const flightsDurationByRegion = useMemo(() => {
+//     if (!filteredFlights?.length) return [];
+
+//     const durationByRegion = new Map();
+
+//     for (const flight of filteredFlights) {
+//       const region = flight.region || 'Не определен';
+//       const duration = flight.durationMinutes || 0;
+//       const currentDuration = durationByRegion.get(region) || 0;
+//       durationByRegion.set(region, currentDuration + duration);
+//     }
+
+//     return Array.from(durationByRegion.entries())
+//       .map(([region, totalDurationMinutes]) => ({
+//         region,
+//         totalDurationMinutes,
+//       }))
+//       .sort((a, b) => b.totalDurationMinutes - a.totalDurationMinutes);
+//   }, [filteredFlights]);
+
+//   // Вычисление пиковой нагрузки: максимальное число полетов за час
+//   const peakHourlyFlights = useMemo(() => {
+//     if (!filteredFlights?.length) return { maxFlights: 0, peakHour: null };
+
+//     const flightsByHour = new Map();
+
+//     for (const flight of filteredFlights) {
+//       const flightDate = new Date(flight.date);
+//       const hourKey = new Date(
+//         flightDate.getFullYear(),
+//         flightDate.getMonth(),
+//         flightDate.getDate(),
+//         flightDate.getHours(),
+//       ).toISOString();
+
+//       flightsByHour.set(hourKey, (flightsByHour.get(hourKey) || 0) + 1);
+//     }
+
+//     let maxFlights = 0;
+//     let peakHour = null;
+
+//     for (const [hour, count] of flightsByHour.entries()) {
+//       if (count > maxFlights) {
+//         maxFlights = count;
+//         peakHour = new Date(hour);
+//       }
+//     }
+
+//     return { maxFlights, peakHour };
+//   }, [filteredFlights]);
+
+//   // Оптимизированная фильтрация полетов
+//   const filterFlights = useCallback(() => {
+//     if (!flightsData?.length) {
+//       setFilteredFlights([]);
+//       return;
+//     }
+
+//     if (!dateRange) {
+//       setFilteredFlights(flightsData);
+//       return;
+//     }
+
+//     const [startDate, endDate] = dateRange;
+//     const startCompareDate = new Date(startDate);
+//     const endCompareDate = new Date(endDate);
+
+//     startCompareDate.setHours(0, 0, 0, 0);
+//     endCompareDate.setHours(23, 59, 59, 999);
+
+//     const filtered = flightsData.filter((flight) => {
+//       const flightDate = new Date(flight.date);
+//       const compareDate = new Date(flightDate);
+//       compareDate.setHours(0, 0, 0, 0);
+//       return compareDate >= startCompareDate && compareDate <= endCompareDate;
+//     });
+
+//     setFilteredFlights(filtered);
+//   }, [flightsData, dateRange]);
+
+//   useEffect(() => {
+//     filterFlights();
+//   }, [filterFlights]);
+
+//   return {
+//     filteredFlights,
+//     dailyFlights,
+//     flightsByRegion,
+//     flightsDurationByRegion,
+//     peakHourlyFlights,
+//     setDateRange,
+//   };
+// };
+// import { useCallback, useEffect, useMemo, useState } from 'react';
+
+// export const useFlightData = (flightsData) => {
+//   const [dateRange, setDateRange] = useState(null);
+//   const [filteredFlights, setFilteredFlights] = useState([]);
+
+//   // Оптимизированное вычисление ежедневных полетов
+//   const dailyFlights = useMemo(() => {
+//     if (!flightsData?.length) return [];
+
+//     const flightsByDate = new Map();
+
+//     // Используем for...of для лучшей читаемости
+//     for (const flight of flightsData) {
+//       const date = flight.date;
+//       flightsByDate.set(date, (flightsByDate.get(date) || 0) + 1);
+//     }
+
+//     return Array.from(flightsByDate.entries())
+//       .map(([date, count]) => ({
+//         date: new Date(date),
+//         count,
+//       }))
+//       .sort((a, b) => a.date - b.date);
+//   }, [flightsData]);
+
+//   // Вычисление количества полетов по регионам
+//   const flightsByRegion = useMemo(() => {
+//     if (!filteredFlights?.length) return [];
+
+//     const regionCounts = new Map();
+
+//     for (const flight of filteredFlights) {
+//       const region = flight.region || 'Не определен';
+//       regionCounts.set(region, (regionCounts.get(region) || 0) + 1);
+//     }
+
+//     return Array.from(regionCounts.entries())
+//       .map(([region, count]) => ({ region, count }))
+//       .sort((a, b) => b.count - a.count);
+//   }, [filteredFlights]);
+
+//   // Вычисление суммарной длительности полетов по регионам
+//   const flightsDurationByRegion = useMemo(() => {
+//     if (!filteredFlights?.length) return [];
+
+//     const durationByRegion = new Map();
+
+//     // Один проход для сбора данных
+//     for (const flight of filteredFlights) {
+//       const region = flight.region || 'Не определен';
+//       const duration = flight.durationMinutes || 0;
+//       const currentDuration = durationByRegion.get(region) || 0;
+//       durationByRegion.set(region, currentDuration + duration);
+//     }
+
+//     // Преобразуем в массив и сортируем
+//     return Array.from(durationByRegion.entries())
+//       .map(([region, totalDurationMinutes]) => ({
+//         region,
+//         totalDurationMinutes,
+//       }))
+//       .sort((a, b) => b.totalDurationMinutes - a.totalDurationMinutes);
+//   }, [filteredFlights]);
+
+//   // Оптимизированная фильтрация полетов
+//   const filterFlights = useCallback(() => {
+//     if (!flightsData?.length) {
+//       setFilteredFlights([]);
+//       return;
+//     }
+
+//     if (!dateRange) {
+//       setFilteredFlights(flightsData);
+//       return;
+//     }
+
+//     const [startDate, endDate] = dateRange;
+//     const startCompareDate = new Date(startDate);
+//     const endCompareDate = new Date(endDate);
+
+//     startCompareDate.setHours(0, 0, 0, 0);
+//     endCompareDate.setHours(23, 59, 59, 999);
+
+//     const filtered = flightsData.filter((flight) => {
+//       const flightDate = new Date(flight.date);
+//       const compareDate = new Date(flightDate);
+//       compareDate.setHours(0, 0, 0, 0);
+//       return compareDate >= startCompareDate && compareDate <= endCompareDate;
+//     });
+
+//     setFilteredFlights(filtered);
+//   }, [flightsData, dateRange]);
+
+//   useEffect(() => {
+//     filterFlights();
+//   }, [filterFlights]);
+
+//   return {
+//     filteredFlights,
+//     dailyFlights,
+//     flightsByRegion,
+//     flightsDurationByRegion,
+//     setDateRange,
+//   };
+// };
 // // hooks/useFlightData.js
 // import { useCallback, useEffect, useMemo, useState } from 'react';
 
