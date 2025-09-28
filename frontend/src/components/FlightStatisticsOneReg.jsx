@@ -4,19 +4,21 @@ import { useState } from 'react';
 
 import { useData } from '../hooks/useData';
 import { useFlightData } from '../hooks/useFlightData';
-// ✅ Добавлено
 import { BrushableBarChart } from './BrushableBarChart';
 import { FlightDurationChart } from './FlightDurationChart/FlightDurationChart';
+import { PeakHourlyFlightsChart } from './PeakHourlyFlightsChart/PeakHourlyFlightsChart';
 import { PieChart } from './PieChart/PieChart';
 import TableInfoChart from './TableInfoChart/TableInfoChart';
 
 const FlightStatisticsOneReg = ({
   dateRange,
   dailyFlights,
+  flightsData,
   flightsByRegion,
   flightsDurationByRegion,
   onDateRangeChange,
   flightsByTimeOfDay,
+  peakHourlyFlights, 
 }) => {
   const stats = {
     averageFlightDuration: flightsDurationByRegion
@@ -27,13 +29,10 @@ const FlightStatisticsOneReg = ({
       : 0,
     daysWithoutFlights: dailyFlights ? dailyFlights.filter((day) => day.count === 0).length : 0,
     totalFlights: dailyFlights ? dailyFlights.reduce((sum, day) => sum + day.count, 0) : 0,
+    peakHourlyFlights: peakHourlyFlights.length > 0 ? peakHourlyFlights[0].maxFlights : 0,
   };
 
-  const { data: flightData, loading, error } = useData();
-
-  // ✅ Используем useFlightData для получения обновлённых данных по диапазону
-  // const [dateRange, setDateRange] = useState(null);
-  // const { flightsByTimeOfDay } = useFlightData(flightData, dateRange); // ✅
+  const { data: flightData, loading, error } = useData(); // ✅ Убран data:
 
   if (loading) {
     return (
@@ -51,7 +50,7 @@ const FlightStatisticsOneReg = ({
     );
   }
 
-  if (!flightData) {
+  if (!flightsData) {
     return (
       <div className="chart-container">
         <div>Нет данных для отображения</div>
@@ -64,10 +63,16 @@ const FlightStatisticsOneReg = ({
       <TableInfoChart data={stats} />
       <h3 className="chart-title">Количество полетов по датам</h3>
       <BrushableBarChart data={dailyFlights} onBrush={onDateRangeChange} />
+      <h3 className="chart-title">Пиковая нагрузка по дням</h3>
+      <PeakHourlyFlightsChart
+        peakHourlyFlightsData={peakHourlyFlights}
+        onBrush={onDateRangeChange}
+      />
+
       <h3 className="chart-title">Суммарная длительность полетов по датам</h3>
-      <FlightDurationChart flightData={flightData} dateRange={dateRange} />
+      <FlightDurationChart flightData={flightsData} dateRange={dateRange} />
       <h3 className="chart-title">Распределение полетов по часам</h3>
-      <PieChart data={flightsByTimeOfDay} /> {/* ✅ Теперь обновляется при брашинге */}
+      <PieChart data={flightsByTimeOfDay} />
     </div>
   );
 };

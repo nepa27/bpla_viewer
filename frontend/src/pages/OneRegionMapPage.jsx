@@ -202,7 +202,7 @@ const OneRegionMapPage = () => {
         dailyFlights={dailyFlights}
         flightsData={flightData}
         onDateRangeChange={setDateRange}
-        peakHourlyFlightsData={peakHourlyFlightsData}
+        peakHourlyFlights={peakHourlyFlights}
         flightsByTimeOfDay={flightsByTimeOfDay}
         dateRange={dateRange}
       />
