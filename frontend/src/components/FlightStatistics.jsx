@@ -9,6 +9,7 @@ const FlightStatistics = ({
   flightsByRegion,
   flightsDurationByRegion,
   onDateRangeChange,
+  dateRange,
 }) => {
   return (
     <div className="chart-container">

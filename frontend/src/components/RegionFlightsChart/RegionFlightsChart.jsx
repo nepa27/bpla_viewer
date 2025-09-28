@@ -37,7 +37,6 @@ export const RegionFlightsChart = memo(({ data, onBrush = null }) => {
 
     let sortedData = data.slice(); // [...data];
 
-
     switch (selectedOption) {
       case SORT_OPTIONS_KEY.desc:
         return sortedData.sort((a, b) => b.count - a.count).slice(0, 10);

@@ -70,6 +70,17 @@ function prepareFlightDurations(duration) {
     return 0;
   }
 }
+// {
+//     "flight_id": "7772529562",
+//     "drone_type": "BLA",
+//     "takeoff_coords": "53.38 88.12",
+//     "landing_coords": "53.38 88.12",
+//     "flight_date": "14.05.25",
+//     "takeoff_time": "03:00",
+//     "landing_time": "09:00",
+//     "flight_duration": "6:00",
+//     "region_name": "Кемеровская область"
+// }
 
 export const useData = () => {
   const [data, setData] = useState(null);
@@ -134,6 +145,8 @@ export const useData = () => {
                       date: date.toISOString().split('T')[0],
                       lat,
                       lng,
+                      takeoff_time: d['takeoff_time'] || 'Не найдено',
+                      landing_time: d['landing_time'] || 'Не найдено',
                       type: d['drone_type'] || 'Не указан',
                       // region: d['region_id'] || 'Не определен',
                       region: d['region_name'] || 'Не определен', // @TODO
