@@ -120,37 +120,79 @@ export const useFlightData = (flightsData, dateRange = null) => {
   }, [filteredFlights]);
 
   // Вычисление пиковой нагрузки: максимальное число полетов за час
+  // Вычисление пиковой нагрузки: максимальное число полетов за час для каждой даты
   const peakHourlyFlights = useMemo(() => {
-    if (!filteredFlights?.length) return { maxFlights: 0, peakHour: null };
+    if (!filteredFlights?.length) return [];
 
-    const flightsByHour = new Map();
+    // Создаем Map для хранения данных по каждой дате
+    const dailyPeakData = new Map();
 
+    // Для каждого полета создаем временные интервалы
     for (const flight of filteredFlights) {
-      const flightDate = new Date(flight.date);
-      const hourKey = new Date(
-        flightDate.getFullYear(),
-        flightDate.getMonth(),
-        flightDate.getDate(),
-        flightDate.getHours(),
-      ).toISOString();
+      const flightDateStr = flight.date; // "2025-01-01"
 
-      flightsByHour.set(hourKey, (flightsByHour.get(hourKey) || 0) + 1);
-    }
+      // Если еще не создана запись для этой даты, создаем ее
+      if (!dailyPeakData.has(flightDateStr)) {
+        dailyPeakData.set(flightDateStr, new Map());
+      }
 
-    let maxFlights = 0;
-    let peakHour = null;
+      const hourlyCounts = dailyPeakData.get(flightDateStr);
 
-    for (const [hour, count] of flightsByHour.entries()) {
-      if (count > maxFlights) {
-        maxFlights = count;
-        peakHour = new Date(hour);
+      // Парсим время взлета и посадки
+      const [startHours, startMinutes] = flight.takeoff_time.split(':').map(Number);
+      const [endHours, endMinutes] = flight.landing_time.split(':').map(Number);
+
+      // Создаем дату для полета
+      const flightDate = new Date(flightDateStr);
+
+      // Определяем все часы, когда полет активен
+      const startTime = new Date(flightDate);
+      startTime.setHours(startHours, startMinutes, 0, 0);
+
+      const endTime = new Date(flightDate);
+      endTime.setHours(endHours, endMinutes, 0, 0);
+
+      // Генерируем все часы между началом и окончанием полета
+      const currentHour = new Date(startTime);
+      while (currentHour <= endTime) {
+        // Создаем ключ для часа (год, месяц, день, час)
+        const hourKey = `${currentHour.getFullYear()}-${String(currentHour.getMonth() + 1).padStart(2, '0')}-${String(currentHour.getDate()).padStart(2, '0')}T${String(currentHour.getHours()).padStart(2, '0')}:00`;
+
+        // Увеличиваем счетчик для этого часа
+        hourlyCounts.set(hourKey, (hourlyCounts.get(hourKey) || 0) + 1);
+
+        // Переходим к следующему часу
+        currentHour.setHours(currentHour.getHours() + 1);
       }
     }
 
-    return { maxFlights, peakHour };
+    // Находим максимальное количество полетов для каждой даты
+    const result = [];
+
+    for (const [date, hourlyCounts] of dailyPeakData.entries()) {
+      let maxFlights = 0;
+      let peakHour = null;
+
+      for (const [hourKey, count] of hourlyCounts.entries()) {
+        if (count > maxFlights) {
+          maxFlights = count;
+          peakHour = new Date(hourKey);
+        }
+      }
+
+      result.push({
+        date,
+        maxFlights,
+        peakHour,
+      });
+    }
+
+    // Сортируем по дате
+    result.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    return result;
   }, [filteredFlights]);
 
-  // console.log(filteredFlights)
   return {
     filteredFlights,
     dailyFlights,
