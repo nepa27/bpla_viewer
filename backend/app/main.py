@@ -3,9 +3,15 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from sqladmin import Admin
 
-from backend.app.admin.admin import FlightAdmin, RegionAdmin, UploadView, UploadFileView
 from .database import create_tables, async_engine
+from backend.app.admin.admin import (
+    FlightAdmin,
+    RegionAdmin,
+    UploadView,
+    UploadFileView
+)
 from backend.app.api.flights import router as flight_router
+from backend.app.api.polygons import router as polygon_router
 
 
 @asynccontextmanager
@@ -45,6 +51,7 @@ admin.add_view(FlightAdmin)
 admin.add_view(RegionAdmin)
 
 app.include_router(flight_router)
+app.include_router(polygon_router)
 
 
 @app.get("/health", description='Health check', tags=['Health check'])
