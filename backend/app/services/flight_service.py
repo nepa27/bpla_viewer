@@ -14,38 +14,6 @@ from backend.app.models.region import Region
 
 class FlightService:
     @staticmethod
-    async def get_all_flights(
-            db: AsyncSession,
-            skip: int = 0,
-            limit: int = 100
-    ) -> Tuple[List[Dict[str, Any]], int]:
-        """Получить все полеты из всех регионов с пагинацией"""
-        total_count = await FlightService._get_count(db)
-
-        result = await FlightService.get_data(db, skip, limit)
-
-        flights = result.all()
-        formatted_flights = FlightService._format_flights_data(flights)
-
-        return formatted_flights, total_count
-
-    @staticmethod
-    async def get_flights_by_region(
-            db: AsyncSession,
-            region_id: int,
-            skip: int = 0,
-            limit: int = 100
-    ) -> Tuple[List[Dict[str, Any]], int]:
-        """Получить все полеты в конкретном регионе с пагинацией"""
-        total_count = await FlightService._get_count(db, region_id)
-
-        result = await FlightService.get_data(db, skip, limit, region_id)
-        flights = result.all()
-        formatted_flights = FlightService._format_flights_data(flights)
-
-        return formatted_flights, total_count
-
-    @staticmethod
     def _format_csv_value(value):
         """Форматирует значение для CSV"""
         if value is None:
@@ -84,26 +52,6 @@ class FlightService:
         return f"{hours:01d}:{minutes:02d}"
 
     @staticmethod
-    def _format_flights_data(flights: list) -> list:
-        formatted_flights: list = []
-        for flight in flights:
-            formatted_flights.append({
-                "flight_id": flight.flight_id,
-                "drone_type": flight.drone_type,
-                "takeoff_lat": float(flight.takeoff_lat) if flight.takeoff_lat else None,
-                "takeoff_lon": float(flight.takeoff_lon) if flight.takeoff_lon else None,
-                "landing_lat": float(flight.landing_lat) if flight.landing_lat else None,
-                "landing_lon": float(flight.landing_lon) if flight.landing_lon else None,
-                "flight_date": flight.flight_date.strftime("%d.%m.%Y") if flight.flight_date else None,
-                "takeoff_time": flight.takeoff_time.strftime("%H:%M:%S") if flight.takeoff_time else None,
-                "landing_time": flight.landing_time.strftime("%H:%M:%S") if flight.landing_time else None,
-                "flight_duration": FlightService._format_duration(flight.flight_duration),
-                "region_name": flight.region_name
-            })
-
-        return formatted_flights
-
-    @staticmethod
     async def get_data(
             db: AsyncSession,
             skip: Optional[int] = None,
@@ -112,7 +60,6 @@ class FlightService:
             from_date: Optional[date] = None,
             to_date: Optional[date] = None,
     ) -> engine.result.ChunkedIteratorResult:
-        print(region_id)
         query = (select(
             Flight.flight_id,
             Flight.drone_type,
@@ -140,14 +87,6 @@ class FlightService:
 
         result = await db.execute(query)
         return result
-
-    @staticmethod
-    async def _get_count(db: AsyncSession, region_id: Optional[int] = None) -> int:
-        query = select(func.count(Flight.flight_id))
-        if region_id is not None:
-            query = query.where(Flight.region_id == region_id)
-        total_count_result = await db.execute(query)
-        return total_count_result.scalar()
 
     @staticmethod
     def create_csv_gzip(flights_data) -> bytes:
