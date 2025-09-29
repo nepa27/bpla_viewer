@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.api.responses import get_all_flights_gzip_responses, get_flights_by_region_gzip_responses
 from backend.app.database import get_db
-from backend.app.schemas.flight import FlightResponse, PaginatedFlightResponse
+from backend.app.schemas.flight import PaginatedFlightResponse
 from backend.app.services.flight_service import FlightService
 
 
