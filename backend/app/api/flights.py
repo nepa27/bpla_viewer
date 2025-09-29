@@ -1,3 +1,6 @@
+from datetime import date
+from typing import Optional
+
 from fastapi import APIRouter, Depends, HTTPException, status, Query, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -72,7 +75,11 @@ async def get_flights_by_region(
         )
 
 
-@router.get("/regions_gzip/", responses=get_all_flights_gzip_responses)
+@router.get(
+    "/regions_gzip/",
+    responses=get_all_flights_gzip_responses,
+    response_model=PaginatedFlightResponse
+)
 async def get_all_flights_gzip(db: AsyncSession = Depends(get_db)):
     """Получить все полеты в виде GZIP с CSV"""
     try:
@@ -103,20 +110,31 @@ async def get_all_flights_gzip(db: AsyncSession = Depends(get_db)):
         )
 
 
-@router.get("/regions_gzip/{region_id}", responses=get_flights_by_region_gzip_responses)
-async def get_flights_by_region_gzip(region_id: int, db: AsyncSession = Depends(get_db)):
+@router.get(
+    "/regions_gzip/{region_id}",
+    responses=get_flights_by_region_gzip_responses,
+    response_model=PaginatedFlightResponse
+)
+async def get_flights_by_region_gzip(
+    region_id: int,
+    from_date: Optional[date] = Query(None, description="Дата начала периода"),
+    to_date: Optional[date] = Query(None, description="Дата конца периода"),
+    db: AsyncSession = Depends(get_db)
+):
     """Получить полеты региона в виде GZIP с CSV"""
     try:
-        flights_data = await FlightService.get_data(db, region_id)
-
+        flights_data = await FlightService.get_data(
+            db,
+            region_id=region_id,
+            from_date=from_date,
+            to_date=to_date
+        )
         if not flights_data:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"No flights found for region ID {region_id}"
+                detail=f"No flights found for region ID {region_id} in the specified date range"
             )
-
         gzip_data = FlightService.create_csv_gzip(flights_data)
-
         return Response(
             content=gzip_data,
             media_type="application/gzip",
@@ -124,7 +142,6 @@ async def get_flights_by_region_gzip(region_id: int, db: AsyncSession = Depends(
                 "Content-Disposition": f"attachment; filename=region_{region_id}_flights.csv.gz"
             }
         )
-
     except HTTPException:
         raise
     except Exception as e:

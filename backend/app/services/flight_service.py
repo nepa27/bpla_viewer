@@ -1,5 +1,5 @@
 import csv
-from datetime import timedelta
+from datetime import timedelta, date
 import gzip
 import os
 import tempfile
@@ -108,8 +108,11 @@ class FlightService:
             db: AsyncSession,
             skip: Optional[int] = None,
             limit: Optional[int] = None,
-            region_id: Optional[int] = None
+            region_id: Optional[int] = None,
+            from_date: Optional[date] = None,
+            to_date: Optional[date] = None,
     ) -> engine.result.ChunkedIteratorResult:
+        print(region_id)
         query = (select(
             Flight.flight_id,
             Flight.drone_type,
@@ -124,7 +127,10 @@ class FlightService:
             Region.name.label('region_name')
         ).join(Region, Flight.region_id == Region.region_id, isouter=True)
         ).order_by(Flight.flight_date)
-        # )
+        if from_date:
+            query = query.where(Flight.flight_date >= from_date)
+        if to_date:
+            query = query.where(Flight.flight_date <= to_date)
         if skip:
             query = query.offset(skip)
         if limit:
