@@ -2,7 +2,6 @@ from os import getenv
 from typing import Any, AsyncGenerator
 
 from dotenv import load_dotenv
-from sqlalchemy import text
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 
 from sqlalchemy.orm import declarative_base
@@ -14,7 +13,6 @@ DB_PORT = getenv('DB_PORT', '5432')
 DB_USER = getenv('DB_USER', 'postgres')
 DB_PASS = getenv('DB_PASS', 'password')
 DB_NAME = getenv('DB_NAME', 'flight_db')
-SCHEMA_NAME = getenv('SCHEMA_NAME', 'your_schema_name')
 
 DATABASE_URL = f'postgresql+asyncpg://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
 
@@ -35,7 +33,6 @@ AsyncSessionLocal = async_sessionmaker(
 
 async def get_db() -> AsyncGenerator[AsyncSession | Any, Any]:
     async with AsyncSessionLocal() as session:
-        await session.execute(text(f"SET search_path TO {SCHEMA_NAME}"))
         try:
             yield session
         finally:
