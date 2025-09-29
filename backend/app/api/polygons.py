@@ -12,7 +12,7 @@ router = APIRouter(
 )
 
 
-@router.get("/")
+@router.get("")
 async def get_polygons():
     """Получить полигон координат."""
     try:
