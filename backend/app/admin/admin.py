@@ -1,5 +1,5 @@
-import asyncio
 import os
+import tempfile
 
 from fastapi import UploadFile
 from fastapi.templating import Jinja2Templates
@@ -10,6 +10,7 @@ from starlette.responses import JSONResponse
 
 from backend.app.admin.custom_converter import GeometryWKTField, format_coordinates
 from backend.app.models import Flight, Region
+from backend.app.utils.csv_load import main as csv_load
 
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -177,31 +178,59 @@ class UploadFileView(BaseView):
 
     async def process_uploaded_file(self, file: UploadFile):
         """
-        Функция-заглушка для обработки загруженного файла
-        В будущем здесь будет логика обработки Excel файла
+        Обрабатывает файл и загружает данные в базу.
+        Возвращает результат обработки.
         """
         try:
-            print(f"Начинаем обработку файла: {file.filename}")
-            await asyncio.sleep(3)
+            suffix = file.filename.rsplit('.', 1)[-1]
+            with tempfile.NamedTemporaryFile(
+                    delete=False,
+                    suffix=suffix
+            ) as tmp_file:
+                tmp_path = tmp_file.name
 
-            # Здесь будет ваша логика обработки Excel
-            result = {
-                "success": True,
-                "message": f"Файл '{file.filename}' успешно обработан! Обработано 15 записей.",
-                "processed_records": 15,
-                "file_info": {
-                    "filename": file.filename,
-                    "size": "~2.5 MB",
-                    "type": "Excel"
+                contents = await file.read()
+                tmp_file.write(contents)
+
+            print(f"Файл сохранен во временное расположение: {tmp_path}")
+
+            try:
+                line_count = contents.decode('utf-8').count('\n')
+                if suffix in ['xlsx', 'xls']:
+                    pass
+                else:
+                    await csv_load(tmp_path)
+
+                result = {
+                    "success": True,
+                    "message": f"Файл '{file.filename}' успешно обработан и данные загружены в базу!",
+                    "processed_records": line_count - 1,
+                    "file_info": {
+                        "filename": file.filename,
+                        "size": f"{len(contents) / 1024 / 1024:.2f} MB",
+                        "type": "CSV"
+                    }
                 }
-            }
 
-            print(f"Обработка завершена: {result}")
-            return result
+                return result
+
+            except Exception as e:
+                print(f"Ошибка в функции main(): {e}")
+                return {
+                    "success": False,
+                    "message": f"Ошибка при обработке данных: {str(e)}"
+                }
+
+            finally:
+                if os.path.exists(tmp_path):
+                    os.unlink(tmp_path)
+                    print(f"Временный файл удален: {tmp_path}")
 
         except Exception as e:
-            print(f"Ошибка при обработке файла: {e}")
+            print(f"Ошибка при сохранении файла: {e}")
             return {
                 "success": False,
-                "message": f"Ошибка при обработке файла: {str(e)}"
+                "message": f"Ошибка при сохранении файла: {str(e)}"
             }
+        finally:
+            await file.close()
