@@ -1,0 +1,48 @@
+/* components/Drawer/DrawerHeader.css */
+.drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.drawer-header h2 {
+  margin: 0;
+  color: var(--accent-blue);
+  font-size: 1.5rem;
+}
+
+.drawer-close-button {
+  background: none;
+  border: none;
+  color: var(--text-light);
+  font-size: 2rem;
+  cursor: pointer;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: var(--transition);
+}
+
+.drawer-close-button:hover {
+  background-color: rgba(100, 255, 218, 0.1);
+  color: var(--accent-blue);
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .drawer-header h2 {
+    font-size: 1.3rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .drawer-header {
+    padding: 15px;
+  }
+}
