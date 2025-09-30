@@ -19,8 +19,8 @@ export const Drawer = ({ isOpen, onClose }) => {
     // { label: 'Главная', path: ROUTES.HOME },
     // { label: 'Все регионы', path: ROUTES.REGIONS },
     // { label: 'Статистика', path: '/statistics' },
-    { label: 'Документация', path: `${BASE_URL}/docs` }, //'http://192.168.0.133:8000/docs' },
-    { label: 'Документация2', path: `${BASE_URL}/redoc` }, //'http://192.168.0.133:8000/docs' },
+    { label: 'Документация Swagger', path: `${BASE_URL}/docs` }, //'http://192.168.0.133:8000/docs' },
+    { label: 'Документация Redoc', path: `${BASE_URL}/redoc` }, //'http://192.168.0.133:8000/docs' },
     { label: 'Презентация', path: `${BASE_URL}/prezentation` }, //'http://192.168.0.133:8000/prezentation' }, // @TODO
     { label: 'Админ панель', path: `${BASE_URL}/admin/flight/list` }, //'http://192.168.0.133:8000/admin/flight/list' },
   ];
