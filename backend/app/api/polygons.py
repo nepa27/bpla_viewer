@@ -1,10 +1,9 @@
-import gzip
 import os
 
 from fastapi import APIRouter, HTTPException, status, Response
 
 from backend.app.config import STATIC_DIR
-
+from backend.app.constants import RUSSIA_ID_POLYGON
 
 router = APIRouter(
     prefix="/polygons",
@@ -16,7 +15,7 @@ router = APIRouter(
 async def get_polygons():
     """Получить полигон координат."""
     try:
-        polygon_path = os.path.join(STATIC_DIR, 'russia_regions_id.geo.json.gz')
+        polygon_path = os.path.join(STATIC_DIR, RUSSIA_ID_POLYGON)
 
         with open(polygon_path, 'rb') as f:
             data =  f.read()
