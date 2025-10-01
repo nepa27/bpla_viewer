@@ -1,18 +1,20 @@
-from sqlalchemy import Column, Integer, String
-from sqlalchemy.orm import relationship
+from typing import List
+from sqlalchemy import Integer, String
+from sqlalchemy.orm import relationship, Mapped, mapped_column
 
 from backend.app.database import Base
+from backend.app.models.flight import Flight
 
 
 class Region(Base):
     __tablename__ = "regions"
 
-    region_id = Column(
+    region_id: Mapped[int] = mapped_column(
         Integer, primary_key=True, index=True, unique=True, autoincrement=True
     )
-    name = Column(String, unique=True, index=True, nullable=True)
+    name: Mapped[str] = mapped_column(String, unique=True, index=True, nullable=True)
 
-    flights = relationship("Flight", back_populates="region_rel")
+    flights: Mapped[List["Flight"]] = relationship("Flight", back_populates="region_rel")
 
-    def __str__(self):
-        return self.name
+    def __str__(self) -> str:
+        return str(self.name)
