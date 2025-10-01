@@ -34,7 +34,7 @@ async def get_all_flights_gzip(
                 detail="No flights found"
             )
 
-        gzip_data = FlightService.create_csv_gzip(flights_data)
+        gzip_data = await FlightService.create_csv_gzip_async(flights_data)
 
         return Response(
             content=gzip_data,
@@ -77,7 +77,7 @@ async def get_flights_by_region_gzip(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=f"No flights found for region ID {region_id} in the specified date range"
             )
-        gzip_data = FlightService.create_csv_gzip(flights_data)
+        gzip_data = await FlightService.create_csv_gzip_async(flights_data)
         return Response(
             content=gzip_data,
             media_type="application/gzip",
