@@ -16,21 +16,16 @@ router = APIRouter(
 async def get_polygons():
     """Получить полигон координат."""
     try:
-        polygon_path = os.path.join(STATIC_DIR, 'russia_regions_id.geo.json')
+        polygon_path = os.path.join(STATIC_DIR, 'russia_regions_id.geo.json.gz')
 
-        gz_filename = polygon_path + '.gz'
-        with open(polygon_path, 'rb') as f_in:
-            with gzip.open(gz_filename, 'wb', compresslevel=9) as f_out:
-                f_out.writelines(f_in)
-
-        with open(gz_filename, 'rb') as f:
-            gzip_data =  f.read()
+        with open(polygon_path, 'rb') as f:
+            data =  f.read()
 
             return Response(
-                content=gzip_data,
+                content=data,
                 media_type="application/gzip",
                 headers={
-                    "Content-Disposition": "attachment; filename=polygons.csv.gz"
+                    "Content-Disposition": "attachment; filename=polygons.geo.json.gz"
                 }
             )
 
@@ -41,5 +36,3 @@ async def get_polygons():
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error generating GZIP file: {str(e)}"
         )
-    finally:
-        os.remove(gz_filename)
