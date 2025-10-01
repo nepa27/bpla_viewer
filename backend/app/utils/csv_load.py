@@ -26,6 +26,7 @@ def parse_coordinates(coord_str):
         print(f"Ошибка парсинга координат '{coord_str}': {e}")
         return None
 
+
 def parse_duration(duration_str):
     """Парсит строку длительности вида 'HH:MM' в объект timedelta. Возвращает None для 'Нет данных'."""
     duration_str = duration_str.strip()
@@ -42,6 +43,7 @@ def parse_duration(duration_str):
         print(f"Ошибка парсинга длительности '{duration_str}': {e}")
         return None
 
+
 def parse_time(time_str):
     """Парсит строку времени вида 'HH:MM' в объект time. Возвращает None для 'Нет данных'."""
     time_str = time_str.strip()
@@ -57,6 +59,7 @@ def parse_time(time_str):
         print(f"Ошибка парсинга времени '{time_str}': {e}")
         return None
 
+
 def parse_date(date_str):
     """Парсит строку даты вида 'DD.MM.YY' в объект date. Возвращает None для 'Нет данных'."""
     date_str = date_str.strip()
@@ -67,13 +70,13 @@ def parse_date(date_str):
     except ValueError as e:
         print(f"Ошибка парсинга даты '{date_str}': {e}")
         return None
-
 def parse_drone_type(drone_type_str):
     """Парсит тип дрона, обрабатывает 'Нет данных'."""
     drone_type_str = drone_type_str.strip()
     if drone_type_str.lower() in ['нет данных', 'нет_данных', '', 'null']:
         return "Неизвестный"
     return drone_type_str
+
 
 async def load_csv_to_db(csv_file_path, db_engine):
     """Асинхронно загружает данные из CSV в базу данных."""
@@ -171,6 +174,7 @@ async def load_csv_to_db(csv_file_path, db_engine):
         except Exception as e:
             await session.rollback()
             print(f"Произошла неожиданная ошибка при загрузке: {e}")
+
 
 async def main(csv_path):
 
