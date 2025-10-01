@@ -1,3 +1,6 @@
+import dayjs from 'dayjs';
+import 'dayjs/locale/ru';
+
 /**
  * Преобразует строку даты в формат YYYY-MM-DD
  * @param {string} dateStr - Строка даты в формате ISO или любой другой поддерживаемой даты
@@ -232,3 +235,83 @@ export const prepareBubbleChartData = (
     },
   ];
 };
+
+/**
+ * Агрегирует данные по месяцам
+ * @param {Array} dailyData - Массив вида [{ date: Date, count: number }, ...]
+ * @returns {Array} - Массив вида [{ monthLabel: 'Январь 2025', total: 123 }, ...]
+ */
+export const aggregateByMonth = (dailyData) => {
+  if (!Array.isArray(dailyData)) return [];
+
+  const monthMap = new Map();
+
+  dailyData.forEach((item) => {
+    const date = new Date(item.date);
+    // Формат: "Январь 2025"
+    const monthLabel = date.toLocaleDateString('ru-RU', {
+      month: 'long',
+      year: 'numeric',
+    });
+
+    const current = monthMap.get(monthLabel) || 0;
+    monthMap.set(monthLabel, current + (item.count || 0));
+  });
+
+  // Преобразуем Map в массив и сортируем по дате (опционально)
+  const result = Array.from(monthMap, ([monthLabel, total]) => ({
+    monthLabel,
+    total,
+  }));
+
+  // Сортировка по хронологии (не по алфавиту!)
+  result.sort((a, b) => {
+    const dateA = new Date(a.monthLabel.split(' ')[1], getMonthIndex(a.monthLabel));
+    const dateB = new Date(b.monthLabel.split(' ')[1], getMonthIndex(b.monthLabel));
+    return dateA - dateB;
+  });
+
+  return result;
+};
+
+// Вспомогательная функция для получения индекса месяца из названия на русском
+const getMonthIndex = (monthLabel) => {
+  const monthNames = [
+    'январь',
+    'февраль',
+    'март',
+    'апрель',
+    'май',
+    'июнь',
+    'июль',
+    'август',
+    'сентябрь',
+    'октябрь',
+    'ноябрь',
+    'декабрь',
+  ];
+  const name = monthLabel.toLowerCase().split(' ')[0];
+  return monthNames.indexOf(name);
+};
+
+/**
+ * Преобразует массив дат в формат {from: дата название месяца год, to: дата название месяца год}
+ * @param {Array} dates - Массив дат в формате dayjs объектов или строк
+ * @returns {Object} Объект с полями from и to в нужном формате
+ */
+export function convertDatesToReadableFormat(dates) {
+  if (!Array.isArray(dates) || dates.length < 2) {
+    throw new Error('Необходимо передать массив из двух дат');
+  }
+
+  const [fromDate, toDate] = dates;
+
+  // Устанавливаем локаль на русский язык
+  const fromDayjs = dayjs.isDayjs(fromDate) ? fromDate.locale('ru') : dayjs(fromDate).locale('ru');
+  const toDayjs = dayjs.isDayjs(toDate) ? toDate.locale('ru') : dayjs(toDate).locale('ru');
+
+  return {
+    from: fromDayjs.format('DD MMMM YYYY'),
+    to: toDayjs.format('DD MMMM YYYY'),
+  };
+}
