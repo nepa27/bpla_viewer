@@ -1,10 +1,10 @@
 import csv
 from datetime import timedelta, date
 import gzip
-import os
-import tempfile
-from typing import List, Dict, Any, Tuple, Optional
+from io import StringIO, BytesIO
+from typing import Optional
 
+import asyncio
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, engine
 
@@ -89,52 +89,52 @@ class FlightService:
         return result
 
     @staticmethod
-    def create_csv_gzip(flights_data) -> bytes:
-        """Создает CSV и сжимает его с помощью внешней утилиты gzip для максимального сжатия"""
+    async def create_csv_gzip_async(flights_data) -> bytes:
+        """Асинхронное создание CSV и сжатие"""
 
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as csv_file:
-            writer = csv.writer(csv_file)
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(
+            None,
+            FlightService.create_csv_gzip_sync,
+            flights_data
+        )
+
+    @staticmethod
+    def create_csv_gzip_sync(flights_data) -> bytes:
+        """Синхронная версия для executor"""
+        csv_buffer = StringIO()
+        writer = csv.writer(csv_buffer)
+
+        writer.writerow([
+            'flight_id', 'drone_type', 'takeoff_coords', 'landing_coords',
+            'flight_date', 'takeoff_time', 'landing_time', 'flight_duration', 'region_name'
+        ])
+
+        for flight in flights_data:
+            takeoff_coords = FlightService._format_coordinates(
+                float(flight.takeoff_lat) if flight.takeoff_lat else None,
+                float(flight.takeoff_lon) if flight.takeoff_lon else None
+            )
+
+            landing_coords = FlightService._format_coordinates(
+                float(flight.landing_lat) if flight.landing_lat else None,
+                float(flight.landing_lon) if flight.landing_lon else None
+            )
 
             writer.writerow([
-                'flight_id', 'drone_type', 'takeoff_coords', 'landing_coords',
-                'flight_date', 'takeoff_time', 'landing_time', 'flight_duration', 'region_name'
+                FlightService._format_csv_value(flight.flight_id),
+                FlightService._format_csv_value(flight.drone_type),
+                takeoff_coords,
+                landing_coords,
+                FlightService._format_date_for_csv(flight.flight_date),
+                FlightService._format_time_for_csv(flight.takeoff_time),
+                FlightService._format_time_for_csv(flight.landing_time),
+                FlightService._format_duration(flight.flight_duration),
+                FlightService._format_csv_value(flight.region_name)
             ])
 
-            for flight in flights_data:
-                takeoff_coords = FlightService._format_coordinates(
-                    float(flight.takeoff_lat) if flight.takeoff_lat else None,
-                    float(flight.takeoff_lon) if flight.takeoff_lon else None
-                )
+        gz_buffer = BytesIO()
+        with gzip.GzipFile(fileobj=gz_buffer, mode='wb', compresslevel=9) as f_out:
+            f_out.write(csv_buffer.getvalue().encode('utf-8'))
 
-                landing_coords = FlightService._format_coordinates(
-                    float(flight.landing_lat) if flight.landing_lat else None,
-                    float(flight.landing_lon) if flight.landing_lon else None
-                )
-
-                writer.writerow([
-                    FlightService._format_csv_value(flight.flight_id),
-                    FlightService._format_csv_value(flight.drone_type),
-                    takeoff_coords,
-                    landing_coords,
-                    FlightService._format_date_for_csv(flight.flight_date),
-                    FlightService._format_time_for_csv(flight.takeoff_time),
-                    FlightService._format_time_for_csv(flight.landing_time),
-                    FlightService._format_duration(flight.flight_duration),
-                    FlightService._format_csv_value(flight.region_name)
-                ])
-
-            csv_filename = csv_file.name
-
-        try:
-            gz_filename = csv_filename + '.gz'
-            with open(csv_filename, 'rb') as f_in:
-                with gzip.open(gz_filename, 'wb', compresslevel=9) as f_out:
-                    f_out.writelines(f_in)
-
-            with open(gz_filename, 'rb') as f:
-                return f.read()
-
-        finally:
-            for temp_file in [csv_filename, gz_filename]:
-                if os.path.exists(temp_file):
-                    os.unlink(temp_file)
+        return gz_buffer.getvalue()
