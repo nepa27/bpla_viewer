@@ -10,27 +10,34 @@ from sqlalchemy import text, select
 
 from backend.app.models.flight import Flight
 from backend.app.models.region import Region
+from backend.app.logging import log_function, logger
 
 
+
+@log_function(logger)
 def parse_coordinates(coord_str):
     """Парсит строку координат вида 'lat lon' и возвращает WKT POINT. Возвращает None для 'Нет данных'."""
     coord_str = coord_str.strip()
     if coord_str.lower() in ["нет данных", "нет_данных", "", "null"]:
+        logger.info(f"Получено пустое значение координат: '{coord_str}'")
         return None
     try:
         lat_str, lon_str = coord_str.split()
         lat = float(lat_str)
         lon = float(lon_str)
+        logger.debug(f"Успешно распарсены координаты: lat={lat}, lon={lon}")
         return f"POINT({lon} {lat})"
     except (ValueError, IndexError) as e:
-        print(f"Ошибка парсинга координат '{coord_str}': {e}")
+        logger.error(f"Ошибка парсинга координат '{coord_str}': {e}")
         return None
 
 
+@log_function(logger)
 def parse_duration(duration_str):
     """Парсит строку длительности вида 'HH:MM' в объект timedelta. Возвращает None для 'Нет данных'."""
     duration_str = duration_str.strip()
     if duration_str.lower() in ["нет данных", "нет_данных", "", "null"]:
+        logger.info(f"Получено пустое значение длительности: '{duration_str}'")
         return None
     try:
         parts = duration_str.split(":")
@@ -38,16 +45,20 @@ def parse_duration(duration_str):
             raise ValueError("Неверный формат длительности")
         hours = int(parts[0])
         minutes = int(parts[1])
-        return timedelta(hours=hours, minutes=minutes)
+        result = timedelta(hours=hours, minutes=minutes)
+        logger.debug(f"Успешно распарсена длительность: {result}")
+        return result
     except (ValueError, IndexError) as e:
-        print(f"Ошибка парсинга длительности '{duration_str}': {e}")
+        logger.error(f"Ошибка парсинга длительности '{duration_str}': {e}")
         return None
 
 
+@log_function(logger)
 def parse_time(time_str):
     """Парсит строку времени вида 'HH:MM' в объект time. Возвращает None для 'Нет данных'."""
     time_str = time_str.strip()
     if time_str.lower() in ["нет данных", "нет_данных", "", "null"]:
+        logger.info(f"Получено пустое значение времени: '{time_str}'")
         return None
 
     try:
@@ -56,42 +67,52 @@ def parse_time(time_str):
 
         return datetime.strptime(time_str, "%H:%M").time()
     except ValueError as e:
-        print(f"Ошибка парсинга времени '{time_str}': {e}")
+        logger.error(f"Ошибка парсинга времени '{time_str}': {e}")
         return None
 
 
+@log_function(logger)
 def parse_date(date_str):
     """Парсит строку даты вида 'DD.MM.YY' в объект date. Возвращает None для 'Нет данных'."""
     date_str = date_str.strip()
     if date_str.lower() in ["нет данных", "нет_данных", "", "null"]:
+        logger.info(f"Получено пустое значение даты: '{date_str}'")
         return None
     try:
-        return datetime.strptime(date_str, "%d.%m.%y").date()
+        result = datetime.strptime(date_str, "%d.%m.%y").date()
+        logger.debug(f"Успешно распарсена дата: {result}")
+        return result
     except ValueError as e:
-        print(f"Ошибка парсинга даты '{date_str}': {e}")
+        logger.error(f"Ошибка парсинга даты '{date_str}': {e}")
         return None
 
 
+@log_function(logger)
 def parse_drone_type(drone_type_str):
     """Парсит тип дрона, обрабатывает 'Нет данных'."""
     drone_type_str = drone_type_str.strip()
     if drone_type_str.lower() in ["нет данных", "нет_данных", "", "null"]:
+        logger.info(f"Получен пустой тип дрона: '{drone_type_str}'")
         return "Неизвестный"
+    logger.debug(f"Успешно определен тип дрона: {drone_type_str}")
     return drone_type_str
 
 
+@log_function(logger)
 async def load_csv_to_db(csv_file_path, db_engine):
     """Асинхронно загружает данные из CSV в базу данных."""
+    logger.info(f"Начало загрузки данных из файла: {csv_file_path}")
     AsyncSessionLocal = async_sessionmaker(bind=db_engine, expire_on_commit=False)
 
     async with AsyncSessionLocal() as session:
         try:
             with open(csv_file_path, "r", encoding="utf-8") as csvfile:
                 reader = csv.reader(csvfile)
+                logger.info("Файл CSV успешно открыт")
 
                 first_row = next(reader, None)
                 if first_row and first_row[0].lower() == "flight_id":
-                    print("Пропущена строка заголовка")
+                    logger.info("Пропущена строка заголовка")
                 elif first_row:
                     rows_to_process = [first_row]
                     rows_to_process.extend(list(reader))
@@ -99,10 +120,13 @@ async def load_csv_to_db(csv_file_path, db_engine):
 
                 for row_num, row in enumerate(reader):
                     if len(row) < 9:
-                        print(
+                        logger.warning(
                             f"Строка {row_num + 1} пропущена: недостаточно полей ({len(row)})"
                         )
                         continue
+
+                    flight_id = row[0].strip()
+                    logger.info(f"Обработка полета ID: {flight_id}")
 
                     (
                         flight_id,
@@ -133,18 +157,18 @@ async def load_csv_to_db(csv_file_path, db_engine):
                     region = result.scalars().first()
 
                     if not region:
-                        print(f"Создан новый регион: {region_name}")
+                        logger.info(f"Создан новый регион: {region_name}")
                         region = Region(name=region_name, region_id=int(region_id))
                         session.add(region)
                         await session.flush()
 
                     result = await session.execute(
-                        select(Flight).filter(Flight.flight_id == flight_id.strip())
+                        select(Flight).filter(Flight.flight_id == flight_id)
                     )
                     existing_flight = result.scalars().first()
 
                     if existing_flight:
-                        print(f"Полет с ID {flight_id} уже существует. Пропущен.")
+                        logger.info(f"Полет с ID {flight_id} уже существует. Пропущен.")
                         continue
 
                     flight_params = {
@@ -179,23 +203,25 @@ async def load_csv_to_db(csv_file_path, db_engine):
 
                     new_flight = Flight(**flight_params)
                     session.add(new_flight)
-                    print(f"Добавлен полет: {flight_id}")
+                    logger.info(f"Добавлен новый полет: {flight_id}")
 
-            await session.commit()
-            print("Загрузка данных завершена успешно.")
+                await session.commit()
+                logger.info("Загрузка данных завершена успешно")
 
         except FileNotFoundError:
-            print(f"Ошибка: Файл {csv_file_path} не найден.")
+            logger.error(f"Ошибка: Файл {csv_file_path} не найден")
             await session.rollback()
         except SQLAlchemyError as e:
+            logger.error(f"Ошибка базы данных при загрузке: {str(e)}")
             await session.rollback()
-            print(f"Ошибка базы данных при загрузке: {e}")
         except Exception as e:
+            logger.error(f"Произошла неожиданная ошибка при загрузке: {str(e)}")
             await session.rollback()
-            print(f"Произошла неожиданная ошибка при загрузке: {e}")
 
 
+@log_function(logger)
 async def main(csv_path):
+    logger.info("Запуск процесса загрузки CSV")
     load_dotenv()
 
     DB_HOST = getenv("DB_HOST", "localhost")
@@ -204,11 +230,11 @@ async def main(csv_path):
     DB_PASS = getenv("DB_PASS", "password")
     DB_NAME = getenv("DB_NAME", "flight_db")
 
-    DATABASE_URL = (
-        f"postgresql+asyncpg://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-    )
+    DATABASE_URL = f"postgresql+asyncpg://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+    logger.info(f"Подключение к базе данных: {DB_HOST}:{DB_PORT}/{DB_NAME}")
 
     engine = create_async_engine(DATABASE_URL, echo=False)
 
     await load_csv_to_db(csv_path, engine)
     await engine.dispose()
+    logger.info("Процесс загрузки CSV завершен")

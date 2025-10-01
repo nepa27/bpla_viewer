@@ -10,10 +10,12 @@ from sqlalchemy import select, func, engine
 
 from backend.app.models.flight import Flight
 from backend.app.models.region import Region
+from backend.app.logging import log_function, logger
 
 
 class FlightService:
     @staticmethod
+    @log_function(logger)
     def _format_csv_value(value):
         """Форматирует значение для CSV"""
         if value is None:
@@ -21,6 +23,7 @@ class FlightService:
         return str(value)
 
     @staticmethod
+    @log_function(logger)
     def _format_coordinates(lat, lon):
         """Форматирует координаты в строку 'lat lon'"""
         if lat is None or lon is None:
@@ -28,6 +31,7 @@ class FlightService:
         return f"{lat} {lon}"
 
     @staticmethod
+    @log_function(logger)
     def _format_date_for_csv(flight_date):
         """Форматирует дату в DD.MM.YY для CSV"""
         if not flight_date:
@@ -35,6 +39,7 @@ class FlightService:
         return flight_date.strftime("%d.%m.%y")
 
     @staticmethod
+    @log_function(logger)
     def _format_time_for_csv(time_obj):
         """Форматирует время в HH:MM для CSV"""
         if not time_obj:
@@ -42,6 +47,7 @@ class FlightService:
         return time_obj.strftime("%H:%M")
 
     @staticmethod
+    @log_function(logger)
     def _format_duration(duration: timedelta):
         """Форматирует продолжительность в HH:MM для CSV"""
         if not duration:

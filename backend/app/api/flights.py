@@ -1,5 +1,4 @@
 from typing import Optional
-
 from fastapi import APIRouter, Depends, HTTPException, status, Query, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -10,7 +9,7 @@ from backend.app.api.responses import (
 from backend.app.database import get_db
 from backend.app.schemas.flight import PaginatedFlightResponse
 from backend.app.services.flight_service import FlightService
-
+from backend.app.logging import log_function, logger
 
 router = APIRouter(tags=["Полеты БПЛА"])
 
@@ -20,6 +19,7 @@ router = APIRouter(tags=["Полеты БПЛА"])
     responses=get_all_flights_gzip_responses,
     response_model=PaginatedFlightResponse,
 )
+@log_function(logger)
 async def get_all_flights_gzip(
     from_date: Optional[str] = Query(
         None,
@@ -37,16 +37,19 @@ async def get_all_flights_gzip(
 ):
     """Получить все полеты в виде GZIP с CSV"""
     try:
+        logger.info(f"Запрос на получение полетов с {from_date} по {to_date}")
         flights_data = await FlightService.get_data(
             db, from_date=from_date, to_date=to_date
         )
 
         if not flights_data:
+            logger.warning("Полеты не найдены")
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="No flights found"
             )
 
         gzip_data = await FlightService.create_csv_gzip_async(flights_data)
+        logger.info("Данные успешно подготовлены и сжаты")
 
         return Response(
             content=gzip_data,
@@ -57,6 +60,7 @@ async def get_all_flights_gzip(
     except HTTPException:
         raise
     except Exception as e:
+        logger.error(f"Ошибка при генерации GZIP файла: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error generating GZIP file: {str(e)}",
@@ -68,6 +72,7 @@ async def get_all_flights_gzip(
     responses=get_flights_by_region_gzip_responses,
     response_model=PaginatedFlightResponse,
 )
+@log_function(logger)
 async def get_flights_by_region_gzip(
     region_id: int,
     from_date: Optional[str] = Query(
@@ -86,15 +91,20 @@ async def get_flights_by_region_gzip(
 ):
     """Получить полеты региона в виде GZIP с CSV"""
     try:
+        logger.info(
+            f"Запрос на получение полетов для региона {region_id} с {from_date} по {to_date}"
+        )
         flights_data = await FlightService.get_data(
             db, region_id=region_id, from_date=from_date, to_date=to_date
         )
         if not flights_data:
+            logger.warning(f"Полеты не найдены для региона {region_id}")
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=f"No flights found for region ID {region_id} in the specified date range",
             )
         gzip_data = await FlightService.create_csv_gzip_async(flights_data)
+        logger.info(f"Данные для региона {region_id} успешно подготовлены и сжаты")
         return Response(
             content=gzip_data,
             media_type="application/gzip",
@@ -105,6 +115,9 @@ async def get_flights_by_region_gzip(
     except HTTPException:
         raise
     except Exception as e:
+        logger.error(
+            f"Ошибка при генерации GZIP файла для региона {region_id}: {str(e)}"
+        )
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error generating GZIP file for region {region_id}: {str(e)}",
