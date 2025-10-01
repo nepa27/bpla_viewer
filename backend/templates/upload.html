@@ -338,7 +338,7 @@
         function simulateProgress() {
             let progress = 0;
             const interval = setInterval(() => {
-                progress += Math.random() * 2;
+                progress += Math.random();
                 if (progress >= 90) {
                     progress = 90; // Останавливаемся на 90% до получения ответа
                     clearInterval(interval);
