@@ -1,12 +1,13 @@
 import csv
-from datetime import timedelta, date
+from datetime import timedelta, date, time
 import gzip
 from io import StringIO, BytesIO
-from typing import Optional
+from typing import Optional, Any
 
 import asyncio
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func, engine
+from sqlalchemy import select, func
+from sqlalchemy.engine.result import ChunkedIteratorResult
 
 from backend.app.models.flight import Flight
 from backend.app.models.region import Region
@@ -16,7 +17,7 @@ from backend.app.logging import log_function, logger
 class FlightService:
     @staticmethod
     @log_function(logger)
-    def _format_csv_value(value):
+    def _format_csv_value(value: Any) -> str:
         """Форматирует значение для CSV"""
         if value is None:
             return "Нет данных"
@@ -24,7 +25,7 @@ class FlightService:
 
     @staticmethod
     @log_function(logger)
-    def _format_coordinates(lat, lon):
+    def _format_coordinates(lat: Optional[float], lon: Optional[float]) -> str:
         """Форматирует координаты в строку 'lat lon'"""
         if lat is None or lon is None:
             return "Нет данных"
@@ -32,7 +33,7 @@ class FlightService:
 
     @staticmethod
     @log_function(logger)
-    def _format_date_for_csv(flight_date):
+    def _format_date_for_csv(flight_date: Optional[date]) -> str:
         """Форматирует дату в DD.MM.YY для CSV"""
         if not flight_date:
             return "Нет данных"
@@ -40,7 +41,7 @@ class FlightService:
 
     @staticmethod
     @log_function(logger)
-    def _format_time_for_csv(time_obj):
+    def _format_time_for_csv(time_obj: Optional[time]) -> str:
         """Форматирует время в HH:MM для CSV"""
         if not time_obj:
             return "Нет данных"
@@ -48,7 +49,7 @@ class FlightService:
 
     @staticmethod
     @log_function(logger)
-    def _format_duration(duration: timedelta):
+    def _format_duration(duration: Optional[timedelta]) -> str:
         """Форматирует продолжительность в HH:MM для CSV"""
         if not duration:
             return "Нет данных"
@@ -65,7 +66,7 @@ class FlightService:
         region_id: Optional[int] = None,
         from_date: Optional[date] = None,
         to_date: Optional[date] = None,
-    ) -> engine.result.ChunkedIteratorResult:
+    ) -> ChunkedIteratorResult:
         query = (
             select(
                 Flight.flight_id,
@@ -96,7 +97,7 @@ class FlightService:
         return result
 
     @staticmethod
-    async def create_csv_gzip_async(flights_data) -> bytes:
+    async def create_csv_gzip_async(flights_data: ChunkedIteratorResult) -> bytes:
         """Асинхронное создание CSV и сжатие"""
 
         loop = asyncio.get_event_loop()
