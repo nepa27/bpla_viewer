@@ -53,26 +53,27 @@ class FlightService:
 
     @staticmethod
     async def get_data(
-            db: AsyncSession,
-            skip: Optional[int] = None,
-            limit: Optional[int] = None,
-            region_id: Optional[int] = None,
-            from_date: Optional[date] = None,
-            to_date: Optional[date] = None,
+        db: AsyncSession,
+        skip: Optional[int] = None,
+        limit: Optional[int] = None,
+        region_id: Optional[int] = None,
+        from_date: Optional[date] = None,
+        to_date: Optional[date] = None,
     ) -> engine.result.ChunkedIteratorResult:
-        query = (select(
-            Flight.flight_id,
-            Flight.drone_type,
-            func.ST_Y(Flight.takeoff_coordinates).label('takeoff_lat'),
-            func.ST_X(Flight.takeoff_coordinates).label('takeoff_lon'),
-            func.ST_Y(Flight.landing_coordinates).label('landing_lat'),
-            func.ST_X(Flight.landing_coordinates).label('landing_lon'),
-            Flight.flight_date,
-            Flight.takeoff_time,
-            Flight.landing_time,
-            Flight.flight_duration,
-            Region.name.label('region_name')
-        ).join(Region, Flight.region_id == Region.region_id, isouter=True)
+        query = (
+            select(
+                Flight.flight_id,
+                Flight.drone_type,
+                func.ST_Y(Flight.takeoff_coordinates).label("takeoff_lat"),
+                func.ST_X(Flight.takeoff_coordinates).label("takeoff_lon"),
+                func.ST_Y(Flight.landing_coordinates).label("landing_lat"),
+                func.ST_X(Flight.landing_coordinates).label("landing_lon"),
+                Flight.flight_date,
+                Flight.takeoff_time,
+                Flight.landing_time,
+                Flight.flight_duration,
+                Region.name.label("region_name"),
+            ).join(Region, Flight.region_id == Region.region_id, isouter=True)
         ).order_by(Flight.flight_date)
         if from_date:
             query = query.where(Flight.flight_date >= from_date)
@@ -94,9 +95,7 @@ class FlightService:
 
         loop = asyncio.get_event_loop()
         return await loop.run_in_executor(
-            None,
-            FlightService.create_csv_gzip_sync,
-            flights_data
+            None, FlightService.create_csv_gzip_sync, flights_data
         )
 
     @staticmethod
@@ -105,36 +104,47 @@ class FlightService:
         csv_buffer = StringIO()
         writer = csv.writer(csv_buffer)
 
-        writer.writerow([
-            'flight_id', 'drone_type', 'takeoff_coords', 'landing_coords',
-            'flight_date', 'takeoff_time', 'landing_time', 'flight_duration', 'region_name'
-        ])
+        writer.writerow(
+            [
+                "flight_id",
+                "drone_type",
+                "takeoff_coords",
+                "landing_coords",
+                "flight_date",
+                "takeoff_time",
+                "landing_time",
+                "flight_duration",
+                "region_name",
+            ]
+        )
 
         for flight in flights_data:
             takeoff_coords = FlightService._format_coordinates(
                 float(flight.takeoff_lat) if flight.takeoff_lat else None,
-                float(flight.takeoff_lon) if flight.takeoff_lon else None
+                float(flight.takeoff_lon) if flight.takeoff_lon else None,
             )
 
             landing_coords = FlightService._format_coordinates(
                 float(flight.landing_lat) if flight.landing_lat else None,
-                float(flight.landing_lon) if flight.landing_lon else None
+                float(flight.landing_lon) if flight.landing_lon else None,
             )
 
-            writer.writerow([
-                FlightService._format_csv_value(flight.flight_id),
-                FlightService._format_csv_value(flight.drone_type),
-                takeoff_coords,
-                landing_coords,
-                FlightService._format_date_for_csv(flight.flight_date),
-                FlightService._format_time_for_csv(flight.takeoff_time),
-                FlightService._format_time_for_csv(flight.landing_time),
-                FlightService._format_duration(flight.flight_duration),
-                FlightService._format_csv_value(flight.region_name)
-            ])
+            writer.writerow(
+                [
+                    FlightService._format_csv_value(flight.flight_id),
+                    FlightService._format_csv_value(flight.drone_type),
+                    takeoff_coords,
+                    landing_coords,
+                    FlightService._format_date_for_csv(flight.flight_date),
+                    FlightService._format_time_for_csv(flight.takeoff_time),
+                    FlightService._format_time_for_csv(flight.landing_time),
+                    FlightService._format_duration(flight.flight_duration),
+                    FlightService._format_csv_value(flight.region_name),
+                ]
+            )
 
         gz_buffer = BytesIO()
-        with gzip.GzipFile(fileobj=gz_buffer, mode='wb', compresslevel=9) as f_out:
-            f_out.write(csv_buffer.getvalue().encode('utf-8'))
+        with gzip.GzipFile(fileobj=gz_buffer, mode="wb", compresslevel=9) as f_out:
+            f_out.write(csv_buffer.getvalue().encode("utf-8"))
 
         return gz_buffer.getvalue()

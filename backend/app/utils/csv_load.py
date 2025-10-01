@@ -15,7 +15,7 @@ from backend.app.models.region import Region
 def parse_coordinates(coord_str):
     """Парсит строку координат вида 'lat lon' и возвращает WKT POINT. Возвращает None для 'Нет данных'."""
     coord_str = coord_str.strip()
-    if coord_str.lower() in ['нет данных', 'нет_данных', '', 'null']:
+    if coord_str.lower() in ["нет данных", "нет_данных", "", "null"]:
         return None
     try:
         lat_str, lon_str = coord_str.split()
@@ -30,10 +30,10 @@ def parse_coordinates(coord_str):
 def parse_duration(duration_str):
     """Парсит строку длительности вида 'HH:MM' в объект timedelta. Возвращает None для 'Нет данных'."""
     duration_str = duration_str.strip()
-    if duration_str.lower() in ['нет данных', 'нет_данных', '', 'null']:
+    if duration_str.lower() in ["нет данных", "нет_данных", "", "null"]:
         return None
     try:
-        parts = duration_str.split(':')
+        parts = duration_str.split(":")
         if len(parts) != 2:
             raise ValueError("Неверный формат длительности")
         hours = int(parts[0])
@@ -47,7 +47,7 @@ def parse_duration(duration_str):
 def parse_time(time_str):
     """Парсит строку времени вида 'HH:MM' в объект time. Возвращает None для 'Нет данных'."""
     time_str = time_str.strip()
-    if time_str.lower() in ['нет данных', 'нет_данных', '', 'null']:
+    if time_str.lower() in ["нет данных", "нет_данных", "", "null"]:
         return None
 
     try:
@@ -63,17 +63,19 @@ def parse_time(time_str):
 def parse_date(date_str):
     """Парсит строку даты вида 'DD.MM.YY' в объект date. Возвращает None для 'Нет данных'."""
     date_str = date_str.strip()
-    if date_str.lower() in ['нет данных', 'нет_данных', '', 'null']:
+    if date_str.lower() in ["нет данных", "нет_данных", "", "null"]:
         return None
     try:
         return datetime.strptime(date_str, "%d.%m.%y").date()
     except ValueError as e:
         print(f"Ошибка парсинга даты '{date_str}': {e}")
         return None
+
+
 def parse_drone_type(drone_type_str):
     """Парсит тип дрона, обрабатывает 'Нет данных'."""
     drone_type_str = drone_type_str.strip()
-    if drone_type_str.lower() in ['нет данных', 'нет_данных', '', 'null']:
+    if drone_type_str.lower() in ["нет данных", "нет_данных", "", "null"]:
         return "Неизвестный"
     return drone_type_str
 
@@ -84,11 +86,11 @@ async def load_csv_to_db(csv_file_path, db_engine):
 
     async with AsyncSessionLocal() as session:
         try:
-            with open(csv_file_path, 'r', encoding='utf-8') as csvfile:
+            with open(csv_file_path, "r", encoding="utf-8") as csvfile:
                 reader = csv.reader(csvfile)
 
                 first_row = next(reader, None)
-                if first_row and first_row[0].lower() == 'flight_id':
+                if first_row and first_row[0].lower() == "flight_id":
                     print("Пропущена строка заголовка")
                 elif first_row:
                     rows_to_process = [first_row]
@@ -97,12 +99,23 @@ async def load_csv_to_db(csv_file_path, db_engine):
 
                 for row_num, row in enumerate(reader):
                     if len(row) < 9:
-                        print(f"Строка {row_num + 1} пропущена: недостаточно полей ({len(row)})")
+                        print(
+                            f"Строка {row_num + 1} пропущена: недостаточно полей ({len(row)})"
+                        )
                         continue
 
-                    flight_id, drone_type_str, takeoff_coords_str, landing_coords_str, \
-                        flight_date_str, takeoff_time_str, landing_time_str, \
-                        flight_duration_str, region_name, region_id = row[:10]
+                    (
+                        flight_id,
+                        drone_type_str,
+                        takeoff_coords_str,
+                        landing_coords_str,
+                        flight_date_str,
+                        takeoff_time_str,
+                        landing_time_str,
+                        flight_duration_str,
+                        region_name,
+                        region_id,
+                    ) = row[:10]
 
                     takeoff_wkt = parse_coordinates(takeoff_coords_str)
                     landing_wkt = parse_coordinates(landing_coords_str)
@@ -135,28 +148,34 @@ async def load_csv_to_db(csv_file_path, db_engine):
                         continue
 
                     flight_params = {
-                        'flight_id': flight_id.strip(),
-                        'drone_type': drone_type,
-                        'takeoff_coordinates': text(f"ST_GeomFromText('{takeoff_wkt}', 4326)"),
-                        'flight_date': flight_date,
-                        'takeoff_time': takeoff_time_obj,
-                        'region_id': region.region_id
+                        "flight_id": flight_id.strip(),
+                        "drone_type": drone_type,
+                        "takeoff_coordinates": text(
+                            f"ST_GeomFromText('{takeoff_wkt}', 4326)"
+                        ),
+                        "flight_date": flight_date,
+                        "takeoff_time": takeoff_time_obj,
+                        "region_id": region.region_id,
                     }
 
                     if takeoff_wkt:
-                        flight_params['takeoff_coordinates'] = WKTElement(takeoff_wkt, srid=4326)
+                        flight_params["takeoff_coordinates"] = WKTElement(
+                            takeoff_wkt, srid=4326
+                        )
                     else:
-                        flight_params['takeoff_coordinates'] = None
+                        flight_params["takeoff_coordinates"] = None
 
                     if landing_wkt:
-                        flight_params['landing_coordinates'] = WKTElement(landing_wkt, srid=4326)
+                        flight_params["landing_coordinates"] = WKTElement(
+                            landing_wkt, srid=4326
+                        )
                     else:
-                        flight_params['landing_coordinates'] = None
+                        flight_params["landing_coordinates"] = None
 
                     if landing_time_obj:
-                        flight_params['landing_time'] = landing_time_obj
+                        flight_params["landing_time"] = landing_time_obj
                     if flight_duration:
-                        flight_params['flight_duration'] = flight_duration
+                        flight_params["flight_duration"] = flight_duration
 
                     new_flight = Flight(**flight_params)
                     session.add(new_flight)
@@ -177,18 +196,17 @@ async def load_csv_to_db(csv_file_path, db_engine):
 
 
 async def main(csv_path):
-
     load_dotenv()
 
-    DB_HOST = getenv('DB_HOST', 'localhost')
-    DB_PORT = getenv('DB_PORT', '5432')
-    DB_USER = getenv('DB_USER', 'postgres')
-    DB_PASS = getenv('DB_PASS', 'password')
-    DB_NAME = getenv('DB_NAME', 'flight_db')
+    DB_HOST = getenv("DB_HOST", "localhost")
+    DB_PORT = getenv("DB_PORT", "5432")
+    DB_USER = getenv("DB_USER", "postgres")
+    DB_PASS = getenv("DB_PASS", "password")
+    DB_NAME = getenv("DB_NAME", "flight_db")
 
-
-    DATABASE_URL = f'postgresql+asyncpg://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
-
+    DATABASE_URL = (
+        f"postgresql+asyncpg://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+    )
 
     engine = create_async_engine(DATABASE_URL, echo=False)
 

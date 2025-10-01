@@ -20,11 +20,12 @@ def main(path_raw_data: str) -> str:
         parser_file_with_duration = add_duration_time(parser_file)
 
         polygon_path = os.path.join(STATIC_DIR, RUSSIA_FULL_POLYGON)
-        parser_file_check_coordinate = process_csv_russian_priority(parser_file_with_duration, polygon_path)
+        parser_file_check_coordinate = process_csv_russian_priority(
+            parser_file_with_duration, polygon_path
+        )
 
         data_ready_for_db = add_id_to_csv(parser_file_check_coordinate)
 
         return data_ready_for_db
     except Exception as e:
         print(e)
-
