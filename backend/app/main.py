@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from sqladmin import Admin
 
 from .database import create_tables, async_engine
@@ -38,6 +39,16 @@ app = FastAPI(
     """,
     version="1.0.0",
     lifespan=lifespan
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=['*'],
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "OPTIONS", "DELETE", "PATCH", "PUT"],
+    allow_headers=["Content-Type", "Set-Cookie", "Access-Control-Allow-Headers",
+                   "Access-Control-Allow-Origin",
+                   "Authorization"],
 )
 
 admin = Admin(
