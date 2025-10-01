@@ -11,6 +11,7 @@ from starlette.responses import JSONResponse
 from backend.app.admin.custom_converter import GeometryWKTField, format_coordinates
 from backend.app.models import Flight, Region
 from backend.app.utils.csv_load import main as csv_load
+from backend.app.utils.parser.flight_data_processor import main as xlsx_load
 
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -195,16 +196,15 @@ class UploadFileView(BaseView):
             print(f"Файл сохранен во временное расположение: {tmp_path}")
 
             try:
-                line_count = contents.decode('utf-8').count('\n')
                 if suffix in ['xlsx', 'xls']:
-                    pass
+                    ready_csv = xlsx_load(tmp_path)
+                    await csv_load(ready_csv)
                 else:
                     await csv_load(tmp_path)
 
                 result = {
                     "success": True,
                     "message": f"Файл '{file.filename}' успешно обработан и данные загружены в базу!",
-                    "processed_records": line_count - 1,
                     "file_info": {
                         "filename": file.filename,
                         "size": f"{len(contents) / 1024 / 1024:.2f} MB",
