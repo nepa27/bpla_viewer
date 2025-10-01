@@ -1,9 +1,10 @@
+import asyncio
 from functools import wraps
 import logging
 from logging.handlers import RotatingFileHandler
 import sys
 import traceback
-
+from typing import Callable
 
 log_format = (
     '%(asctime)s - [%(levelname)s] -  %(name)s - '
@@ -42,14 +43,17 @@ def logging_decorator(func: callable) -> callable:
 def log_function(logger):
     def decorator(func: callable) -> callable:
         @wraps(func)
-        def wrapper(*args, **kwargs):
+        async def async_wrapper(*args, **kwargs):
             logger.info(f"Вызвана {func.__name__} с аргументами: {args}, и: {kwargs}")
             try:
-                result = func(*args, **kwargs)
+                if asyncio.iscoroutinefunction(func):
+                    result = await func(*args, **kwargs)
+                else:
+                    result = func(*args, **kwargs)
                 logger.info(f"{func.__name__} успешно отработала")
                 return result
             except Exception as e:
                 logger.error(f"Ошибка в {func.__name__}: {str(e)}\n{traceback.format_exc()}")
                 raise
-        return wrapper
+        return async_wrapper
     return decorator
