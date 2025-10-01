@@ -34,6 +34,7 @@ async def get_all_flights_gzip(
 ):
     """Получить все полеты в виде GZIP с CSV"""
     try:
+        time_before = logger.time_start()
         logger.info(f"Запрос на получение полетов с {from_date} по {to_date}")
         flights_data = await FlightService.get_data(
             db, from_date=from_date, to_date=to_date
@@ -47,6 +48,9 @@ async def get_all_flights_gzip(
 
         gzip_data = await FlightService.create_csv_gzip_async(flights_data)
         logger.info("Данные успешно подготовлены и сжаты")
+
+        time_after = logger.time_end()
+        logger.info(f"Время обработки запроса: {time_after - time_before} секунд")
 
         return Response(
             content=gzip_data,
