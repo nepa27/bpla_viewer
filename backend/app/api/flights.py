@@ -20,8 +20,18 @@ router = APIRouter(
     response_model=PaginatedFlightResponse
 )
 async def get_all_flights_gzip(
-    from_date: Optional[date] = Query(None, description="Дата начала периода"),
-    to_date: Optional[date] = Query(None, description="Дата конца периода"),
+    from_date: Optional[str] = Query(
+        None,
+        description="Дата начала периода в формате YYYY-MM-DD",
+        example="2025-09-09",
+        regex=r'^\d{4}-\d{2}-\d{2}$'
+    ),
+    to_date: Optional[str] = Query(
+        None,
+        description="Дата конца периода в формате YYYY-MM-DD",
+        example="2025-09-09",
+        regex=r'^\d{4}-\d{2}-\d{2}$'
+    ),
     db: AsyncSession = Depends(get_db)
 ):
     """Получить все полеты в виде GZIP с CSV"""
@@ -60,8 +70,18 @@ async def get_all_flights_gzip(
 )
 async def get_flights_by_region_gzip(
     region_id: int,
-    from_date: Optional[date] = Query(None, description="Дата начала периода"),
-    to_date: Optional[date] = Query(None, description="Дата конца периода"),
+    from_date: Optional[str] = Query(
+        None,
+        description="Дата начала периода в формате YYYY-MM-DD",
+        example="2025-09-09",
+        regex=r'^\d{4}-\d{2}-\d{2}$'
+    ),
+    to_date: Optional[str] = Query(
+        None,
+        description="Дата конца периода в формате YYYY-MM-DD",
+        example="2025-09-09",
+        regex=r'^\d{4}-\d{2}-\d{2}$'
+    ),
     db: AsyncSession = Depends(get_db)
 ):
     """Получить полеты региона в виде GZIP с CSV"""
