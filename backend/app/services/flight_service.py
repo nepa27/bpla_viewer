@@ -16,7 +16,6 @@ from backend.app.logging import log_function, logger
 
 class FlightService:
     @staticmethod
-    @log_function(logger)
     def _format_csv_value(value: Any) -> str:
         """Форматирует значение для CSV"""
         if value is None:
@@ -24,7 +23,6 @@ class FlightService:
         return str(value)
 
     @staticmethod
-    @log_function(logger)
     def _format_coordinates(lat: Optional[float], lon: Optional[float]) -> str:
         """Форматирует координаты в строку 'lat lon'"""
         if lat is None or lon is None:
@@ -32,7 +30,6 @@ class FlightService:
         return f"{lat} {lon}"
 
     @staticmethod
-    @log_function(logger)
     def _format_date_for_csv(flight_date: Optional[date]) -> str:
         """Форматирует дату в DD.MM.YY для CSV"""
         if not flight_date:
@@ -40,7 +37,6 @@ class FlightService:
         return flight_date.strftime("%d.%m.%y")
 
     @staticmethod
-    @log_function(logger)
     def _format_time_for_csv(time_obj: Optional[time]) -> str:
         """Форматирует время в HH:MM для CSV"""
         if not time_obj:
@@ -48,7 +44,6 @@ class FlightService:
         return time_obj.strftime("%H:%M")
 
     @staticmethod
-    @log_function(logger)
     def _format_duration(duration: Optional[timedelta]) -> str:
         """Форматирует продолжительность в HH:MM для CSV"""
         if not duration:

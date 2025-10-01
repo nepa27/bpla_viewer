@@ -1,3 +1,4 @@
+from datetime import date
 from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, status, Query, Response
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -7,7 +8,6 @@ from backend.app.api.responses import (
     get_flights_by_region_gzip_responses,
 )
 from backend.app.database import get_db
-from backend.app.schemas.flight import PaginatedFlightResponse
 from backend.app.services.flight_service import FlightService
 from backend.app.logging import log_function, logger
 
@@ -17,21 +17,18 @@ router = APIRouter(tags=["Полеты БПЛА"])
 @router.get(
     "/regions",
     responses=get_all_flights_gzip_responses,
-    response_model=PaginatedFlightResponse,
 )
 @log_function(logger)
 async def get_all_flights_gzip(
-    from_date: Optional[str] = Query(
+    from_date: Optional[date] = Query(
         None,
         description="Дата начала периода в формате YYYY-MM-DD",
-        example="2025-09-09",
-        regex=r"^\d{4}-\d{2}-\d{2}$",
+        example="2025-01-01",
     ),
-    to_date: Optional[str] = Query(
+    to_date: Optional[date] = Query(
         None,
         description="Дата конца периода в формате YYYY-MM-DD",
-        example="2025-09-09",
-        regex=r"^\d{4}-\d{2}-\d{2}$",
+        example="2025-08-01",
     ),
     db: AsyncSession = Depends(get_db),
 ):
@@ -70,22 +67,19 @@ async def get_all_flights_gzip(
 @router.get(
     "/regions/{region_id}",
     responses=get_flights_by_region_gzip_responses,
-    response_model=PaginatedFlightResponse,
 )
 @log_function(logger)
 async def get_flights_by_region_gzip(
     region_id: int,
-    from_date: Optional[str] = Query(
+    from_date: Optional[date] = Query(
         None,
         description="Дата начала периода в формате YYYY-MM-DD",
-        example="2025-09-09",
-        regex=r"^\d{4}-\d{2}-\d{2}$",
+        example="2025-01-01",
     ),
-    to_date: Optional[str] = Query(
+    to_date: Optional[date] = Query(
         None,
         description="Дата конца периода в формате YYYY-MM-DD",
-        example="2025-09-09",
-        regex=r"^\d{4}-\d{2}-\d{2}$",
+        example="2025-08-01",
     ),
     db: AsyncSession = Depends(get_db),
 ):
