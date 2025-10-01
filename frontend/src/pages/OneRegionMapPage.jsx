@@ -1,4 +1,4 @@
-// src/pages/OneRegionMapPage.jsx
+import { Skeleton, Space } from 'antd';
 import dayjs from 'dayjs';
 
 import { useEffect, useState } from 'react';
@@ -11,39 +11,34 @@ import FlightStatisticsOneReg from '../components/FlightStatisticsOneReg';
 import { useFlightData } from '../hooks/useFlightData';
 import { useGzipRegionFlightData } from '../hooks/useGzipRegionFlightData';
 import { useRegions } from '../hooks/useRegions';
-// Обновленный хук
+import { useYmapsLoader } from '../hooks/useYmapsLoader';
 import MapComponent from '../modules/MapComponent';
 import { initialDateRange } from '../utils/constant';
 import { timeToDateConverter } from '../utils/functions';
 import { loadYmapsScript } from '../utils/loadYmaps';
+import { FlightStatsSkeleton, MapSkeleton } from '../utils/skeletons';
 
 const OneRegionMapPage = () => {
   const { id } = useParams();
 
-  const [errorLoadYmaps, setErrorLoadYmaps] = useState(false);
-  const [ymapsLoading, setYmapsLoading] = useState(true);
   const [dateRange, setDateRange] = useState(null);
   const [dateQuery, setDateQuery] = useState(initialDateRange);
 
   const from = timeToDateConverter(dateQuery[0].toDate());
   const to = timeToDateConverter(dateQuery[1].toDate());
 
-  // Используем хук для получения данных полетов конкретного региона
   const {
     data: flightData,
     loading: flightLoading,
     error: flightError,
   } = useGzipRegionFlightData(id, from, to);
 
-  // Используем обновленный хук для получения данных регионов
   const { data: regionsPolygons, loading: regionsLoading, error: regionsError } = useRegions();
 
   const {
     filteredFlights,
     dailyFlights,
-    // peakHourlyFlightsData,
     peakHourlyFlights,
-    // flightsByRegion,
     flightsDurationByRegion,
     flightsByTimeOfDay,
   } = useFlightData(flightData, dateRange);
@@ -53,32 +48,7 @@ const OneRegionMapPage = () => {
   );
   const regionCenter = oneRegionData?.properties?.center || [69, 100];
 
-  useEffect(() => {
-    let isMounted = true;
-
-    setYmapsLoading(true);
-    loadYmapsScript()
-      .then(() => {
-        if (isMounted) {
-          setErrorLoadYmaps(false);
-        }
-      })
-      .catch((error) => {
-        console.error('Ошибка загрузки Yandex Maps API:', error);
-        if (isMounted) {
-          setErrorLoadYmaps(true);
-        }
-      })
-      .finally(() => {
-        if (isMounted) {
-          setYmapsLoading(false);
-        }
-      });
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+  const { errorLoadYmaps, ymapsLoading } = useYmapsLoader();
 
   const loading = ymapsLoading || flightLoading || regionsLoading;
   const error = flightError || regionsError;
@@ -93,16 +63,8 @@ const OneRegionMapPage = () => {
           </div>
         </div>
 
-        <div
-          style={{
-            height: '600px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          Загрузка данных...
-        </div>
+        <MapSkeleton />
+        <FlightStatsSkeleton />
       </div>
     );
   }
@@ -117,16 +79,7 @@ const OneRegionMapPage = () => {
           </div>
         </div>
 
-        <div
-          style={{
-            height: '600px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          Загрузка геоданных...
-        </div>
+        <MapSkeleton />
       </div>
     );
   }
@@ -150,29 +103,6 @@ const OneRegionMapPage = () => {
           }}
         >
           Регион с ID {id} не найден.
-        </div>
-      </div>
-    );
-  }
-
-  if (ymapsLoading) {
-    return (
-      <div className="main">
-        <div className="btn-back-container">
-          <ButtonGoBack />
-          <div className="header-region">
-            <h1>{oneRegionData?.properties?.region || 'Регион России'}</h1>
-          </div>
-        </div>
-        <div
-          style={{
-            height: '600px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          Загрузка Яндекс.Карт...
         </div>
       </div>
     );
@@ -227,7 +157,6 @@ const OneRegionMapPage = () => {
         peakHourlyFlights={peakHourlyFlights}
         flightsByTimeOfDay={flightsByTimeOfDay}
         flightsDurationByRegion={flightsDurationByRegion}
-        // peakHourlyFlightsData={peakHourlyFlightsData}
       />
     </div>
   );
