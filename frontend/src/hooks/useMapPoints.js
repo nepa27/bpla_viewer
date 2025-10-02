@@ -1,7 +1,6 @@
 import { useEffect, useRef } from 'react';
 
 import { hasDataChanged } from './utils/hashUtils';
-import { getClusterHash } from './utils/hashUtils';
 import { updateMapPoints } from './utils/mapPointsProcessor';
 
 export const useMapPoints = ({ mapInstance, ymapsReady, points }) => {
@@ -48,13 +47,10 @@ export const useMapPoints = ({ mapInstance, ymapsReady, points }) => {
         clearTimeout(processingTimeoutRef.current);
       }
 
-      try {
-        if (clustererRef.current && mapInstance.geoObjects) {
-          mapInstance.geoObjects.remove(clustererRef.current);
-        }
-      } catch (e) {
-        // Игнорируем ошибки очистки
+      if (clustererRef.current && mapInstance.geoObjects) {
+        mapInstance.geoObjects.remove(clustererRef.current);
       }
+
       pointsRef.current = [];
       clustererRef.current = null;
     };

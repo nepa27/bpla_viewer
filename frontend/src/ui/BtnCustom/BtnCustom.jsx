@@ -1,4 +1,4 @@
-import { DownloadOutlined } from '@ant-design/icons';
+/* eslint-disable no-unused-vars */
 import { Button } from 'antd';
 
 import { useState } from 'react';

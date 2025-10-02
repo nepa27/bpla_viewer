@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+/* eslint-disable no-unused-vars */
+import { useCallback, useMemo, useRef } from 'react';
 
 import { useNavigate } from 'react-router';
 

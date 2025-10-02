@@ -1,4 +1,4 @@
-// src/components/ChartExportSelector/ChartExportSelector.jsx
+/* eslint-disable no-unused-vars */
 import { DownloadOutlined } from '@ant-design/icons';
 import { Button, Select, Space } from 'antd';
 

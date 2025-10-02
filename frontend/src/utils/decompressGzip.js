@@ -3,10 +3,8 @@ import pako from 'pako';
 export async function decompressGzip(arrayBuffer) {
   // Проверяем поддержку CompressionStream API
   if ('CompressionStream' in window) {
-    try {
-      const stream = new Response(arrayBuffer).body.pipeThrough(new DecompressionStream('gzip'));
-      return await new Response(stream).text();
-    } catch (err) {}
+    const stream = new Response(arrayBuffer).body.pipeThrough(new DecompressionStream('gzip'));
+    return await new Response(stream).text();
   }
 
   //  pako как fallback
@@ -14,6 +12,6 @@ export async function decompressGzip(arrayBuffer) {
     const decompressed = pako.inflate(new Uint8Array(arrayBuffer), { to: 'string' });
     return decompressed;
   } catch (err) {
-    throw new Error('Failed to decompress gzip data');
+    throw new Error('Failed to decompress gzip data', err);
   }
 }

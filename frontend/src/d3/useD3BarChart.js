@@ -1,4 +1,3 @@
-// hooks/useD3BarChart.js
 import * as d3 from 'd3';
 
 import { useCallback, useEffect, useRef } from 'react';
@@ -13,10 +12,9 @@ const useD3BarChart = (
   chartType = 'flights', // 'flights' или 'duration'
   isMobile,
 ) => {
-  const brushRef = useRef(null); // Для хранения элемента браша
-  const dataRef = useRef(processedData); // Для доступа к актуальным данным в обработчике браша
+  const brushRef = useRef(null);
+  const dataRef = useRef(processedData);
 
-  // Обновляем ref при изменении processedData
   useEffect(() => {
     dataRef.current = processedData;
   }, [processedData]);
@@ -31,7 +29,6 @@ const useD3BarChart = (
       return;
     }
 
-    // --- Адаптивные размеры ---
     const containerWidth = containerElement.clientWidth || 900;
     const margin = {
       top: isMobile ? 20 : 30,
@@ -44,10 +41,8 @@ const useD3BarChart = (
     const width = Math.max(300, Math.min(containerWidth - margin.left - margin.right, 1200));
     const height = chartHeight - margin.top - margin.bottom;
 
-    // --- Очистка SVG ---
     d3.select(svgElement).selectAll('*').remove();
 
-    // --- Создание SVG и группы ---
     const svg = d3
       .select(svgElement)
       .attr('class', `region-${chartType}-chart-svg`)
@@ -137,8 +132,7 @@ const useD3BarChart = (
       .text(xAxisLabel);
 
     // --- Столбцы ---
-    const bars = g
-      .selectAll('.bar')
+    g.selectAll('.bar')
       .data(processedData)
       .enter()
       .append('rect')
@@ -181,10 +175,9 @@ const useD3BarChart = (
         .on('start brush end', brushed);
 
       const brushGroup = g.append('g').attr('class', 'brush').call(brush);
-      brushRef.current = brushGroup; // Сохраняем ref на группу браша
+      brushRef.current = brushGroup;
     }
 
-    // --- Функция обработки браша ---
     function brushed(event) {
       if (!event.selection) {
         onBrush(null);
@@ -192,7 +185,7 @@ const useD3BarChart = (
       }
 
       const [y0, y1] = event.selection;
-      const currentData = dataRef.current; // Используем ref для получения актуальных данных
+      const currentData = dataRef.current;
 
       const selectedRegions = currentData
         .filter((region) => {
@@ -203,21 +196,21 @@ const useD3BarChart = (
 
       onBrush(selectedRegions.length > 0 ? selectedRegions : null);
     }
+    // @TODO
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [processedData, onBrush, chartType, isMobile]);
 
-  // Основной useEffect для вызова рендеринга
   useEffect(() => {
     renderChart();
   }, [renderChart]);
 
-  // Очистка при размонтировании или изменении onBrush
   useEffect(() => {
     return () => {
       if (brushRef.current) {
-        brushRef.current.on('.brush', null); // Удаляем обработчики браша
+        brushRef.current.on('.brush', null);
       }
     };
-  }, [onBrush]); // Зависимость от onBrush, чтобы очищать при его изменении
+  }, [onBrush]);
 };
 
 export default useD3BarChart;

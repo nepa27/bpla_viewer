@@ -49,10 +49,7 @@ const FlightStatisticsOneReg = memo(
         <h3 className={style['chart-title']}>Суммарная длительность полетов по датам</h3>
         <FlightDurationChart flightData={flightsData} dateRange={dateRange} />
         <h3 className={style['chart-title']}>Пиковая нагрузка по дням</h3>
-        <PeakHourlyFlightsChart
-          peakHourlyFlightsData={peakHourlyFlights}
-          onBrush={onDateRangeChange}
-        />
+        <PeakHourlyFlightsChart peakHourlyFlightsData={peakHourlyFlights} />
         <h3 className={style['chart-title']}>Распределение полетов по часам</h3>
         <PieChart data={flightsByTimeOfDay} />
       </div>
