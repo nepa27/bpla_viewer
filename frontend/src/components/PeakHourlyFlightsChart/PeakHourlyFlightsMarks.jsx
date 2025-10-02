@@ -62,3 +62,23 @@ export const PeakHourlyFlightsMarks = (g, data, x, y, height, width, isMobile) =
       select('.tooltip').remove();
     });
 };
+
+//  console.log(data)
+// [
+//   {
+//       "date": "2025-01-01T00:00:00.000Z",
+//       "maxFlights": 0,
+//       "peakHour": "1970-01-01T00:00:00.000Z"
+//   },
+//   {
+//       "date": "2025-01-17T00:00:00.000Z",
+//       "maxFlights": 1,
+//       "peakHour": "2025-01-17T00:00:00.000Z"
+//   },
+//   {
+//       "date": "2025-01-26T00:00:00.000Z",
+//       "maxFlights": 0,
+//       "peakHour": "1970-01-01T00:00:00.000Z"
+//   },
+//  ...
+// ]

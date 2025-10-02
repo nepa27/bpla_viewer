@@ -4,7 +4,7 @@ export const PeakHourlyFlightsAxisBottom = (g, x, height, width) => {
   g.append('g')
     .attr('class', 'x-axis')
     .attr('transform', `translate(0,${height})`)
-    .call(axisBottom(x).tickFormat(timeFormat('%d.%m %H:00')).tickSize(0))
+    .call(axisBottom(x).tickFormat(timeFormat('%d.%m')).tickSize(0))
     .selectAll('text')
     .attr('fill', 'white')
     .style('font-size', width < 768 ? '8px' : '10px')

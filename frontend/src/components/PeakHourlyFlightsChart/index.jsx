@@ -2,50 +2,24 @@ import {
   axisBottom,
   axisLeft,
   extent,
-  line,
   max,
   scaleLinear,
   scaleTime,
   select,
-  symbol,
-  symbolCircle,
-  timeFormat,
   timeFormatDefaultLocale,
 } from 'd3';
 
 import { memo, useEffect, useRef } from 'react';
 
+import { timeFormatDefaultRussia } from '../../utils/constant';
 import { PeakHourlyFlightsAxisBottom } from './PeakHourlyFlightsAxisBottom';
 import { PeakHourlyFlightsAxisLeft } from './PeakHourlyFlightsAxisLeft';
 import './PeakHourlyFlightsChart.css';
 import { PeakHourlyFlightsMarks } from './PeakHourlyFlightsMarks';
 
-// Локализация
-timeFormatDefaultLocale({
-  dateTime: '%A, %e %B %Y г. %X',
-  date: '%d.%m.%Y',
-  time: '%H:%M:%S',
-  periods: ['AM', 'PM'],
-  days: ['воскресенье', 'понедельник', 'вторник', 'среда', 'четверг', 'пятница', 'суббота'],
-  shortDays: ['вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'],
-  months: [
-    'января',
-    'февраля',
-    'марта',
-    'апреля',
-    'мая',
-    'июня',
-    'июля',
-    'августа',
-    'сентября',
-    'октября',
-    'ноября',
-    'декабря',
-  ],
-  shortMonths: ['янв', 'фев', 'мар', 'апр', 'май', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'],
-});
+timeFormatDefaultLocale(timeFormatDefaultRussia);
 
-export const PeakHourlyFlightsChart = memo(({ peakHourlyFlightsData, onBrush }) => {
+export const PeakHourlyFlightsChart = memo(({ peakHourlyFlightsData, onBrush = () => {} }) => {
   const svgRef = useRef();
   const containerRef = useRef();
 
@@ -55,7 +29,7 @@ export const PeakHourlyFlightsChart = memo(({ peakHourlyFlightsData, onBrush }) 
       return;
     }
 
-    // ✅ Используем requestAnimationFrame для гарантии, что DOM обновился
+    //   Используем requestAnimationFrame для гарантии, что DOM обновился
     const drawChart = () => {
       // Адаптивные размеры
       const containerWidth = containerRef.current?.clientWidth || 900;
@@ -85,7 +59,7 @@ export const PeakHourlyFlightsChart = memo(({ peakHourlyFlightsData, onBrush }) 
       // Подготовка данных: преобразуем date в Date
       const chartData = peakHourlyFlightsData
         .map((item) => {
-          // ✅ Корректное преобразование дат
+          //   Корректное преобразование дат
           const date = new Date(item.date);
           const peakHour = new Date(item.peakHour);
 
@@ -151,13 +125,13 @@ export const PeakHourlyFlightsChart = memo(({ peakHourlyFlightsData, onBrush }) 
       PeakHourlyFlightsMarks(g, chartData, x, y, height, width, isMobile);
     };
 
-    // ✅ Используем requestAnimationFrame для гарантии, что DOM обновился
+    //   Используем requestAnimationFrame для гарантии, что DOM обновился
     const frameId = requestAnimationFrame(drawChart);
 
     return () => {
       cancelAnimationFrame(frameId);
     };
-  }, [peakHourlyFlightsData]); // Убрана зависимость onBrush и параметр больше не используется
+  }, [peakHourlyFlightsData]);
 
   return (
     <div ref={containerRef} className="peak-hourly-flights-chart-container">
