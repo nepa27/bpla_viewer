@@ -1,0 +1,36 @@
+.bar {
+  transition: fill 0.2s;
+}
+
+.bar:hover {
+  fill: #45a049 !important;
+}
+
+.axis-label {
+  fill: white;
+  font-size: 12px;
+  text-anchor: middle;
+}
+
+.grid line {
+  stroke: #444;
+  stroke-opacity: 0.3;
+  shape-rendering: crispEdges;
+}
+
+.grid path {
+  stroke-width: 0;
+}
+
+.brush .selection {
+  fill: rgba(76, 175, 80, 0.3);
+  stroke: #4caf50;
+  stroke-width: 1;
+}
+
+.x-axis line,
+.y-axis line,
+.x-axis path,
+.y-axis path {
+  stroke: #555;
+}

@@ -1,0 +1,73 @@
+.region-flights-chart-container {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.region-flights-chart-svg {
+  display: block;
+  margin: 0 auto;
+}
+
+.x-axis-container {
+  position: relative;
+  overflow: visible;
+}
+
+.chart-scroll-container {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.chart-scroll-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.chart-scroll-container::-webkit-scrollbar-track {
+  background: #2a2a2a;
+  border-radius: 4px;
+}
+
+.chart-scroll-container::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 4px;
+}
+
+.chart-scroll-container::-webkit-scrollbar-thumb:hover {
+  background: #777;
+}
+
+.axis-label {
+  fill: white;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.grid line {
+  stroke: #444;
+  stroke-opacity: 0.3;
+  shape-rendering: crispEdges;
+}
+
+.grid path {
+  stroke-width: 0;
+}
+
+.bar {
+  transition: fill 0.2s ease;
+}
+
+.bar-label {
+  pointer-events: none;
+}
+
+.brush .selection {
+  fill: rgba(76, 175, 80, 0.2);
+  stroke: #4caf50;
+  stroke-width: 1;
+}
+
+@media (max-width: 768px) {
+  .axis-label {
+    font-size: 10px;
+  }
+}

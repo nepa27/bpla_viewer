@@ -1,0 +1,89 @@
+/* components/PieChart/PieChart.css */
+.pie-chart-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.pie-chart-svg {
+  font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
+}
+
+.arc-label {
+  fill: white;
+  font-size: 14px;
+  font-weight: 500;
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
+
+.legend {
+  width: fit-content;
+}
+.legend-item {
+  width: 100%;
+  min-width: 200px;
+}
+
+.legend-label {
+  fill: #ccd6f6;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.chart-title {
+  fill: #ccd6f6;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+@media (max-width: 1024px) {
+  .arc-label {
+    font-size: 12px;
+  }
+
+  .legend-label {
+    font-size: 12px;
+  }
+
+  .chart-title {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .pie-chart-container {
+    flex-direction: column;
+  }
+
+  .pie-chart-svg {
+    margin-bottom: 30px;
+  }
+
+  .arc-label {
+    font-size: 10px;
+  }
+
+  .legend-label {
+    font-size: 11px;
+  }
+
+  .chart-title {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .arc-label {
+    font-size: 9px;
+  }
+
+  .legend-label {
+    font-size: 10px;
+  }
+
+  .chart-title {
+    font-size: 12px;
+  }
+}

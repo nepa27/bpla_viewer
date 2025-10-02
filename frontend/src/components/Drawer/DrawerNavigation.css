@@ -1,0 +1,86 @@
+.drawer-nav {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.drawer-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.drawer-menu-item {
+  border-bottom: 1px solid rgba(136, 146, 176, 0.1);
+}
+
+.drawer-menu-link {
+  display: block;
+  padding: 15px 20px;
+  color: var(--text-light);
+  text-decoration: none;
+  transition: var(--transition);
+  font-size: 1.1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.drawer-menu-link:hover {
+  background-color: rgba(100, 255, 218, 0.1);
+  color: var(--accent-blue);
+  padding-left: 25px;
+}
+
+.drawer-menu-link.active {
+  background-color: rgba(100, 255, 218, 0.2);
+  color: var(--accent-blue);
+  border-left: 3px solid var(--accent-blue);
+  padding-left: 17px;
+}
+
+/* Стили для разделителя */
+.drawer-menu-divider {
+  padding: 5px 20px;
+  border-bottom: none;
+}
+
+.drawer-menu-divider hr {
+  border: none;
+  height: 1px;
+  background-color: var(--border-color);
+  margin: 0;
+}
+
+/* Scrollbar для меню */
+.drawer-nav::-webkit-scrollbar {
+  width: 6px;
+}
+
+.drawer-nav::-webkit-scrollbar-track {
+  background: rgba(10, 25, 47, 0.3);
+  border-radius: 3px;
+}
+
+.drawer-nav::-webkit-scrollbar-thumb {
+  background: var(--accent-blue-dark);
+  border-radius: 3px;
+}
+
+.drawer-nav::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-blue);
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .drawer-menu-link {
+    padding: 12px 15px;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .drawer-menu-link {
+    padding: 10px 15px;
+    font-size: 0.9rem;
+  }
+}

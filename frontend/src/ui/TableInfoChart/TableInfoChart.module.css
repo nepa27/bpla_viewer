@@ -1,0 +1,45 @@
+/* Добавьте эти стили в ваш основной CSS файл */
+.info-board {
+  display: flex;
+  justify-content: space-around;
+  background: rgba(25, 25, 35, 0.8);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 120px;
+}
+
+.info-label {
+  color: #8892b0;
+  font-size: 12px;
+  margin-bottom: 4px;
+  text-align: center;
+}
+
+.info-value {
+  color: #ccd6f6;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .info-board {
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .info-item {
+    width: 100%;
+    max-width: 300px;
+  }
+}
