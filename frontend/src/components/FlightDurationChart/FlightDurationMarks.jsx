@@ -36,7 +36,7 @@ export const FlightDurationMarks = (g, data, x, y, height, width, isMobile) => {
     .on('mouseover', function (event, d) {
       select(this).attr('fill', '#ff6b6b');
 
-      // ✅ Создаём тултип внутри SVG
+      // Тултип внутри SVG
       const tooltip = select(this.parentNode)
         .append('g')
         .attr('class', 'tooltip-group')
@@ -65,10 +65,10 @@ export const FlightDurationMarks = (g, data, x, y, height, width, isMobile) => {
     })
     .on('mouseout', function () {
       select(this).attr('fill', '#64ffda');
-      // Удаляем тултип
       select(this.parentNode).select('.tooltip-group').remove();
     });
 };
+// Альтернативный вариант без точек
 // import { curveNatural, line, select, symbol, symbolCircle, timeFormat } from 'd3';
 
 // export const FlightDurationMarks = (g, data, x, y, height, width, isMobile) => {
