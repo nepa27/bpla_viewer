@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Загрузка данных</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome для иконок -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .upload-area {
+            border: 2px dashed #007bff;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            background-color: #f8f9fa;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .upload-area:hover {
+            border-color: #0056b3;
+            background-color: #e9ecef;
+        }
+        .upload-area.dragover {
+            border-color: #28a745;
+            background-color: #d1ecf1;
+        }
+        .progress-container {
+            display: none;
+            margin-top: 20px;
+        }
+        .file-info {
+            display: none;
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+        }
+        .spinner-border-custom {
+            width: 3rem;
+            height: 3rem;
+        }
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1050;
+            min-width: 300px;
+        }
+        .results {
+            display: none;
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 5px;
+        }
+        .progress {
+            position: relative;
+        }
+        .progress-percent {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-weight: bold;
+            font-size: 12px;
+            color: #000;
+        }
+        .progress-info {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="mb-0">
+                            <i class="fas fa-upload me-2"></i>
+                            Загрузка данных о полетах
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <!-- Область загрузки файла -->
+                        <div class="upload-area" id="uploadArea">
+                            <i class="fas fa-cloud-upload-alt fa-3x text-primary mb-3"></i>
+                            <h5>Перетащите файл сюда или нажмите для выбора</h5>
+                            <p class="text-muted">Поддерживаются форматы: CSV, Excel (XLS, XLSX)</p>
+                            <input type="file" id="fileInput" accept=".csv,.xls,.xlsx" style="display: none;">
+                        </div>
+
+                        <!-- Информация о выбранном файле -->
+                        <div class="file-info" id="fileInfo">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-file-alt me-2"></i>
+                                <span id="fileName"></span>
+                                <span class="badge bg-primary ms-2" id="fileSize"></span>
+                            </div>
+                        </div>
+
+<!-- Прогресс бар -->
+<div class="progress-container" id="progressContainer">
+    <div class="d-flex align-items-center justify-content-center mb-3">
+        <div class="spinner-border spinner-border-custom text-primary me-3" role="status"></div>
+        <div>
+            <span class="fs-5">Обрабатываем файл...</span>
+            <div class="progress-info mt-1">
+                <small class="text-muted" id="progressText">Подготовка к загрузке...</small>
+            </div>
+        </div>
+    </div>
+    <div class="progress" style="height: 20px;">
+        <div class="progress-bar progress-bar-striped progress-bar-animated"
+             role="progressbar"
+             id="progressBar"
+             style="width: 0%"
+             aria-valuenow="0"
+             aria-valuemin="0"
+             aria-valuemax="100">
+            <span class="progress-percent" id="progressPercent">0%</span>
+        </div>
+    </div>
+    <div class="mt-2">
+        <small class="text-muted">
+            <i class="fas fa-info-circle me-1"></i>
+            <span id="progressDetails">Пожалуйста, не закрывайте страницу</span>
+        </small>
+    </div>
+</div>
+
+                        <!-- Результаты обработки -->
+                        <div class="results" id="results">
+                            <h5><i class="fas fa-check-circle text-success me-2"></i>Обработка завершена</h5>
+                            <div id="resultsContent"></div>
+                        </div>
+
+                        <!-- Кнопки -->
+                        <div class="mt-4" id="buttonContainer">
+                            <button type="button" class="btn btn-primary" id="uploadBtn" disabled>
+                                <i class="fas fa-upload me-2"></i>
+                                Загрузить файл
+                            </button>
+                            <button type="button" class="btn btn-secondary ms-2" id="clearBtn" disabled>
+                                <i class="fas fa-times me-2"></i>
+                                Очистить
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Быстрые ссылки -->
+                <div class="card mt-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Быстрые действия</h5>
+                        <div class="list-group">
+                            <a href="/admin/flight/list" class="list-group-item list-group-item-action">
+                                <i class="fa-solid fa-plane me-2"></i>Управление полетами
+                            </a>
+                            <a href="/admin/region/list" class="list-group-item list-group-item-action">
+                                <i class="fa-solid fa-map me-2"></i>Управление регионами
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Уведомления -->
+    <div id="notifications"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileName = document.getElementById('fileName');
+        const fileSize = document.getElementById('fileSize');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const progressContainer = document.getElementById('progressContainer');
+        const buttonContainer = document.getElementById('buttonContainer');
+        const results = document.getElementById('results');
+        const resultsContent = document.getElementById('resultsContent');
+        const notifications = document.getElementById('notifications');
+
+        let selectedFile = null;
+
+        // Обработчики для drag & drop
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFileSelect(files[0]);
+            }
+        });
+
+        // Клик по области загрузки
+        uploadArea.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        // Выбор файла через input
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFileSelect(e.target.files[0]);
+            }
+        });
+
+        // Обработка выбранного файла
+        function handleFileSelect(file) {
+            // Сбрасываем предыдущие результаты
+            results.style.display = 'none';
+
+            // Проверяем расширение файла
+            const fileName = file.name.toLowerCase();
+            if (!fileName.endsWith('.xlsx') && !fileName.endsWith('.xls') && !fileName.endsWith('.csv')) {
+                showNotification('Ошибка', 'Пожалуйста, выберите файл в формате XLSX, XLS или CSV', 'warning');
+                return;
+            }
+
+            selectedFile = file;
+            fileName.textContent = file.name;
+            fileSize.textContent = formatFileSize(file.size);
+
+            fileInfo.style.display = 'block';
+            uploadBtn.disabled = false;
+            clearBtn.disabled = false;
+        }
+
+        // Форматирование размера файла
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Загрузка файла
+        uploadBtn.addEventListener('click', async () => {
+            if (!selectedFile) return;
+
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+
+            // Показываем прогресс
+            buttonContainer.style.display = 'none';
+            progressContainer.style.display = 'block';
+            results.style.display = 'none';
+
+            // Сбрасываем прогресс
+            updateProgress(0, 'Начинаем загрузку файла...');
+
+            try {
+                // Эмулируем прогресс во время загрузки
+                simulateProgress();
+
+                const response = await fetch('/admin/upload-file', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                // Завершаем прогресс
+                updateProgress(100, 'Обработка завершена!');
+
+                // Небольшая задержка чтобы пользователь увидел 100%
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
+                // Скрываем прогресс
+                progressContainer.style.display = 'none';
+                buttonContainer.style.display = 'block';
+
+                if (result.success) {
+                    showResults(result);
+                    showNotification('Успех!', result.message, 'success');
+
+                    // УБИРАЕМ АВТОМАТИЧЕСКИЙ РЕДИРЕКТ
+                    // setTimeout(() => {
+                    //     window.location.href = '/admin/flight/list';
+                    // }, 3000);
+
+                } else {
+                    showNotification('Ошибка', result.message, 'danger');
+                }
+            } catch (error) {
+                progressContainer.style.display = 'none';
+                buttonContainer.style.display = 'block';
+                showNotification('Ошибка', 'Произошла ошибка при загрузке файла', 'danger');
+                console.error('Upload error:', error);
+            }
+        });
+
+        // Функция для обновления прогресса
+        function updateProgress(percent, text) {
+            const progressBar = document.getElementById('progressBar');
+            const progressPercent = document.getElementById('progressPercent');
+            const progressText = document.getElementById('progressText');
+            const progressDetails = document.getElementById('progressDetails');
+
+            const roundedPercent = Math.round(percent);
+
+            progressBar.style.width = roundedPercent + '%';
+            progressBar.setAttribute('aria-valuenow', roundedPercent);
+            progressPercent.textContent = roundedPercent + '%';
+            progressText.textContent = text;
+
+            if (roundedPercent < 30) {
+                progressDetails.textContent = 'Читаем файл...';
+            } else if (roundedPercent < 60) {
+                progressDetails.textContent = 'Парсим данные...';
+            } else if (roundedPercent < 90) {
+                progressDetails.textContent = 'Валидируем данные...';
+            } else {
+                progressDetails.textContent = 'Загружаем в базу данных...';
+            }
+        }
+
+        // Эмуляция прогресса
+        function simulateProgress() {
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random();
+                if (progress >= 90) {
+                    progress = 90; // Останавливаемся на 90% до получения ответа
+                    clearInterval(interval);
+                }
+                updateProgress(Math.min(progress, 90), 'Обрабатываем файл...');
+            }, 500);
+        }
+
+        function showResults(result) {
+            let resultsHtml = `
+                <p><strong>Файл:</strong> ${result.file_info.filename}</p>
+                <p><strong>Обработано записей:</strong> ${result.processed_records || 'информация недоступна'}</p>
+                <p><strong>Размер файла:</strong> ${result.file_info.size}</p>
+                <p><strong>Тип файла:</strong> ${result.file_info.type}</p>
+            `;
+
+            // Добавляем дополнительные поля если они есть
+            if (result.file_info.columns) {
+                resultsHtml += `<p><strong>Колонки:</strong> ${result.file_info.columns.join(', ')}</p>`;
+            }
+
+            resultsContent.innerHTML = resultsHtml;
+            results.style.display = 'block';
+
+            // Добавляем кнопку для просмотра результатов
+            const viewResultsBtn = document.createElement('button');
+            viewResultsBtn.className = 'btn btn-success mt-3';
+            viewResultsBtn.innerHTML = '<i class="fas fa-eye me-2"></i>Посмотреть загруженные данные';
+            viewResultsBtn.onclick = () => {
+                window.location.href = '/admin/flight/list';
+            };
+            resultsContent.appendChild(viewResultsBtn);
+        }
+
+        // Очистка выбранного файла
+        clearBtn.addEventListener('click', clearFile);
+
+        function clearFile() {
+            selectedFile = null;
+            fileInput.value = '';
+            fileInfo.style.display = 'none';
+            uploadBtn.disabled = true;
+            clearBtn.disabled = true;
+            results.style.display = 'none';
+        }
+
+        // Показ уведомлений
+        function showNotification(title, message, type) {
+            const notification = document.createElement('div');
+            notification.className = `alert alert-${type} alert-dismissible fade show notification`;
+            notification.innerHTML = `
+                <strong>${title}</strong> ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+
+            notifications.appendChild(notification);
+
+            // Автоматическое удаление через 5 секунд
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
