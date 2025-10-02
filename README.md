@@ -115,10 +115,10 @@ INFO:     Application startup complete.
 и что у вас запущен PostgreSQL сервер.
 
 
-```
+
 #### Frontend
 Запускаем сервер
-
+```
 npm run dev - запуск в режиме разработки
 npm run built - сборка проекта на продакшн
 ```
