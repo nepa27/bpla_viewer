@@ -11,7 +11,6 @@ from sqlalchemy.engine.result import ChunkedIteratorResult
 
 from backend.app.models.flight import Flight
 from backend.app.models.region import Region
-from backend.app.logging import log_function, logger
 
 
 class FlightService:
@@ -90,6 +89,26 @@ class FlightService:
 
         result = await db.execute(query)
         return result
+
+    @staticmethod
+    async def get_data_to_excel(
+            db: AsyncSession,
+            from_date: Optional[date] = None,
+            to_date: Optional[date] = None,
+    ) -> list:
+        query = (
+            select(
+                Region.name.label("region_name"),
+                func.count(Flight.flight_id).label("count_flights"),
+            ).join(Region, Flight.region_id == Region.region_id, isouter=True)
+        ).group_by(Region.name.label("region_name"))
+        if from_date:
+            query = query.where(Flight.flight_date >= from_date)
+        if to_date:
+            query = query.where(Flight.flight_date <= to_date)
+
+        result = await db.execute(query)
+        return result.all()
 
     @staticmethod
     async def create_csv_gzip_async(flights_data: ChunkedIteratorResult) -> bytes:
