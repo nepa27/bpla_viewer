@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-unused-vars
 import { Skeleton, Space, Spin } from 'antd';
 
 export const MapSkeleton = () => (

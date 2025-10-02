@@ -45,6 +45,7 @@ export const useFlightData = (flightsData, dateRange = null) => {
 
     for (const flight of filteredFlights) {
       // Используем takeoff_time (например, "00:00")
+      // eslint-disable-next-line no-unused-vars
       const [hours, minutes] = flight.takeoff_time.split(':').map(Number);
 
       if (hours >= 5 && hours < 12) {

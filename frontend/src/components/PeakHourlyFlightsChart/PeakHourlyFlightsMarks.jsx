@@ -40,7 +40,8 @@ export const PeakHourlyFlightsMarks = (g, data, x, y, height, width, isMobile) =
       // Форматируем peakHour
       const peakHourFormatted = timeFormat('%d.%m.%Y %H:00')(d.peakHour);
 
-      const tooltip = select('body')
+      //const tooltip
+      select('body')
         .append('div')
         .attr('class', 'tooltip')
         .style('position', 'absolute')

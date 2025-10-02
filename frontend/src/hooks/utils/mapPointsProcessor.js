@@ -1,4 +1,4 @@
-// utils/mapPointsProcessor.js
+/* eslint-disable no-unused-vars */
 import { clusterPoints } from './clusterUtils';
 import { createClusterer, createPlacemark } from './geoObjectUtils';
 import { getClusterHash } from './hashUtils';
@@ -7,12 +7,6 @@ export const processPoints = (pointsArray, zoomLevel) => {
   if (!pointsArray || pointsArray.length === 0) return [];
 
   const clustered = clusterPoints(pointsArray, zoomLevel);
-
-  //   const totalCount = clustered.reduce((sum, cluster) => sum + cluster.count, 0);
-
-  //   console.log(
-  //     `Кластеризовано ${pointsArray.length} точек -> ${clustered.length} кластеров (${totalCount} полетов)`,
-  //   );
 
   return clustered;
 };

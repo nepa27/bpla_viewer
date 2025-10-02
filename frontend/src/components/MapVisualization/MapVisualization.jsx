@@ -20,7 +20,7 @@ const MapVisualization = forwardRef(
     const [tooltip, setTooltip] = useState({ visible: false, content: '', x: 0, y: 0 });
     const mapGroupRef = useRef(null);
     const svgRef = useRef(null);
-    const { initializeZoom, resetZoom, currentScale } = useMapZoom();
+    const { initializeZoom, resetZoom } = useMapZoom();
     const navigate = useNavigate();
 
     const renderMap = useCallback(
@@ -90,6 +90,9 @@ const MapVisualization = forwardRef(
         resetZoomButton(svg, mapGroup, initializeZoom, resetZoom);
         resetRegionButton(svg, handleResetRegion);
       },
+
+      //  @TODO
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       [ref, onRegionSelect, onResetRegion, setTooltip, flightsByRegion, maxFlightsInRegion],
     );
 

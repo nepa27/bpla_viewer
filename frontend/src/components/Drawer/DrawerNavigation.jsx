@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useMemo } from 'react';
 
 import './DrawerNavigation.css';
@@ -32,23 +33,19 @@ export const DrawerNavigation = ({
   return (
     <nav className="drawer-nav">
       <ul className="drawer-menu">
-        {/* Основные пункты меню */}
         {menuItems.map((item) => (
           <MenuItem key={item.path} item={item} onClose={onClose} />
         ))}
 
-        {/* Разделитель */}
         <li className="drawer-menu-divider">
           <hr />
         </li>
 
-        {/* Заголовок раздела регионов */}
         <RegionsSectionHeader
           isExpanded={isRegionsExpanded}
           onToggle={() => setIsRegionsExpanded(!isRegionsExpanded)}
         />
 
-        {/* Поиск по регионам */}
         {isRegionsExpanded && (
           <RegionsSearch
             searchTerm={searchTerm}
@@ -57,7 +54,6 @@ export const DrawerNavigation = ({
           />
         )}
 
-        {/* Список регионов */}
         {isRegionsExpanded && (
           <RegionsList regions={filteredRegions} searchTerm={searchTerm} onClose={onClose} />
         )}
@@ -66,7 +62,6 @@ export const DrawerNavigation = ({
   );
 };
 
-// Компонент для отдельного пункта меню
 const MenuItem = ({ item, onClose }) => {
   return (
     <li className="drawer-menu-item">
