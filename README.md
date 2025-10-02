@@ -16,11 +16,15 @@
 [![GeoAlchemy2](https://img.shields.io/badge/-GeoAlchemy2-464646?style=flat-square)](https://geoalchemy-2.readthedocs.io/en/latest/)
 [![JavaScript](https://img.shields.io/badge/-JavaScript-464646?style=flat-square&logo=JavaScript)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 [![React](https://img.shields.io/badge/-React-464646?style=flat-square&logo=React)](https://reactjs.org/)
+[![Ant Design](https://img.shields.io/badge/-Ant%20Design-464646?style=flat-square&logo=Ant%20Design)](https://ant.design/)
+[![React Router](https://img.shields.io/badge/-React%20Router-464646?style=flat-square&logo=React%20Router)](https://reactrouter.com/)
+[![TanStack Query](https://img.shields.io/badge/-TanStack%20Query-464646?style=flat-square&logo=TanStack)](https://tanstack.com/query/)
+[![Yandex Maps](https://img.shields.io/badge/-Yandex%20Maps-464646?style=flat-square&logo=Yandex)](https://yandex.ru/maps/)
+[![D3.js](https://img.shields.io/badge/-D3.js-464646?style=flat-square&logo=D3.js)](https://d3js.org/)
+[![Vite](https://img.shields.io/badge/-Vite-464646?style=flat-square&logo=Vite)](https://vitejs.dev/)
 
 ## Описание
-Основной задачей проекта является - создание сервиса для анализа количества и длительности полетов гражданских беспилотников в регионах 
-Российской Федерации на основе данных Росавиации. Интеграция с системой Госкорпораций ОРВД в области накопления и систематизации стандартизированных сообщений,
-согласно приказу Минтранса РФ от 25.12.2018 г., с фокусом на эффективность, простоту и наглядность для конечных пользователей.
+Основной задачей проекта является создание сервиса для анализа количества и длительности полетов гражданских беспилотных летательных аппаратов (БПЛА) в регионах Российской Федерации на основе данных Росавиации. Интеграция с системой Госкорпораций ОРВД в области накопления и систематизации стандартизированных сообщений, согласно приказу Минтранса РФ от 25.12.2018 г., с фокусом на эффективность, простоту и наглядность для конечных пользователей.
 
 ## Основные особенности
 - Создан эффективный парсер формализованных сообщений, который уверенно справляется с обработкой практически всех типов данных (более 99,4%).
@@ -31,6 +35,8 @@
 - Разработана админ-панель для загрузки новых данных и редактирования имеющихся.
 
 ## Стек использованных технологий
+
+### Backend
 + Python 3.11
 + FastAPI 0.104.1
 + Pydantic 2.11.9
@@ -44,15 +50,22 @@
 + Pandas 2.1.3
 + Openpyxl 3.1.5
 + GeoAlchemy2 0.14.2
-+ JavaScript
-+ React 19.0.0 (React Router DOM (v7.3.0), Redux Toolkit (v2.6.1), React Hook Form (v7.54.2), Material-UI (MUI) (v7.0.2), Emotion (v11.14.0),
-  React Window (v1.8.11), React Swipeable (v7.0.2))
 
+### Frontend
++ React 19.1.1 (React Router DOM v7.9.1, TanStack Query v5.90.2)
++ Ant Design 5.27.4 (UI компоненты)
++ @pbe/react-yandex-maps 1.2.5 (Интеграция с Яндекс Картами)
++ D3.js 7.9.0 (Визуализация данных)
++ date-fns 4.1.0 (Работа с датами)
++ pptxgenjs 4.0.1 (Экспорт в PowerPoint)
++ Vite 7.1.2 (Сборка проекта)
++ ESLint & Prettier (Код-стайл и форматирование)
 
 ## Запуск проекта
 
 ### Установка
 - **Предварительно установите PostgreSQL с расширением PostGIS на Вашу операционную систему!**
+
 #### Backend
 Во-первых установите Python и pip (команды для Ubuntu)
 ```
