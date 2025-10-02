@@ -24,7 +24,7 @@ export const useFileExcelDownload = () => {
 
       const response = await fetch(`${BASE_URL}${ROUTES.EXСEL_EXPORT}?from=${from}&to=${to}`, {
         method: 'GET',
-        // credentials: 'include', 
+        // credentials: 'include',
       });
 
       if (!response.ok) {
