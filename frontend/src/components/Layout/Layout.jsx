@@ -1,10 +1,9 @@
-// components/Layout.jsx
 import { useState } from 'react';
 
 import { Outlet } from 'react-router-dom';
 
 import { Drawer } from '../Drawer/Drawer';
-import './Layout.css';
+import style from './Layout.module.css';
 
 const Layout = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -14,22 +13,19 @@ const Layout = () => {
   };
 
   return (
-    <div className="layout">
-      {/* Кнопка для открытия Drawer */}
+    <div className={style.layout}>
       <button
-        className={`drawer-toggle-button ${isDrawerOpen ? 'open' : ''}`}
+        className={`${style['drawer-toggle-button']} ${isDrawerOpen ? style.open : ''}`}
         onClick={toggleDrawer}
         aria-label={isDrawerOpen ? 'Закрыть меню' : 'Открыть меню'}
       >
         ☰
       </button>
 
-      {/* Основной контент */}
-      <main className="layout-main">
+      <main className={style['layout-main']}>
         <Outlet />
       </main>
 
-      {/* Боковое меню */}
       <Drawer
         isOpen={isDrawerOpen}
         onClose={() => setIsDrawerOpen(false)}
