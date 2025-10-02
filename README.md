@@ -118,7 +118,7 @@ INFO:     Application startup complete.
 ```
 #### Frontend
 Запускаем сервер
-```
+
 npm run dev - запуск в режиме разработки
 npm run built - сборка проекта на продакшн
 ```
