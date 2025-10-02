@@ -40,6 +40,35 @@ export function getDateStartYear() {
 }
 
 /**
+ * Форматирование длительности в человекочитаемый формат
+ * @param {number} minutes количество минут
+ * @returns {string} Количество дней в формате DD д HH ч (например, "3 д 20 ч") || HH ч MM мин (например, "3 ч 20 мин")
+ */
+export function formatDuration(minutes) {
+  if (minutes < 60) {
+    return `${Math.round(minutes)} мин`;
+  } else if (minutes < 1440) {
+    const hours = Math.floor(minutes / 60);
+    const mins = Math.round(minutes % 60);
+    return `${hours} ч ${mins} мин`;
+  } else {
+    const days = Math.floor(minutes / 1440);
+    const hours = Math.floor((minutes % 1440) / 60);
+    return `${days} д ${hours} ч`;
+  }
+}
+
+/**
+ * Форматирования минут в часы
+ * @param {number} minutes количество минут
+ * @returns {string} Количество часов HH ч (например, "3 ч")
+ */
+export const formatAxisHours = (minutes) => {
+  const hours = Math.round(minutes / 60);
+  return `${hours} ч`;
+};
+
+/**
  * Подготавливает данные для линейчатых, столбчатых, линейных и других XY-диаграмм
  * (bar, column, line, area, radar и т.д.)
  *

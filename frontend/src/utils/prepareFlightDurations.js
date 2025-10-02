@@ -1,7 +1,7 @@
 export function prepareFlightDurations(duration) {
   // flight_duration: "1:00"
   if (!duration || duration === 'Не найдено') {
-    return 0; // Если время не найдено, считаем длительность 0
+    return 0;
   }
 
   try {

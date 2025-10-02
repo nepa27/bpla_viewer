@@ -1,5 +1,3 @@
-// utils/prepareRegionsData.js
-
 /**
  * Подготавливает данные регионов для отображения в меню
  * @param {Object} regionsData - данные регионов в формате GeoJSON
@@ -14,7 +12,6 @@ export const prepareRegionsForMenu = (regionsData) => {
     .map((feature) => {
       const { region_id, region } = feature.properties || {};
 
-      // Пропускаем регионы без ID или названия
       if (!region_id || !region) {
         return null;
       }
@@ -26,5 +23,5 @@ export const prepareRegionsForMenu = (regionsData) => {
       };
     })
     .filter(Boolean) // Убираем null значения
-    .sort((a, b) => a.name.localeCompare(b.name, 'ru')); // Сортируем по алфавиту
+    .sort((a, b) => a.name.localeCompare(b.name, 'ru'));
 };

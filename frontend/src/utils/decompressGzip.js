@@ -1,18 +1,15 @@
 import pako from 'pako';
 
-// Функция для разархивирования gzip в браузере
 export async function decompressGzip(arrayBuffer) {
   // Проверяем поддержку CompressionStream API
   if ('CompressionStream' in window) {
     try {
       const stream = new Response(arrayBuffer).body.pipeThrough(new DecompressionStream('gzip'));
       return await new Response(stream).text();
-    } catch (err) {
-      // fallback to pako
-    }
+    } catch (err) {}
   }
 
-  // Используем pako как fallback
+  //  pako как fallback
   try {
     const decompressed = pako.inflate(new Uint8Array(arrayBuffer), { to: 'string' });
     return decompressed;
