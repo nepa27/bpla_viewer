@@ -1,11 +1,9 @@
-// hooks/useFlightData.js
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 export const useFlightDataFallBack = (flightsData) => {
   const [dateRange, setDateRange] = useState(null);
   const [filteredFlights, setFilteredFlights] = useState([]);
 
-  // Оптимизированное вычисление ежедневных полетов
   const dailyFlights = useMemo(() => {
     if (!flightsData || flightsData.length === 0) return [];
 
@@ -24,7 +22,6 @@ export const useFlightDataFallBack = (flightsData) => {
     return result;
   }, [flightsData]);
 
-  // Новое: вычисление количества полетов по регионам
   const flightsByRegion = useMemo(() => {
     if (!filteredFlights || filteredFlights.length === 0) return new Map();
 
@@ -37,9 +34,8 @@ export const useFlightDataFallBack = (flightsData) => {
     }
 
     return regionCounts;
-  }, [filteredFlights]); // Зависит от filteredFlights, которые обновляются при изменении dateRange
+  }, [filteredFlights]); 
 
-  // Оптимизированная фильтрация полетов
   const filterFlights = useCallback(() => {
     if (!flightsData || flightsData.length === 0) {
       setFilteredFlights([]);
@@ -79,7 +75,7 @@ export const useFlightDataFallBack = (flightsData) => {
   return {
     filteredFlights,
     dailyFlights,
-    flightsByRegion, // Возвращаем новое значение
+    flightsByRegion, 
     setDateRange,
   };
 };

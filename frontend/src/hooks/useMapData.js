@@ -1,4 +1,3 @@
-// hooks/useMapData.js
 import { useEffect, useState } from 'react';
 
 export const useMapData = (geoData) => {
