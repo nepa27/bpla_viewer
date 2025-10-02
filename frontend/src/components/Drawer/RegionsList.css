@@ -1,0 +1,48 @@
+.drawer-region-link {
+  padding: 12px 20px;
+  font-size: 0.95rem;
+}
+
+.drawer-region-link:hover {
+  padding-left: 25px;
+}
+
+.drawer-no-results,
+.drawer-regions-count {
+  padding: 12px 20px;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-style: italic;
+}
+
+.drawer-regions-count {
+  color: var(--accent-blue);
+  font-weight: 500;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .drawer-region-link {
+    padding: 10px 15px;
+    font-size: 0.9rem;
+  }
+
+  .drawer-no-results,
+  .drawer-regions-count {
+    padding: 10px 15px;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .drawer-region-link {
+    padding: 8px 15px;
+    font-size: 0.85rem;
+  }
+
+  .drawer-no-results,
+  .drawer-regions-count {
+    padding: 8px 15px;
+    font-size: 0.8rem;
+  }
+}

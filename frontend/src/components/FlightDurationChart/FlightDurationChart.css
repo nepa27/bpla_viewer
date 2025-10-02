@@ -1,0 +1,31 @@
+.flight-duration-chart-container {
+  width: 100%;
+}
+
+.flight-duration-chart-svg {
+  width: 100%;
+}
+
+.line {
+  fill: none;
+  stroke: #4caf50;
+  stroke-width: 2px;
+}
+
+.dot {
+  cursor: pointer;
+}
+
+.axis-label {
+  fill: white;
+  font-size: 12px;
+}
+
+.grid .tick line {
+  stroke: #e0e0e0;
+  stroke-opacity: 0.2;
+}
+
+.grid path {
+  stroke-width: 0;
+}

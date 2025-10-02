@@ -1,0 +1,109 @@
+/* Карточка с картой */
+.map-wrapper {
+  width: 100%;
+  background: var(--card-bg);
+  backdrop-filter: blur(12px);
+  border-radius: 16px;
+  padding: 25px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--card-border);
+  transition: var(--transition);
+}
+
+.map-wrapper:hover {
+  border-color: var(--accent-blue-dark);
+  transform: translateY(-2px);
+}
+
+/* Контейнер карты */
+.map-container {
+  width: 100%;
+  height: 600px;
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(10, 25, 47, 0.8);
+  border: 1px solid var(--border-color);
+}
+
+.map-element {
+  width: 100%;
+  height: 100%;
+}
+
+/* Загрузка карты */
+.map-loading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10, 25, 47, 0.9);
+  z-index: 1000;
+  font-size: 1.2rem;
+  color: var(--accent-blue);
+  backdrop-filter: blur(4px);
+}
+
+.map-loading::after {
+  content: '';
+  width: 20px;
+  height: 20px;
+  margin-left: 15px;
+  border: 2px solid transparent;
+  border-top: 2px solid var(--accent-blue);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+/* Ошибка карты */
+.map-error {
+  width: 100%;
+  height: 600px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ff6b6b;
+  border: 1px solid rgba(255, 107, 107, 0.3);
+  border-radius: 12px;
+  background: rgba(17, 34, 64, 0.5);
+  font-size: 1.1rem;
+  text-align: center;
+  padding: 20px;
+}
+
+@media (max-width: 1024px) {
+  .map-wrapper {
+    padding: 20px;
+    border-radius: 14px;
+  }
+
+  .map-container {
+    height: 500px;
+  }
+}
+
+@media (max-width: 768px) {
+  .map-wrapper {
+    padding: 18px;
+    border-radius: 12px;
+  }
+
+  .map-container {
+    height: 400px;
+  }
+}
+
+@media (max-width: 480px) {
+  .map-wrapper {
+    padding: 15px;
+    border-radius: 10px;
+  }
+
+  .map-container {
+    height: 350px;
+  }
+}

@@ -1,0 +1,60 @@
+/* components/RegionDurationChart/RegionDurationChart.css */
+.region-duration-chart-container {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.region-duration-chart-svg {
+  display: block;
+  margin: 0 auto;
+}
+
+.axis-label {
+  fill: white;
+  font-size: 12px;
+  font-weight: bold;
+  text-anchor: middle;
+}
+
+.grid line {
+  stroke: #444;
+  stroke-opacity: 0.3;
+  shape-rendering: crispEdges;
+}
+
+.grid path {
+  stroke-width: 0;
+}
+
+.bar {
+  transition: fill 0.2s ease;
+}
+
+.bar:hover {
+  fill: #1976d2 !important;
+}
+
+.bar-label {
+  pointer-events: none;
+  font-size: 10px;
+}
+
+.brush .selection {
+  fill: rgba(33, 150, 243, 0.3);
+  stroke: #2196f3;
+  stroke-width: 1;
+}
+
+.x-axis line,
+.y-axis line,
+.x-axis path,
+.y-axis path {
+  stroke: #555;
+}
+
+@media (max-width: 768px) {
+  .axis-label {
+    font-size: 10px;
+  }
+}

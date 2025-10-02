@@ -1,0 +1,48 @@
+.drawer-section-header {
+  padding: 0;
+  border-bottom: none;
+}
+
+.drawer-section-toggle {
+  width: 100%;
+  background: rgba(17, 34, 64, 0.5);
+  border: none;
+  color: var(--accent-blue);
+  font-weight: 600;
+  font-size: 1rem;
+  padding: 15px 20px;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: var(--transition);
+}
+
+.drawer-section-toggle:hover {
+  background-color: rgba(100, 255, 218, 0.1);
+}
+
+.drawer-toggle-arrow {
+  transition: transform 0.3s ease;
+  font-size: 0.8rem;
+}
+
+.drawer-toggle-arrow.expanded {
+  transform: rotate(180deg);
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .drawer-section-toggle {
+    padding: 12px 15px;
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .drawer-section-toggle {
+    padding: 10px 15px;
+    font-size: 0.9rem;
+  }
+}
