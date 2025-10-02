@@ -15,7 +15,7 @@ const Layout = () => {
   return (
     <div className={style.layout}>
       <button
-        className={`${style['drawer-toggle-button']} ${isDrawerOpen ? style.open : ''}`}
+        className={`${style['drawer-toggle-button']} ${isDrawerOpen ? 'open' : ''}`}
         onClick={toggleDrawer}
         aria-label={isDrawerOpen ? 'Закрыть меню' : 'Открыть меню'}
       >
