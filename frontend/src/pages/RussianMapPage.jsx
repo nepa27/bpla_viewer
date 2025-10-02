@@ -1,13 +1,10 @@
-import { DownloadOutlined } from '@ant-design/icons';
-import { Button, Skeleton, Space } from 'antd';
-
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import ChartExportSelector from '../components/ChartExportSelector/ChartExportSelector';
 import DateRangePicker from '../components/DatePicker/DatePicker';
 import { useFlightData } from '../hooks/useFlightData';
 import { useGzipFlightData } from '../hooks/useGzipFlightData';
-import { useRegions } from '../hooks/useRegions';
+import { useGzipPolygonsData } from '../hooks/useGzipPolygonsData';
 import { useYmapsLoader } from '../hooks/useYmapsLoader';
 import FlightStatistics from '../modules/FlightStatistics/FlightStatistics';
 import MapComponent from '../modules/MapComponent/MapComponent';
@@ -18,12 +15,6 @@ import { FlightStatsSkeleton, MapSkeleton } from '../utils/skeletons';
 const RussianMapPage = () => {
   const [dateRange, setDateRange] = useState(null);
   const [dateQuery, setDateQuery] = useState(initialDateRange);
-  const [exportDisabled, setExportDisabled] = useState(false);
-
-  // Рефы для каждого графика
-  const dailyFlightsRef = useRef(null);
-  const regionFlightsRef = useRef(null);
-  const durationFlightsRef = useRef(null);
 
   const from = timeToDateConverter(dateQuery[0].toDate());
   const to = timeToDateConverter(dateQuery[1].toDate());
@@ -34,7 +25,11 @@ const RussianMapPage = () => {
     error: flightError,
   } = useGzipFlightData(from, to);
 
-  const { data: regionsPolygons, loading: regionsLoading, error: regionsError } = useRegions();
+  const {
+    data: regionsPolygons,
+    loading: regionsLoading,
+    error: regionsError,
+  } = useGzipPolygonsData();
 
   const { filteredFlights, dailyFlights, flightsByRegion, flightsDurationByRegion } = useFlightData(
     flightData,
@@ -49,11 +44,6 @@ const RussianMapPage = () => {
   const handleDateRangeChange = useCallback((range) => {
     setDateRange(range);
   }, []);
-
-
-  const handleExportComplete = (chartId) => {
-    console.log('Экспорт завершен:', chartId);
-  };
 
   if (error) {
     return (
@@ -132,12 +122,8 @@ const RussianMapPage = () => {
       <h1>Карта России</h1>
 
       <ChartExportSelector
-        dataRange={dateQuery}
-        dailyFlights={dailyFlights}
-        flightsByRegion={flightsByRegion}
-        flightsDurationByRegion={flightsDurationByRegion}
-        onExportComplete={handleExportComplete}
-        disabled={exportDisabled}
+        dateRange={dateQuery}
+        chartsData={{ dailyFlights, flightsByRegion, flightsDurationByRegion }}
       />
 
       <MapComponent
