@@ -18,7 +18,7 @@ export const Legend = (
     .attr('transform', `translate(${offsetX},${offsetY})`);
 
   if (isMobile) {
-    // ✅ Горизонтальное размещение с переносом строк
+    //   Горизонтальное размещение с переносом строк
     const maxWidth = containerWidth * 0.9; // 90% ширины контейнера
     let currentX = 0;
     let currentY = 0;
@@ -31,7 +31,7 @@ export const Legend = (
       .append('g')
       .attr('class', 'legend-item')
       .attr('transform', (d) => {
-        // ✅ Примерная длина текста (в пикселях)
+        //   Примерная длина текста (в пикселях)
         const textLength = d.label.length * fontSize * 0.6 + 18 + itemMargin; // 0.6 — приблизительная ширина символа
 
         if (currentX + textLength > maxWidth) {
@@ -60,7 +60,7 @@ export const Legend = (
       .attr('font-size', fontSize)
       .text((d) => `${d.label}: ${d.percent}% (${d.value})`);
   } else {
-    // ✅ Вертикальное расположение для десктопа
+    //   Вертикальное расположение для десктопа
     const legendItems = legend
       .selectAll('.legend-item')
       .data(data)

@@ -67,16 +67,16 @@ export const PieChart = memo(({ data }) => {
       .append('g')
       .attr('transform', `translate(${width / 2},${outerRadius + margin.top})`);
 
-    // ✅ Рассчитываем общее количество
+    //   Рассчитываем общее количество
     const totalValue = data.reduce((sum, d) => sum + d.value, 0);
 
-    // ✅ Добавляем проценты в данные
+    //   Добавляем проценты в данные
     const dataWithPercents = data.map((d) => ({
       ...d,
       percent: totalValue ? ((d.value / totalValue) * 100).toFixed(1) : 0,
     }));
 
-    // ✅ Гармоничные цвета под времена суток (в тон палитре)
+    //   Гармоничные цвета под времена суток (в тон палитре)
     const color = scaleOrdinal()
       .domain(dataWithPercents.map((d) => d.label))
       .range([

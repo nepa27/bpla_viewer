@@ -28,5 +28,5 @@ export const Arcs = (g, data, pieGenerator, arcGenerator, color) => {
     })
     .attr('text-anchor', 'middle')
     .attr('class', 'arc-label')
-    .text((d) => `${d.data.percent}%`); // ✅ Показываем и процент, и количество
+    .text((d) => `${d.data.percent}%`); //   Показываем и процент, и количество
 };
