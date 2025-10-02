@@ -3,25 +3,7 @@ import * as d3 from 'd3';
 
 import { useCallback, useEffect, useRef } from 'react';
 
-// Опционально: вынести в utils
-const formatDuration = (minutes) => {
-  if (minutes < 60) {
-    return `${Math.round(minutes)} мин`;
-  } else if (minutes < 1440) {
-    const hours = Math.floor(minutes / 60);
-    const mins = Math.round(minutes % 60);
-    return `${hours} ч ${mins} мин`;
-  } else {
-    const days = Math.floor(minutes / 1440);
-    const hours = Math.floor((minutes % 1440) / 60);
-    return `${days} д ${hours} ч`;
-  }
-};
-
-const formatAxisHours = (minutes) => {
-  const hours = Math.round(minutes / 60);
-  return `${hours} ч`;
-};
+import { formatAxisHours, formatDuration } from '../utils/functions';
 
 const useD3BarChart = (
   svgRef,

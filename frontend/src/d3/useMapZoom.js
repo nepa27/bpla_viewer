@@ -31,6 +31,7 @@ export const useMapZoom = () => {
     },
     [setCurrentScale],
   );
+  // console.log('zoom')
 
   return { initializeZoom, resetZoom, currentScale };
 };
