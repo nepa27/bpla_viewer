@@ -34,7 +34,7 @@ export const useFlightDataFallBack = (flightsData) => {
     }
 
     return regionCounts;
-  }, [filteredFlights]); 
+  }, [filteredFlights]);
 
   const filterFlights = useCallback(() => {
     if (!flightsData || flightsData.length === 0) {
@@ -75,7 +75,7 @@ export const useFlightDataFallBack = (flightsData) => {
   return {
     filteredFlights,
     dailyFlights,
-    flightsByRegion, 
+    flightsByRegion,
     setDateRange,
   };
 };

@@ -152,9 +152,9 @@ export const useFlightData = (flightsData, dateRange = null) => {
       while (currentHour <= endTime) {
         // Создаем ключ для часа в формате YYYY-MM-DDTHH:00:00
         const hourKey = new Date(currentHour);
-        hourKey.setMinutes(0, 0, 0); 
+        hourKey.setMinutes(0, 0, 0);
 
-        const hourStr = hourKey.toISOString().slice(0, 13) + ':00:00.000Z'; 
+        const hourStr = hourKey.toISOString().slice(0, 13) + ':00:00.000Z';
         hourlyCounts.set(hourStr, (hourlyCounts.get(hourStr) || 0) + 1);
 
         currentHour.setHours(currentHour.getHours() + 1);
@@ -170,7 +170,7 @@ export const useFlightData = (flightsData, dateRange = null) => {
       for (const [hourKey, count] of hourlyCounts.entries()) {
         if (count > maxFlights) {
           maxFlights = count;
-          peakHourISO = hourKey; 
+          peakHourISO = hourKey;
         }
       }
 

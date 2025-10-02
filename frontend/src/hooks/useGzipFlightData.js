@@ -8,7 +8,7 @@ import ROUTES from '../utils/routes';
 const BASE_URL =
   import.meta.env.VITE_IS_WORK == 'prod'
     ? import.meta.env.VITE_API_URL
-    : import.meta.env.VITE_API_URL_WORK; 
+    : import.meta.env.VITE_API_URL_WORK;
 
 /**
  * Хук для получения и обработки данных полетов из gzip
@@ -61,7 +61,7 @@ export const useGzipFlightData = (from, to) => {
         throw err;
       }
     },
-    enabled: !!from && !!to, 
+    enabled: !!from && !!to,
     staleTime: 5 * 60 * 1000, // 5 минут кеширования
     cacheTime: 30 * 60 * 1000, // 30 минут в кеше
   });

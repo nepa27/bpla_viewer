@@ -27,7 +27,7 @@ export const OneRegionMapPage = () => {
 
   const from = timeToDateConverter(dateQuery[0].toDate());
   const to = timeToDateConverter(dateQuery[1].toDate());
- 
+
   const {
     data: flightData,
     loading: flightLoading,
