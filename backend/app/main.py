@@ -8,6 +8,7 @@ from .database import create_tables, async_engine
 from backend.app.admin.admin import FlightAdmin, RegionAdmin, UploadView, UploadFileView
 from backend.app.api.flights import router as flight_router
 from backend.app.api.polygons import router as polygon_router
+from backend.app.api.export import router as export_router
 
 
 @asynccontextmanager
@@ -63,6 +64,7 @@ admin.add_view(RegionAdmin)
 
 app.include_router(flight_router)
 app.include_router(polygon_router)
+app.include_router(export_router)
 
 
 @app.get("/health", description="Health check", tags=["Health check"])
