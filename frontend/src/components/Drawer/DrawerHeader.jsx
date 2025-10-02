@@ -1,4 +1,3 @@
-// components/Drawer/DrawerHeader.jsx
 import './DrawerHeader.css';
 
 export const DrawerHeader = ({ onClose }) => {

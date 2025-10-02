@@ -1,4 +1,3 @@
-// components/Drawer/DrawerNavigation.jsx
 import { useMemo } from 'react';
 
 import './DrawerNavigation.css';

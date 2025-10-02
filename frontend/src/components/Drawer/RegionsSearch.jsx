@@ -1,4 +1,3 @@
-// components/Drawer/RegionsSearch.jsx
 import './RegionsSearch.css';
 
 export const RegionsSearch = ({ searchTerm, setSearchTerm, clearSearch }) => {

@@ -1,43 +1,43 @@
-// components/Drawer/Drawer.jsx
 import { useState } from 'react';
 
-import { useRegions } from '../../hooks/useRegions';
+import { useGzipPolygonsData } from '../../hooks/useGzipPolygonsData';
 import { prepareRegionsForMenu } from '../../utils/prepareRegionsData';
-import ROUTES from '../../utils/routes';
 import './Drawer.css';
 import { DrawerFooter } from './DrawerFooter';
 import { DrawerHeader } from './DrawerHeader';
 import { DrawerNavigation } from './DrawerNavigation';
 
-const BASE_URL = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_URL_WORK;
+const BASE_URL =
+  import.meta.env.VITE_IS_WORK == 'prod'
+    ? import.meta.env.VITE_API_URL
+    : import.meta.env.VITE_API_URL_WORK;
 
 export const Drawer = ({ isOpen, onClose }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isRegionsExpanded, setIsRegionsExpanded] = useState(true);
 
   const menuItems = [
-    // { label: 'Главная', path: ROUTES.HOME },
-    // { label: 'Все регионы', path: ROUTES.REGIONS },
-    // { label: 'Статистика', path: '/statistics' },
-    { label: 'Документация Swagger', path: `${BASE_URL}/docs` }, //'http://192.168.0.133:8000/docs' },
-    { label: 'Документация Redoc', path: `${BASE_URL}/redoc` }, //'http://192.168.0.133:8000/docs' },
-    { label: 'Презентация', path: `${BASE_URL}/prezentation` }, //'http://192.168.0.133:8000/prezentation' }, // @TODO
-    { label: 'Админ панель', path: `${BASE_URL}/admin/flight/list` }, //'http://192.168.0.133:8000/admin/flight/list' },
+    {
+      label: 'Документация',
+      path: 'https://docs.google.com/document/d/1EyT4ExZmKhAPZVgl-wzLFLzGn0BVEHXfD-EQQTDKYhs/edit?usp=sharing',
+    },
+    {
+      label: 'Презентация',
+      path: `https://docs.google.com/presentation/d/1M3pVkCrbEOC9_y0Jh8oyeLK19jmj9u08aOPOabSDkTo/edit?usp=sharing`,
+    },
+    { label: 'Демонстрация работы', path: ' https://disk.yandex.ru/d/yxUuDdwFjy7zuA' },
+    { label: 'Админ панель', path: `${BASE_URL}/admin/flight/list` },
   ];
-  // Получаем данные регионов
-  const { data: regionsData } = useRegions();
+  const { data: regionsData } = useGzipPolygonsData();
 
-  // Подготавливаем данные регионов
   const regions = prepareRegionsForMenu(regionsData);
 
-  // Очистка поиска
   const clearSearch = () => {
     setSearchTerm('');
   };
 
   return (
     <>
-      {/* Overlay для закрытия при клике вне меню */}
       {isOpen && (
         <div
           className="drawer-overlay"
@@ -48,7 +48,6 @@ export const Drawer = ({ isOpen, onClose }) => {
         />
       )}
 
-      {/* Боковое меню */}
       <aside className={`drawer ${isOpen ? 'open' : 'closed'}`}>
         <DrawerHeader onClose={onClose} />
 
