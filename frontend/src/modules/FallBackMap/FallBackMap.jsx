@@ -15,7 +15,7 @@ const FallBackMap = ({ geoData, flightsData }) => {
   const navigate = useNavigate();
 
   const { mapData, loading } = useMapData(geoData);
-  const { flightsByRegion } = useFlightDataFallBack(flightsData);
+  const flightsByRegion = useFlightDataFallBack(flightsData);
 
   const maxFlightsInRegion = useMemo(() => {
     if (flightsByRegion.size === 0) {
