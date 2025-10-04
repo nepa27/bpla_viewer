@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { DownloadOutlined } from '@ant-design/icons';
-import { Button, Select, Space } from 'antd';
+import { Select, Space } from 'antd';
 
 import { memo, useCallback, useState } from 'react';
 

@@ -1,6 +1,4 @@
 /* eslint-disable no-unused-vars */
-import { Skeleton, Space } from 'antd';
-
 import { memo, useCallback } from 'react';
 
 import { BrushableBarChart } from '../../components/BrushableBarChart';
