@@ -5,7 +5,7 @@ import { BrushableBarChart } from '../../components/BrushableBarChart';
 import { FlightDurationChart } from '../../components/FlightDurationChart';
 import { PeakHourlyFlightsChart } from '../../components/PeakHourlyFlightsChart';
 import { PieChart } from '../../components/PieChart/PieChart';
-import { useFlightData } from '../../hooks/useFlightData';
+import { useFlightFullData } from '../../hooks/useFlightFullData';
 import TableInfoChart from '../../ui/TableInfoChart/TableInfoChart';
 import style from './FlightStatisticsOneReg.module.css';
 
@@ -18,7 +18,7 @@ const FlightStatisticsOneReg = memo(
     peakHourlyFlights,
     flightsByTimeOfDay,
   }) => {
-    const { statistics } = useFlightData(flightsData, dateRange);
+    const { statistics } = useFlightFullData(flightsData, dateRange);
 
     const dataTableInfo = useMemo(
       () => [

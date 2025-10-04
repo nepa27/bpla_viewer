@@ -3,7 +3,7 @@ import { useCallback, useState } from 'react';
 
 import ChartExportSelector from '../components/ChartExportSelector/ChartExportSelector';
 import DateRangePicker from '../components/DatePicker/DatePicker';
-import { useFlightData } from '../hooks/useFlightData';
+import { useFlightCoreData } from '../hooks/useFlightCoreData';
 import { useGzipFlightData } from '../hooks/useGzipFlightData';
 import { useGzipPolygonsData } from '../hooks/useGzipPolygonsData';
 import { useYmapsLoader } from '../hooks/useYmapsLoader';
@@ -32,10 +32,8 @@ const RussianMapPage = () => {
     error: regionsError,
   } = useGzipPolygonsData();
 
-  const { filteredFlights, dailyFlights, flightsByRegion, flightsDurationByRegion } = useFlightData(
-    flightData,
-    dateRange,
-  );
+  const { filteredFlights, dailyFlights, flightsByRegion, flightsDurationByRegion } =
+    useFlightCoreData(flightData, dateRange);
 
   const { errorLoadYmaps, ymapsLoading } = useYmapsLoader();
 

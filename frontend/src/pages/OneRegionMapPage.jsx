@@ -1,14 +1,11 @@
 /* eslint-disable no-unused-vars */
-import { Skeleton, Space } from 'antd';
-import dayjs from 'dayjs';
-
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { useParams } from 'react-router';
 
 import ChartExportSelectorRegion from '../components/ChartExportSelectorRegion/ChartExportSelectorRegion';
 import DateRangePicker from '../components/DatePicker/DatePicker';
-import { useFlightData } from '../hooks/useFlightData';
+import { useFlightFullData } from '../hooks/useFlightFullData';
 import { useGzipPolygonsData } from '../hooks/useGzipPolygonsData';
 import { useGzipRegionFlightData } from '../hooks/useGzipRegionFlightData';
 import { useYmapsLoader } from '../hooks/useYmapsLoader';
@@ -17,7 +14,6 @@ import MapComponent from '../modules/MapComponent/MapComponent';
 import ButtonGoBack from '../ui/ButtonGoBack/ButtonGoBack';
 import { initialDateRange } from '../utils/constant';
 import { timeToDateConverter } from '../utils/functions';
-import { loadYmapsScript } from '../utils/loadYmaps';
 import { FlightStatsSkeleton, MapSkeleton } from '../utils/skeletons';
 
 export const OneRegionMapPage = () => {
@@ -48,7 +44,7 @@ export const OneRegionMapPage = () => {
     flightsDurationByRegion,
     flightsByTimeOfDay,
     statistics,
-  } = useFlightData(flightData, dateRange);
+  } = useFlightFullData(flightData, dateRange);
 
   const oneRegionData = regionsPolygons?.features?.find(
     (obj) => String(obj.properties?.region_id) === String(id),
