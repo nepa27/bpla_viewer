@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { clusterPoints } from './clusterUtils';
 import { createClusterer, createPlacemark } from './geoObjectUtils';
 import { getClusterHash } from './hashUtils';
