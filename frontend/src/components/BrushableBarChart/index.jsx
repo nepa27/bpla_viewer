@@ -1,6 +1,6 @@
 import { axisBottom, axisLeft, brushX, max, scaleBand, scaleLinear, select } from 'd3';
 
-import { memo, useCallback, useEffect, useRef } from 'react';
+import { memo, useEffect, useMemo, useRef } from 'react';
 
 import { AxisBottom } from './AxisBottom';
 import { AxisLeft } from './AxisLeft';
@@ -13,7 +13,7 @@ export const BrushableBarChart = memo(({ data, onBrush = () => {} }) => {
   const brushRef = useRef();
 
   // Группируем данные по месяцам
-  const monthlyData = useCallback(() => {
+  const groupedMonthlyData = useMemo(() => {
     if (!data?.length) return [];
 
     const groupedData = {};
@@ -34,8 +34,6 @@ export const BrushableBarChart = memo(({ data, onBrush = () => {} }) => {
 
   useEffect(() => {
     if (!data?.length || !svgRef.current) return;
-
-    const groupedMonthlyData = monthlyData();
 
     // Адаптивные размеры
     const containerWidth = containerRef.current?.clientWidth || 900;
@@ -127,7 +125,8 @@ export const BrushableBarChart = memo(({ data, onBrush = () => {} }) => {
     return () => {
       brushGroup.on('brush end', null);
     };
-  }, [data, onBrush, monthlyData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data, onBrush]);
 
   if (!data || !Array.isArray(data) || data.length === 0) {
     return (
