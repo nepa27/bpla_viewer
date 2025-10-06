@@ -10,7 +10,10 @@
     "lint:fix": "eslint . --ext .js,.jsx --fix",
     "format": "prettier --write .",
     "preview": "vite preview",
-    "prepare": "husky"
+    "prepare": "husky",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@ant-design/icons": "^6.0.2",
@@ -30,6 +33,9 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.33.0",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
     "@trivago/prettier-plugin-sort-imports": "^5.2.2",
     "@types/react": "^19.1.10",
     "@types/react-dom": "^19.1.7",
@@ -44,9 +50,12 @@
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^16.3.0",
     "husky": "^9.1.7",
+    "jest-dom": "^4.0.0",
+    "jsdom": "^27.0.0",
     "lint-staged": "^16.1.6",
     "prettier": "^3.6.2",
-    "vite": "^7.1.2"
+    "vite": "^7.1.2",
+    "vitest": "^3.2.4"
   },
   "lint-staged": {
     "src/**/*.{js,jsx,ts,tsx}": [
