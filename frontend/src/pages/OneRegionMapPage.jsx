@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { useParams } from 'react-router';
 
@@ -22,8 +22,9 @@ export const OneRegionMapPage = () => {
   const [dateRange, setDateRange] = useState(null);
   const [dateQuery, setDateQuery] = useState(initialDateRange);
 
-  const from = timeToDateConverter(dateQuery[0].toDate());
-  const to = timeToDateConverter(dateQuery[1].toDate());
+  const [from, to] = useMemo(() => {
+    return [timeToDateConverter(dateQuery[0].toDate()), timeToDateConverter(dateQuery[1].toDate())];
+  }, [dateQuery]);
 
   const {
     data: flightData,
@@ -55,6 +56,17 @@ export const OneRegionMapPage = () => {
 
   const loading = ymapsLoading || flightLoading || regionsLoading;
   const error = flightError || regionsError;
+
+  const chartsDataForExport = useMemo(
+    () => ({
+      dailyFlights,
+      flightData,
+      peakHourlyFlights,
+      flightsByTimeOfDay,
+      statistics,
+    }),
+    [dailyFlights, flightData, peakHourlyFlights, flightsByTimeOfDay, statistics],
+  );
 
   if (loading) {
     return (
@@ -135,13 +147,13 @@ export const OneRegionMapPage = () => {
   }
   const regionName = oneRegionData?.properties?.region || 'Регион России';
 
-  const chartsDataForExport = {
-    dailyFlights,
-    flightData,
-    peakHourlyFlights,
-    flightsByTimeOfDay,
-    statistics,
-  };
+  // const chartsDataForExport = {
+  //   dailyFlights,
+  //   flightData,
+  //   peakHourlyFlights,
+  //   flightsByTimeOfDay,
+  //   statistics,
+  // };
 
   return (
     <div className="main">

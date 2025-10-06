@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import ChartExportSelector from '../components/ChartExportSelector/ChartExportSelector';
 import DateRangePicker from '../components/DatePicker/DatePicker';
@@ -17,8 +17,11 @@ const RussianMapPage = () => {
   const [dateRange, setDateRange] = useState(null);
   const [dateQuery, setDateQuery] = useState(initialDateRange);
 
-  const from = timeToDateConverter(dateQuery[0].toDate());
-  const to = timeToDateConverter(dateQuery[1].toDate());
+  // const from = timeToDateConverter(dateQuery[0].toDate());
+  // const to = timeToDateConverter(dateQuery[1].toDate());
+  const [from, to] = useMemo(() => {
+    return [timeToDateConverter(dateQuery[0].toDate()), timeToDateConverter(dateQuery[1].toDate())];
+  }, [dateQuery]);
 
   const {
     data: flightData,
@@ -39,10 +42,6 @@ const RussianMapPage = () => {
 
   const loading = ymapsLoading || flightLoading || regionsLoading;
   const error = flightError || regionsError;
-
-  const handleDateRangeChange = useCallback((range) => {
-    setDateRange(range);
-  }, []);
 
   if (error) {
     return (
@@ -138,7 +137,7 @@ const RussianMapPage = () => {
         dailyFlights={dailyFlights}
         flightsByRegion={flightsByRegion}
         flightsDurationByRegion={flightsDurationByRegion}
-        onDateRangeChange={handleDateRangeChange}
+        onDateRangeChange={setDateRange}
       />
     </div>
   );
