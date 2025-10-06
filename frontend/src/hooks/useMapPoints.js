@@ -1,40 +1,35 @@
 import { useEffect, useRef } from 'react';
 
-import { hasDataChanged } from './utils/hashUtils';
 import { updateMapPoints } from './utils/mapPointsProcessor';
 
 export const useMapPoints = ({ mapInstance, ymapsReady, points }) => {
   const pointsRef = useRef([]);
   const clustererRef = useRef(null);
-  const lastZoomRef = useRef(3);
+  const pointsHashRef = useRef('');
   const processingTimeoutRef = useRef(null);
 
   useEffect(() => {
     if (!mapInstance || !ymapsReady || !points) return;
 
+    // Очищаем предыдущий таймер
+    if (processingTimeoutRef.current) {
+      clearTimeout(processingTimeoutRef.current);
+    }
+
     const processClusters = () => {
-      if (pointsRef.current.length > 0 && !hasDataChanged(pointsRef.current, points)) {
-        return;
-      }
-
       const zoom = mapInstance.getZoom();
-      lastZoomRef.current = zoom;
-
-      updateMapPoints(mapInstance, points, zoom, pointsRef, clustererRef);
+      updateMapPoints(mapInstance, points, zoom, pointsRef, clustererRef, pointsHashRef);
     };
 
     processClusters();
 
     const handleZoomChange = () => {
       const newZoom = mapInstance.getZoom();
-      lastZoomRef.current = newZoom;
-
       if (processingTimeoutRef.current) {
         clearTimeout(processingTimeoutRef.current);
       }
-
       processingTimeoutRef.current = setTimeout(() => {
-        updateMapPoints(mapInstance, points, newZoom, pointsRef, clustererRef);
+        updateMapPoints(mapInstance, points, newZoom, pointsRef, clustererRef, pointsHashRef);
       }, 0);
     };
 
@@ -42,17 +37,19 @@ export const useMapPoints = ({ mapInstance, ymapsReady, points }) => {
 
     return () => {
       mapInstance.events.remove('zoomchange', handleZoomChange);
-
       if (processingTimeoutRef.current) {
         clearTimeout(processingTimeoutRef.current);
       }
-
-      if (clustererRef.current && mapInstance.geoObjects) {
-        mapInstance.geoObjects.remove(clustererRef.current);
+      if (clustererRef.current && mapInstance?.geoObjects) {
+        try {
+          mapInstance.geoObjects.remove(clustererRef.current);
+        } catch (e) {
+          console.warn('Ошибка удаления кластера:', e);
+        }
       }
-
       pointsRef.current = [];
       clustererRef.current = null;
+      pointsHashRef.current = '';
     };
   }, [mapInstance, ymapsReady, points]);
 

@@ -33,7 +33,7 @@ export const useFlightCoreData = (flightsData, dateRange = null) => {
   }, [dateRange, flightsData]);
 
   const dailyFlights = useMemo(() => {
-    if (!flightsData?.length) return [];
+    if (!flightsData || flightsData.length === 0) return [];
 
     const flightsByDate = new Map();
     for (const flight of flightsData) {

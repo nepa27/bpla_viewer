@@ -1,4 +1,3 @@
-// utils/hashUtils.js
 export const getClusterHash = (clusters) => {
   if (!clusters || clusters.length === 0) return '';
 
