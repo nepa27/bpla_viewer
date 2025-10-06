@@ -1,14 +1,3 @@
-.drawer-nav {
-  flex: 1;
-  overflow-y: auto;
-}
-
-.drawer-menu {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-/* 
 .drawer-menu-item {
   border-bottom: 1px solid rgba(136, 146, 176, 0.1);
 }
@@ -36,38 +25,6 @@
   color: var(--accent-blue);
   border-left: 3px solid var(--accent-blue);
   padding-left: 17px;
-} */
-
-/* Стили для разделителя */
-.drawer-menu-divider {
-  padding: 5px 20px;
-  border-bottom: none;
-}
-
-.drawer-menu-divider hr {
-  border: none;
-  height: 1px;
-  background-color: var(--border-color);
-  margin: 0;
-}
-
-/* Scrollbar для меню */
-.drawer-nav::-webkit-scrollbar {
-  width: 6px;
-}
-
-.drawer-nav::-webkit-scrollbar-track {
-  background: rgba(10, 25, 47, 0.3);
-  border-radius: 3px;
-}
-
-.drawer-nav::-webkit-scrollbar-thumb {
-  background: var(--accent-blue-dark);
-  border-radius: 3px;
-}
-
-.drawer-nav::-webkit-scrollbar-thumb:hover {
-  background: var(--accent-blue);
 }
 
 /* Адаптивность */

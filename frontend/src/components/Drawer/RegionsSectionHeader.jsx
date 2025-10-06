@@ -1,6 +1,8 @@
+import { memo } from 'react';
+
 import './RegionsSectionHeader.css';
 
-export const RegionsSectionHeader = ({ isExpanded, onToggle }) => {
+export const RegionsSectionHeader = memo(({ isExpanded, onToggle }) => {
   return (
     <li className="drawer-menu-item drawer-section-header">
       <button className="drawer-section-toggle" onClick={onToggle} aria-expanded={isExpanded}>
@@ -9,4 +11,4 @@ export const RegionsSectionHeader = ({ isExpanded, onToggle }) => {
       </button>
     </li>
   );
-};
+});

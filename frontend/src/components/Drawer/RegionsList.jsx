@@ -1,9 +1,11 @@
 /* eslint-disable no-unused-vars */
+import { memo } from 'react';
+
 import { Link, useLocation } from 'react-router-dom';
 
 import './RegionsList.css';
 
-export const RegionsList = ({ regions, searchTerm, onClose }) => {
+export const RegionsList = memo(({ regions, searchTerm, onClose }) => {
   const location = useLocation();
 
   return (
@@ -34,4 +36,4 @@ export const RegionsList = ({ regions, searchTerm, onClose }) => {
       )}
     </>
   );
-};
+});
