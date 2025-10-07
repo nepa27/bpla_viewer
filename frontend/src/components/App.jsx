@@ -7,6 +7,8 @@ import Layout from '../components/Layout';
 import RussianMapPage from '../pages/RussianMapPage';
 import ROUTES from '../utils/routes';
 import './App.css';
+import SignInForm from './SignInForm/SignInForm';
+import SignUpForm from './SignUpForm/SignUpForm';
 
 const OneRegionMapPage = lazy(() => import('../pages/OneRegionMapPage'));
 const NotFoundPage = lazy(() => import('../pages/NotFoundPage'));
@@ -36,6 +38,22 @@ const App = () => {
           element={
             <Suspense fallback={<div>Загрузка...</div>}>
               <OneRegionMapPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path={ROUTES.SIGN_IN}
+          element={
+            <Suspense fallback={<div>Загрузка...</div>}>
+              <SignInForm />
+            </Suspense>
+          }
+        />
+        <Route
+          path={ROUTES.SIGN_UP}
+          element={
+            <Suspense fallback={<div>Загрузка...</div>}>
+              <SignUpForm />
             </Suspense>
           }
         />

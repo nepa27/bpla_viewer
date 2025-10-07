@@ -344,3 +344,6 @@ export function convertDatesToReadableFormat(dates) {
     to: toDayjs.format('DD MMMM YYYY'),
   };
 }
+
+export const getUpperCaseStartedWord = (word) =>
+  word[0].toUpperCase() + word.slice(1).toLowerCase();
