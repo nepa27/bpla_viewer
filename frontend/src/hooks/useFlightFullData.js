@@ -122,10 +122,37 @@ export const useFlightFullData = (flightsData, dateRange = null) => {
     return { averageFlightDuration, daysWithoutFlights, totalFlights };
   }, [filteredFlights, dateRange, flightsData]);
 
+  const flightDurationByDate = useMemo(() => {
+    if (!filteredFlights?.length) return [];
+
+    const aggregated = new Map();
+
+    for (const flight of filteredFlights) {
+      const dateStr = flight.date; // "2025-01-01"
+      const duration = flight.durationMinutes || 0;
+
+      if (!aggregated.has(dateStr)) {
+        aggregated.set(dateStr, {
+          date: new Date(dateStr),
+          totalDuration: 0,
+        });
+      }
+      aggregated.get(dateStr).totalDuration += duration;
+    }
+
+    return Array.from(aggregated.values())
+      .map(({ date, totalDuration }) => ({
+        date,
+        value: totalDuration,
+      }))
+      .sort((a, b) => a.date - b.date);
+  }, [filteredFlights]);
+
   return {
     ...core,
     flightsByTimeOfDay,
     peakHourlyFlights,
     statistics,
+    flightDurationByDate,
   };
 };

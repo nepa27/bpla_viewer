@@ -5,7 +5,6 @@ import { BrushableBarChart } from '../../components/BrushableBarChart';
 import { FlightDurationChart } from '../../components/FlightDurationChart';
 import { PeakHourlyFlightsChart } from '../../components/PeakHourlyFlightsChart';
 import { PieChart } from '../../components/PieChart/PieChart';
-import { useFlightFullData } from '../../hooks/useFlightFullData';
 import TableInfoChart from '../../ui/TableInfoChart/TableInfoChart';
 import { ChartsSkeletonStatistics } from '../../utils/skeletons';
 import style from './FlightStatisticsOneReg.module.css';
@@ -13,23 +12,21 @@ import style from './FlightStatisticsOneReg.module.css';
 const FlightStatisticsOneReg = memo(
   ({
     dailyFlights,
-    flightsData,
-    dateRange,
     onDateRangeChange,
+    statistics,
     peakHourlyFlights,
     flightsByTimeOfDay,
+    flightDurationByDate,
   }) => {
-    const { statistics } = useFlightFullData(flightsData, dateRange);
-
     const hasData = useMemo(() => {
       return (
         Array.isArray(dailyFlights) &&
         Array.isArray(peakHourlyFlights) &&
         Array.isArray(flightsByTimeOfDay) &&
-        flightsData != null &&
+        Array.isArray(flightDurationByDate) &&
         statistics != null
       );
-    }, [dailyFlights, peakHourlyFlights, flightsByTimeOfDay, flightsData, statistics]);
+    }, [dailyFlights, peakHourlyFlights, flightsByTimeOfDay, statistics, flightDurationByDate]);
 
     const dataTableInfo = useMemo(
       () => [
@@ -54,7 +51,7 @@ const FlightStatisticsOneReg = memo(
         <h3 className={style['chart-title']}>Количество полетов по датам</h3>
         <BrushableBarChart data={dailyFlights} onBrush={onDateRangeChange} />
         <h3 className={style['chart-title']}>Суммарная длительность полетов по датам</h3>
-        <FlightDurationChart flightData={flightsData} dateRange={dateRange} />
+        <FlightDurationChart data={flightDurationByDate} />
         <h3 className={style['chart-title']}>Пиковая нагрузка по дням</h3>
         <PeakHourlyFlightsChart peakHourlyFlightsData={peakHourlyFlights} />
         <h3 className={style['chart-title']}>Распределение полетов по часам</h3>

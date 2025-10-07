@@ -48,6 +48,7 @@ export const OneRegionMapPage = () => {
     flightsDurationByRegion,
     flightsByTimeOfDay,
     statistics,
+    flightDurationByDate,
   } = useFlightFullData(flightData, dateRange);
 
   const oneRegionData = regionsPolygons?.features?.find(
@@ -63,12 +64,12 @@ export const OneRegionMapPage = () => {
   const chartsDataForExport = useMemo(
     () => ({
       dailyFlights,
-      flightData,
+      flightDurationByDate,
       peakHourlyFlights,
       flightsByTimeOfDay,
       statistics,
     }),
-    [dailyFlights, flightData, peakHourlyFlights, flightsByTimeOfDay, statistics],
+    [dailyFlights, flightDurationByDate, peakHourlyFlights, flightsByTimeOfDay, statistics],
   );
 
   const regionName = oneRegionData?.properties?.region || 'Регион России';
@@ -171,13 +172,13 @@ export const OneRegionMapPage = () => {
       <DateRangePicker dateRange={dateQuery} setDateRange={setDateQuery} />
 
       <FlightStatisticsOneReg
+        statistics={statistics}
         dailyFlights={dailyFlights}
-        flightsData={flightData}
-        dateRange={dateRange}
         onDateRangeChange={setDateRange}
         peakHourlyFlights={peakHourlyFlights}
         flightsByTimeOfDay={flightsByTimeOfDay}
         flightsDurationByRegion={flightsDurationByRegion}
+        flightDurationByDate={flightDurationByDate}
       />
     </div>
   );
