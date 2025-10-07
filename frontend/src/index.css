@@ -85,7 +85,6 @@ body {
 
 .chart-container:hover {
   border-color: var(--accent-blue-dark);
-  transform: translateY(-2px);
 }
 
 .map-container {
@@ -238,11 +237,6 @@ body {
   color: var(--accent-blue, #64ffda) !important;
 }
 
-/* Цвет стрелок в шапке календаря */
-.ant-picker-header button {
-  color: var(--accent-blue, #64ffda) !important;
-}
-
 /* Цвет текста в календаре */
 .ant-picker-cell .ant-picker-cell-inner,
 .ant-picker-header-view button {
@@ -299,4 +293,13 @@ body {
   background-color: var(--secondary-dark, #112240) !important;
   border-color: var(--border-color, rgba(136, 146, 176, 0.2)) !important;
   box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3) !important;
+}
+
+.anticon-swap-right {
+  color: #52c4b9 !important;
+  font-size: large;
+}
+
+.ant-picker-clear:hover {
+  color: #52c4b9 !important;
 }
