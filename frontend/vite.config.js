@@ -14,5 +14,11 @@ export default defineConfig({
       '@hooks': path.resolve('./src/hooks'),
     },
   },
-  test: { globals: true, environment: 'jsdom', setupFiles: './src/setupTests.js', css: true },
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: './src/helpers/setupTests.js',
+    css: true,
+    svg: true,
+  },
 });
