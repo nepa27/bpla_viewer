@@ -7,6 +7,7 @@ import { PeakHourlyFlightsChart } from '../../components/PeakHourlyFlightsChart'
 import { PieChart } from '../../components/PieChart/PieChart';
 import { useFlightFullData } from '../../hooks/useFlightFullData';
 import TableInfoChart from '../../ui/TableInfoChart/TableInfoChart';
+import { ChartsSkeletonStatistics } from '../../utils/skeletons';
 import style from './FlightStatisticsOneReg.module.css';
 
 const FlightStatisticsOneReg = memo(
@@ -20,25 +21,31 @@ const FlightStatisticsOneReg = memo(
   }) => {
     const { statistics } = useFlightFullData(flightsData, dateRange);
 
+    const hasData = useMemo(() => {
+      return (
+        Array.isArray(dailyFlights) &&
+        Array.isArray(peakHourlyFlights) &&
+        Array.isArray(flightsByTimeOfDay) &&
+        flightsData != null &&
+        statistics != null
+      );
+    }, [dailyFlights, peakHourlyFlights, flightsByTimeOfDay, flightsData, statistics]);
+
     const dataTableInfo = useMemo(
       () => [
         {
           id: 1,
           name: 'Средняя продолжительность полета:',
-          value: statistics.averageFlightDuration,
+          value: statistics?.averageFlightDuration || '—',
         },
-        { id: 2, name: 'Дней без полетов:', value: statistics.daysWithoutFlights },
-        { id: 3, name: 'Всего полетов:', value: statistics.totalFlights },
+        { id: 2, name: 'Дней без полетов:', value: statistics?.daysWithoutFlights || 0 },
+        { id: 3, name: 'Всего полетов:', value: statistics?.totalFlights || 0 },
       ],
       [statistics],
     );
 
-    if (!flightsData) {
-      return (
-        <div className={style['chart-container']}>
-          <div>Нет данных для отображения</div>
-        </div>
-      );
+    if (!hasData) {
+      return <ChartsSkeletonStatistics count={5} />;
     }
 
     return (
