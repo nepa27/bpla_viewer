@@ -1,4 +1,3 @@
-// hooks/useFlightCoreData.js
 import { useEffect, useMemo, useState } from 'react';
 
 export const useFlightCoreData = (flightsData, dateRange = null) => {

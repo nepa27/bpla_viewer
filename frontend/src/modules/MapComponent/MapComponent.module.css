@@ -12,7 +12,6 @@
 
 .map-wrapper:hover {
   border-color: var(--accent-blue-dark);
-  transform: translateY(-2px);
 }
 
 /* Контейнер карты */
