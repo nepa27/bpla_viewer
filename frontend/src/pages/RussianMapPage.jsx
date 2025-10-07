@@ -4,6 +4,7 @@ import { useCallback, useMemo, useState } from 'react';
 import ChartExportSelector from '../components/ChartExportSelector/ChartExportSelector';
 import DateRangePicker from '../components/DatePicker/DatePicker';
 import ErrorDisplay from '../components/ErrorDisplay/ErrorDisplay';
+import MessageDisplay from '../components/MessageDisplay/MessageDisplay';
 import { useFlightCoreData } from '../hooks/useFlightCoreData';
 import { useGzipFlightData } from '../hooks/useGzipFlightData';
 import { useGzipPolygonsData } from '../hooks/useGzipPolygonsData';
@@ -19,10 +20,12 @@ const RussianMapPage = () => {
   const [dateRange, setDateRange] = useState(null);
   const [dateQuery, setDateQuery] = useState(initialDateRange);
 
-  // const from = timeToDateConverter(dateQuery[0].toDate());
-  // const to = timeToDateConverter(dateQuery[1].toDate());
   const [from, to] = useMemo(() => {
-    return [timeToDateConverter(dateQuery[0].toDate()), timeToDateConverter(dateQuery[1].toDate())];
+    if (!dateQuery) return ['', ''];
+    return [
+      timeToDateConverter(dateQuery[0]?.toDate()),
+      timeToDateConverter(dateQuery[1]?.toDate()),
+    ];
   }, [dateQuery]);
 
   const {
@@ -72,19 +75,15 @@ const RussianMapPage = () => {
     }
 
     return (
-      <div className="main">
+      <>
         <h1>Карта России</h1>
-        <div
-          style={{
-            height: '600px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          Нет данных для отображения
-        </div>
-      </div>
+        <MessageDisplay
+          title="Выберите диапазон дат"
+          submessage="Выберите период для отображения данных"
+          buttonText="Перезагрузить "
+          icon="📅"
+        />
+      </>
     );
   }
 
