@@ -3,6 +3,7 @@ import { useCallback, useMemo, useState } from 'react';
 
 import ChartExportSelector from '../components/ChartExportSelector/ChartExportSelector';
 import DateRangePicker from '../components/DatePicker/DatePicker';
+import ErrorDisplay from '../components/ErrorDisplay/ErrorDisplay';
 import { useFlightCoreData } from '../hooks/useFlightCoreData';
 import { useGzipFlightData } from '../hooks/useGzipFlightData';
 import { useGzipPolygonsData } from '../hooks/useGzipPolygonsData';
@@ -11,6 +12,7 @@ import FlightStatistics from '../modules/FlightStatistics/FlightStatistics';
 import MapComponent from '../modules/MapComponent/MapComponent';
 import { initialDateRange } from '../utils/constant';
 import { timeToDateConverter } from '../utils/functions';
+import ROUTES from '../utils/routes';
 import { FlightStatsSkeleton, MapSkeleton } from '../utils/skeletons';
 
 const RussianMapPage = () => {
@@ -47,16 +49,13 @@ const RussianMapPage = () => {
     return (
       <div className="main">
         <h1>Карта России</h1>
-        <div
-          style={{
-            height: '600px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          Ошибка: {error.message || error}
-        </div>
+        <ErrorDisplay
+          errorCode="500"
+          errorMessage="Ошибка сервера"
+          errorSubmessage={error}
+          buttonText="перезагрузить страницу"
+          linkTo={ROUTES.HOME}
+        />
       </div>
     );
   }
