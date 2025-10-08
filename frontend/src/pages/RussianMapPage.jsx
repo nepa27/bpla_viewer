@@ -76,7 +76,9 @@ const RussianMapPage = () => {
 
     return (
       <>
-        <h1>Карта России</h1>
+        <div className="main">
+          <h1>Карта России</h1>
+        </div>
         <MessageDisplay
           title="Выберите диапазон дат"
           submessage="Выберите период для отображения данных"

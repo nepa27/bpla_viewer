@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { useCallback, useMemo, useRef } from 'react';
+import { memo, useCallback, useMemo, useRef } from 'react';
 
 import { useNavigate } from 'react-router';
 
@@ -10,7 +10,7 @@ import { generateLegendSteps } from '../../utils/colorScale';
 import ROUTES from '../../utils/routes';
 import style from './FallBackMap.module.css';
 
-const FallBackMap = ({ geoData, flightsData }) => {
+const FallBackMap = memo(({ geoData, flightsData }) => {
   const svgRef = useRef();
   const navigate = useNavigate();
 
@@ -75,6 +75,6 @@ const FallBackMap = ({ geoData, flightsData }) => {
       </div>
     </div>
   );
-};
+});
 
 export default FallBackMap;
