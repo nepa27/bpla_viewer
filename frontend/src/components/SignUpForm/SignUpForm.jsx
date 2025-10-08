@@ -7,15 +7,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 
 import { SignUpSchema } from '../../helpers/validationSchemas';
+import { useAuth } from '../../hooks/useAuth';
 import ROUTES from '../../utils/routes';
 import Input from '../Input/Input';
 import styles from './SignUpForm.module.css';
-
-// Функция для шифрования (замените на вашу реализацию)
-const encryptData = async (data) => {
-  // Замените на вашу реализацию шифрования
-  return JSON.stringify(data);
-};
 
 function SignUpForm() {
   const {
@@ -30,7 +25,7 @@ function SignUpForm() {
   const [serverErrors, setServerErrors] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const [userData, setUserData] = useState(null);
+  const { auth, isSignupPending } = useAuth();
 
   // Проверка авторизации при загрузке
   useEffect(() => {
@@ -38,7 +33,6 @@ function SignUpForm() {
     if (savedUser) {
       try {
         const parsedUser = JSON.parse(savedUser);
-        setUserData(parsedUser);
         // Если пользователь уже авторизован, перенаправляем на домашнюю страницу
         navigate(ROUTES.HOME);
       } catch (e) {
@@ -52,41 +46,24 @@ function SignUpForm() {
       setIsLoading(true);
       setServerErrors(null);
 
-      // Здесь делается запрос на регистрацию
-      const response = await fetch('/api/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
+      const userData = {
+        username: data.username,
+        email: data.email,
+        password: data.password,
+      };
 
-      const result = await response.json();
+      const response = await auth(userData);
 
-      if (!response.ok) {
-        if (result.errors) {
-          toast.error(result.errors.message || 'Ошибка регистрации');
-          setServerErrors(result);
-        } else {
-          toast.error('Ошибка регистрации');
-        }
-        return;
-      }
-
-      if (result.user) {
-        // Шифруем и сохраняем данные пользователя
-        try {
-          const encryptedData = await encryptData(result.user);
-          localStorage.setItem('user', encryptedData);
-          setUserData(result.user);
-          toast.success('Регистрация успешна!');
-          navigate(ROUTES.HOME);
-        } catch (encryptError) {
-          toast.error('Ошибка сохранения данных пользователя');
-        }
+      if (response) {
+        toast.success('Регистрация успешна!');
+        navigate(ROUTES.SIGN_IN);
       }
     } catch (err) {
-      toast.error(`Ошибка: ${err.message || err}`);
+      if (err.message) {
+        toast.error(`Ошибка: ${err.message}`);
+      } else {
+        toast.error('Ошибка регистрации');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -152,8 +129,12 @@ function SignUpForm() {
           error={errors.agreement?.message}
         />
 
-        <button type="submit" className={styles.submitButton} disabled={isLoading}>
-          {isLoading ? 'Регистрация...' : 'Создать аккаунт'}
+        <button
+          type="submit"
+          className={styles.submitButton}
+          disabled={isLoading || isSignupPending}
+        >
+          {isLoading || isSignupPending ? 'Регистрация...' : 'Создать аккаунт'}
         </button>
 
         <span className={styles.footerText}>
@@ -174,7 +155,10 @@ function SignUpForm() {
         pauseOnFocusLoss
         draggable={false}
         pauseOnHover
-        theme="light"
+        theme="colored"
+        toastClassName={styles.toast}
+        bodyClassName={styles.toastBody}
+        progressClassName={styles.toastProgress}
       />
     </section>
   );

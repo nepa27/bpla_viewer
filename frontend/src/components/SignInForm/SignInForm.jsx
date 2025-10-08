@@ -3,29 +3,34 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { useEffect, useState } from 'react';
 
 import { useForm } from 'react-hook-form';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 
 import { SignInSchema } from '../../helpers/validationSchemas';
+import { useAuth } from '../../hooks/useAuth';
 import ROUTES from '../../utils/routes';
 import Input from '../Input/Input';
 import styles from './SignInForm.module.css';
-
-// Функция для шифрования (замените на вашу реализацию)
-const encryptData = async (data) => {
-  // Замените на вашу реализацию шифрования
-  return JSON.stringify(data);
-};
 
 function SignInForm() {
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm({ resolver: yupResolver(SignInSchema) });
+  } = useForm({
+    mode: 'onChange',
+    defaultValues: {},
+    resolver: yupResolver(SignInSchema),
+  });
+
   const [serverErrors, setServerErrors] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const { signIn, isLoginPending, isFaceLoginPending } = useAuth();
+
+  const fromPage = location.state?.from?.pathname || ROUTES.HOME;
+
   const [userData, setUserData] = useState(null);
 
   // Проверка авторизации при загрузке
@@ -48,41 +53,23 @@ function SignInForm() {
       setIsLoading(true);
       setServerErrors(null);
 
-      // Здесь делается запрос на вход
-      const response = await fetch('/api/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
+      const authData = {
+        email: data.email,
+        password: data.password,
+      };
 
-      const result = await response.json();
+      const response = await signIn(authData);
 
-      if (!response.ok) {
-        if (result.errors) {
-          toast.error(result.errors.message || 'Ошибка входа');
-          setServerErrors(result);
-        } else {
-          toast.error('Ошибка входа');
-        }
-        return;
-      }
-
-      if (result.user) {
-        // Шифруем и сохраняем данные пользователя
-        try {
-          const encryptedData = await encryptData(result.user);
-          localStorage.setItem('user', encryptedData);
-          setUserData(result.user);
-          toast.success('Вход успешен!');
-          navigate(ROUTES.HOME);
-        } catch (encryptError) {
-          toast.error('Ошибка сохранения данных пользователя');
-        }
+      if (response) {
+        toast.success('Вход successful!');
+        navigate(fromPage, { replace: true });
       }
     } catch (err) {
-      toast.error(`Ошибка: ${err.message || err}`);
+      if (err.message) {
+        toast.error(`Ошибка: ${err.message}`);
+      } else {
+        toast.error('Ошибка входа');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -115,8 +102,12 @@ function SignInForm() {
           {...register('password')}
         />
 
-        <button type="submit" className={styles.submitButton} disabled={isLoading}>
-          {isLoading ? 'Вход...' : 'Войти'}
+        <button
+          type="submit"
+          className={styles.submitButton}
+          disabled={isLoading || isLoginPending || isFaceLoginPending}
+        >
+          {isLoading || isLoginPending || isFaceLoginPending ? 'Вход...' : 'Войти'}
         </button>
 
         <span className={styles.footerText}>
@@ -137,7 +128,10 @@ function SignInForm() {
         pauseOnFocusLoss
         draggable={false}
         pauseOnHover
-        theme="light"
+        theme="colored"
+        toastClassName={styles.toast}
+        bodyClassName={styles.toastBody}
+        progressClassName={styles.toastProgress}
       />
     </section>
   );
