@@ -19,8 +19,8 @@ export function timeToDateConverter(dateStr) {
  * Получает текущую дату в формате DD.MM.YYYY
  * @returns {string} Текущая дата в формате DD.MM.YYYY (например, "25.12.2023")
  */
-export function getDateNow() {
-  const date = new Date();
+export function getDateNow(dateStr = Date.now()) {
+  const date = new Date(dateStr);
   const day = String(date.getDate()).padStart(2, '0');
   const month = String(date.getMonth() + 1).padStart(2, '0'); // Месяцы с 0 до 11
   const year = date.getFullYear();
