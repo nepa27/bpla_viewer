@@ -1,7 +1,7 @@
 const ROUTES = {
   HOME: '/',
-  SIGN_UP: '/sign-up',
-  SIGN_IN: '/sign-in',
+  SIGN_UP: '/register',
+  SIGN_IN: '/auth',
   REGIONS: '/regions',
   POLYGONS: '/polygons',
   REGION_ONE: '/regions/:id',
