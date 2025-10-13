@@ -47,7 +47,7 @@ function SignUpForm() {
       setServerErrors(null);
 
       const userData = {
-        username: data.username,
+        // username: data.username,
         email: data.email,
         password: data.password,
       };
@@ -78,15 +78,6 @@ function SignUpForm() {
         <span className={styles.title}>Создать аккаунт</span>
 
         <Input
-          type="text"
-          label="Имя пользователя"
-          autoComplete="username"
-          containerClass={styles.inputContainer}
-          error={serverErrors?.errors?.username || errors.username?.message}
-          {...register('username')}
-        />
-
-        <Input
           type="email"
           label="Email адрес"
           autoComplete="email"
@@ -114,20 +105,6 @@ function SignUpForm() {
         />
 
         <hr className={styles.divider} />
-
-        <Input
-          {...register('agreement')}
-          type="checkbox"
-          value
-          autoComplete="off"
-          containerClass={styles.checkboxContainer}
-          label={
-            <span>
-              Я согласен с <a href="/privacy">обработкой персональных данных</a>
-            </span>
-          }
-          error={errors.agreement?.message}
-        />
 
         <button
           type="submit"
