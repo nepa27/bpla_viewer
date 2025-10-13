@@ -18,14 +18,11 @@ const Input = forwardRef(
     ref,
   ) => {
     const labelName = label || getUpperCaseStartedWord(name);
-    const isCheckboxOrRadio = type === 'checkbox' || type === 'radio';
 
     return (
-      <div
-        className={`${containerClass} ${isCheckboxOrRadio ? styles.checkboxContainer : styles.inputContainer}`}
-      >
-        {!isCheckboxOrRadio && useLabel && (
-          <label htmlFor={name} className={styles.label}>
+      <div className={`${(containerClass, styles.inputContainer)}`}>
+        {useLabel && (
+          <label htmlFor={name} className={styles?.label}>
             {labelName}
           </label>
         )}
@@ -36,19 +33,9 @@ const Input = forwardRef(
           type={type}
           name={name}
           placeholder={placeholder || getUpperCaseStartedWord(name)}
-          className={`${styles.input} ${error ? styles.error : ''} ${isCheckboxOrRadio ? styles.checkbox : ''} ${props.disabled ? styles.disabled : ''}`}
+          className={`${styles.input} ${error ? styles.error : ''}  ${props.disabled ? styles.disabled : ''}`}
           {...props}
         />
-        {!isCheckboxOrRadio && error && <span className={styles.errorText}>{error}</span>}
-
-        {isCheckboxOrRadio && (
-          <div className={styles.checkboxLabelContainer}>
-            <label htmlFor={name} className={styles.checkboxLabel}>
-              {labelName}
-            </label>
-            {error && <span className={styles.errorText}>{` (${error})`}</span>}
-          </div>
-        )}
       </div>
     );
   },
