@@ -11,6 +11,7 @@ from backend.app.api.responses import (
 from backend.app.database import get_db
 from backend.app.services.flight_service import FlightService
 from backend.app.logging import log_function, logger
+from backend.app.services.user_service import UserService
 
 router = APIRouter(tags=["Полеты БПЛА"])
 
@@ -32,24 +33,21 @@ async def get_all_flights_gzip(
         example="2025-08-01",
     ),
     db: AsyncSession = Depends(get_db),
+    # current_user: dict = Depends(UserService.get_current_user),
 ):
     """Получить все полеты в виде GZIP с CSV"""
     try:
         time_before = time()
         logger.info(f"Запрос на получение полетов с {from_date} по {to_date}")
-        flights_data = await FlightService.get_data(
+        gzip_data = await FlightService.get_cached_flights_data(
             db, from_date=from_date, to_date=to_date
         )
-
-        if not flights_data:
+        if not gzip_data:
             logger.warning("Полеты не найдены")
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="No flights found"
             )
-
-        gzip_data = await FlightService.create_csv_gzip_async(flights_data)
         logger.info("Данные успешно подготовлены и сжаты")
-
         time_after = time()
         logger.info(f"Время обработки запроса: {time_after - time_before} секунд")
 
@@ -93,16 +91,15 @@ async def get_flights_by_region_gzip(
         logger.info(
             f"Запрос на получение полетов для региона {region_id} с {from_date} по {to_date}"
         )
-        flights_data = await FlightService.get_data(
+        gzip_data = await FlightService.get_cached_flights_data(
             db, region_id=region_id, from_date=from_date, to_date=to_date
         )
-        if not flights_data:
+        if not gzip_data:
             logger.warning(f"Полеты не найдены для региона {region_id}")
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=f"No flights found for region ID {region_id} in the specified date range",
             )
-        gzip_data = await FlightService.create_csv_gzip_async(flights_data)
         logger.info(f"Данные для региона {region_id} успешно подготовлены и сжаты")
         return Response(
             content=gzip_data,
