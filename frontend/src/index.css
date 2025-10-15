@@ -314,7 +314,6 @@ TABLE
   border-radius: 12px !important;
   border: 1px solid rgba(136, 146, 176, 0.1) !important;
   box-shadow: 0 10px 30px rgba(2, 12, 27, 0.7) !important;
-  margin-top: 20px !important;
   overflow: hidden !important;
   transition: all 0.3s ease !important;
   width: 100% !important;
@@ -627,10 +626,6 @@ TABLE
   .custom-table .ant-pagination-options {
     display: none !important;
   }
-
-  .table-wrapper {
-    margin-top: 15px !important;
-  }
 }
 
 @media (max-width: 768px) {
@@ -656,7 +651,6 @@ TABLE
   }
 
   .table-wrapper {
-    margin-top: 12px !important;
     border-radius: 10px !important;
   }
 
@@ -685,7 +679,6 @@ TABLE
   }
 
   .table-wrapper {
-    margin-top: 10px !important;
     border-radius: 8px !important;
   }
 
@@ -714,10 +707,6 @@ TABLE
     min-width: 26px !important;
     height: 26px !important;
     font-size: 0.65rem !important;
-  }
-
-  .table-wrapper {
-    margin-top: 8px !important;
   }
 }
 
@@ -793,6 +782,9 @@ TABLE
   height: 24px !important;
   line-height: 22px !important;
   min-width: 24px !important;
+  min-height: 34px !important;
+  display: flex;
+  align-self: center;
 }
 
 .custom-table .ant-table-filter-trigger:hover {
@@ -925,4 +917,14 @@ TABLE
     background: #52c4b9 !important;
     border-radius: 2px !important;
   }
+}
+
+.custom-table .ant-pagination .ant-pagination-jump-next .ant-pagination-item-container,
+.custom-table .ant-pagination .ant-pagination-jump-prev .ant-pagination-item-container {
+  position: static !important;
+}
+
+.custom-table .ant-select {
+  display: flex;
+  align-items: center;
 }
