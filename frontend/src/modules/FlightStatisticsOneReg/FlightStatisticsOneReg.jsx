@@ -5,6 +5,7 @@ import { BrushableBarChart } from '../../components/BrushableBarChart';
 import { FlightDurationChart } from '../../components/FlightDurationChart';
 import { PeakHourlyFlightsChart } from '../../components/PeakHourlyFlightsChart';
 import { PieChart } from '../../components/PieChart/PieChart';
+import DateRangeShower from '../../ui/DateRangeShower/DateRangeShower';
 import TableInfoChart from '../../ui/TableInfoChart/TableInfoChart';
 import { ChartsSkeletonStatistics } from '../../utils/skeletons';
 import style from './FlightStatisticsOneReg.module.css';
@@ -12,6 +13,7 @@ import style from './FlightStatisticsOneReg.module.css';
 const FlightStatisticsOneReg = memo(
   ({
     dailyFlights,
+    dateRange,
     onDateRangeChange,
     statistics,
     peakHourlyFlights,
@@ -49,6 +51,7 @@ const FlightStatisticsOneReg = memo(
       <div className={style['chart-container']}>
         <TableInfoChart data={dataTableInfo} />
         <h3 className={style['chart-title']}>Количество полетов по датам</h3>
+        {dateRange && <DateRangeShower dateRange={dateRange} />}
         <BrushableBarChart data={dailyFlights} onBrush={onDateRangeChange} />
         <h3 className={style['chart-title']}>Суммарная длительность полетов по датам</h3>
         <FlightDurationChart data={flightDurationByDate} />

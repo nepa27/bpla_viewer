@@ -6,6 +6,7 @@ import { useParams } from 'react-router';
 import ChartExportSelectorRegion from '../components/ChartExportSelectorRegion/ChartExportSelectorRegion';
 import DateRangePicker from '../components/DatePicker/DatePicker';
 import ErrorDisplay from '../components/ErrorDisplay/ErrorDisplay';
+import TableMain from '../components/Table/Table';
 import { useFlightFullData } from '../hooks/useFlightFullData';
 import { useGzipPolygonsData } from '../hooks/useGzipPolygonsData';
 import { useGzipRegionFlightData } from '../hooks/useGzipRegionFlightData';
@@ -171,7 +172,10 @@ export const OneRegionMapPage = () => {
 
       <DateRangePicker dateRange={dateQuery} setDateRange={setDateQuery} />
 
+      <TableMain data={filteredFlights} />
+
       <FlightStatisticsOneReg
+        dateRange={dateRange}
         statistics={statistics}
         dailyFlights={dailyFlights}
         onDateRangeChange={setDateRange}
