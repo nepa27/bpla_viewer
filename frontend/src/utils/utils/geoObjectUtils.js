@@ -1,4 +1,4 @@
-import { getDateNow } from '../../utils/functions';
+import { getDateNow } from '../functions';
 
 export const createPlacemark = (cluster, isCluster = false) => {
   if (!isCluster) {
