@@ -458,6 +458,7 @@ export const exportAllRegionCharts = async (
   regionName,
   { dailyFlights, peakHourlyFlights, flightsByTimeOfDay, statistics, flightDurationByDate },
   date,
+  base64Image,
 ) => {
   if (!statistics) {
     console.warn('Статистика отсутствует');
@@ -473,6 +474,20 @@ export const exportAllRegionCharts = async (
 
     addRegionTitleSlide(pptx, regionName, date);
     addStatisticsSlide(pptx, statistics, date);
+
+    // Слайд с изображением (полный слайд)
+    const imageSlide = pptx.addSlide();
+    imageSlide.background = { color: '002B5B' };
+
+    imageSlide.addImage({
+      data: base64Image,
+      type: 'base64',
+      x: '5%',
+      y: '5%',
+      w: '90%',
+      h: '90%',
+      sizing: { fit: 'contain' },
+    });
 
     // Слайд: Полёты по датам
     const slide1 = pptx.addSlide();
@@ -711,7 +726,7 @@ export const exportDurationByDateChart = async (regionName, flightDurationByDate
 // ==============================
 // Универсальный экспорт для региона
 // ==============================
-export const exportRegionChartByType = async (type, regionName, chartsData, date) => {
+export const exportRegionChartByType = async (type, regionName, chartsData, date, base64Image) => {
   const { dailyFlights, peakHourlyFlights, flightsByTimeOfDay, statistics, flightDurationByDate } =
     chartsData;
 
@@ -728,6 +743,6 @@ export const exportRegionChartByType = async (type, regionName, chartsData, date
       return exportStatisticsSlide(regionName, statistics, date);
     case 'all-region':
     default:
-      return exportAllRegionCharts(regionName, chartsData, date);
+      return exportAllRegionCharts(regionName, chartsData, date, base64Image);
   }
 };
