@@ -14,7 +14,7 @@ import MapComponent from '../modules/MapComponent/MapComponent';
 import { initialDateRange } from '../utils/constant';
 import { getDateNow, timeToDateConverter } from '../utils/functions';
 import ROUTES from '../utils/routes';
-import { FlightStatsSkeleton, MapSkeleton } from '../utils/skeletons';
+import { FlightStatsSkeleton, MapSkeleton } from '../utils/skeletons/skeletons';
 
 const RussianMapPage = () => {
   const [dateRange, setDateRange] = useState(null);

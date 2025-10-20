@@ -17,7 +17,7 @@ import ButtonGoBack from '../ui/ButtonGoBack/ButtonGoBack';
 import { initialDateRange } from '../utils/constant';
 import { timeToDateConverter } from '../utils/functions';
 import ROUTES from '../utils/routes';
-import { ChartsSkeletonStatistics, MapSkeleton } from '../utils/skeletons';
+import { ChartsSkeletonStatistics, MapSkeleton } from '../utils/skeletons/skeletons';
 
 export const OneRegionMapPage = () => {
   const { id } = useParams();
