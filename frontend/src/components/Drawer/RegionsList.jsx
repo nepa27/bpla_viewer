@@ -23,7 +23,7 @@ export const RegionsList = memo(({ regions, searchTerm, onClose }) => {
           </li>
         ))}
 
-      {searchTerm && regions.length === 0 && (
+      {searchTerm && !regions.length && (
         <li className="drawer-menu-item">
           <div className="drawer-no-results">Регионы не найдены</div>
         </li>
