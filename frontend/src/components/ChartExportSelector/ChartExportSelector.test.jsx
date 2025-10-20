@@ -24,15 +24,6 @@ vi.mock('../../utils/functions', () => ({
   convertDatesToReadableFormat: mocks.mockConvertDatesToReadableFormat,
 }));
 
-vi.mock('../../utils/exportUtilsRegions', () => ({
-  exportChartByType: mocks.mockExportChartByType,
-  exportOptions: [
-    { value: 'all', label: 'Все графики' },
-    { value: 'bar', label: 'Столбчатая диаграмма' },
-    { value: 'line', label: 'Линейная диаграмма' },
-  ],
-}));
-
 describe('ChartExportSelector', () => {
   const mockChartsData = {
     dailyFlights: [],
@@ -47,13 +38,6 @@ describe('ChartExportSelector', () => {
 
     expect(screen.getByText('Экспорт в pptx')).toBeInTheDocument();
     expect(screen.getByText('Экспорт в excel')).toBeInTheDocument();
-  });
-
-  it('should render select component', () => {
-    render(<ChartExportSelector chartsData={mockChartsData} dateRange={mockDateRange} />);
-
-    const select = screen.getByRole('combobox');
-    expect(select).toBeInTheDocument();
   });
 
   it('should render export buttons', () => {
