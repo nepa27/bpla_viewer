@@ -49,7 +49,8 @@ async def get_all_flights_gzip(
             )
         logger.info("Данные успешно подготовлены и сжаты")
         time_after = time()
-        logger.info(f"Время обработки запроса: {time_after - time_before} секунд")
+        time_work = time_after - time_before
+        logger.info(f"Время обработки запроса: {time_work:.5f} секунд")
 
         return Response(
             content=gzip_data,
