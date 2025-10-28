@@ -58,8 +58,6 @@ export const useGzipFlightData = (from, to) => {
       }
     },
     enabled: !!from && !!to,
-    staleTime: 5 * 60 * 1000,
-    cacheTime: 30 * 60 * 1000,
   });
 
   return {

@@ -10,17 +10,9 @@ const BASE_URL =
 
 /**
  * Хук для получения и разархивирования данных полигонов из gzip
- * @param {string} from - начальная дата (YYYY-MM-DD)
- * @param {string} to - конечная дата (YYYY-MM-DD)
  * @returns {Object} { data, loading, error, refetch }
  */
 export const useGzipPolygonsData = () => {
-  const buildUrl = () => {
-    const params = new URLSearchParams();
-
-    return `${BASE_URL}${ROUTES.POLYGONS}${params.toString() ? '?' + params.toString() : ''}`;
-  };
-
   const {
     data,
     isLoading: loading,
@@ -30,7 +22,7 @@ export const useGzipPolygonsData = () => {
     queryKey: ['gzipPolygonsData'],
     queryFn: async () => {
       try {
-        const url = buildUrl();
+        const url = `${BASE_URL}${ROUTES.POLYGONS}`;
 
         const response = await fetch(url, {
           headers: {
@@ -56,8 +48,6 @@ export const useGzipPolygonsData = () => {
       }
     },
     enabled: true,
-    staleTime: 5 * 60 * 1000, // 5 минут кеширования
-    cacheTime: 30 * 60 * 1000, // 30 минут в кеше
   });
 
   return {

@@ -69,8 +69,6 @@ export const useGzipRegionFlightData = (regionId, from, to) => {
       }
     },
     enabled: !!regionId && !!from && !!to,
-    staleTime: 5 * 60 * 1000,
-    cacheTime: 30 * 60 * 1000,
   });
 
   return {
