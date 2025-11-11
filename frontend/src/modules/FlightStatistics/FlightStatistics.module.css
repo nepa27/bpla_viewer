@@ -11,16 +11,19 @@
 
 .chart-container:hover {
   border-color: var(--accent-blue-dark);
-  /* transform: translateY(-2px); */
 }
 
 .chart-title {
   color: var(--accent-blue);
   text-align: center;
-  margin-bottom: 20px;
   font-size: 1.5rem;
+  margin-bottom: 20px;
   font-weight: 600;
   letter-spacing: 0.5px;
+}
+
+.chart-title--mg {
+  margin-bottom: 20px;
 }
 
 @media (max-width: 1024px) {
@@ -42,6 +45,9 @@
 
   .chart-title {
     font-size: 1.2rem;
+    margin-bottom: 15px;
+  }
+  .chart-title--mg {
     margin-bottom: 15px;
   }
 }

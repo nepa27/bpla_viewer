@@ -7,7 +7,7 @@ import { PeakHourlyFlightsChart } from '../../components/PeakHourlyFlightsChart'
 import { PieChart } from '../../components/PieChart/PieChart';
 import DateRangeShower from '../../ui/DateRangeShower/DateRangeShower';
 import TableInfoChart from '../../ui/TableInfoChart/TableInfoChart';
-import { ChartsSkeletonStatistics } from '../../utils/skeletons';
+import { ChartsSkeletonStatistics } from '../../utils/skeletons/skeletons';
 import style from './FlightStatisticsOneReg.module.css';
 
 const FlightStatisticsOneReg = memo(

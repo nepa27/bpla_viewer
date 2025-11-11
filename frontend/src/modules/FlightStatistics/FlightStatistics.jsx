@@ -5,7 +5,7 @@ import { BrushableBarChart } from '../../components/BrushableBarChart';
 import { RegionDurationChart } from '../../components/RegionDurationChart/RegionDurationChart';
 import { RegionFlightsChart } from '../../components/RegionFlightsChart/RegionFlightsChart';
 import DateRangeShower from '../../ui/DateRangeShower/DateRangeShower';
-import { ChartsSkeletonStatistics } from '../../utils/skeletons';
+import { ChartsSkeletonStatistics } from '../../utils/skeletons/skeletons';
 import style from './FlightStatistics.module.css';
 
 const FlightStatistics = memo(
