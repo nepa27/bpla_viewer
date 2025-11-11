@@ -3,11 +3,12 @@ import { Button, Table } from 'antd';
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
+import { compareDates, rebuildDateView } from '../../utils/functions';
 import Input from '../Input/Input';
 
 const columnNamesRu = {
   id: 'ID полета',
-  date: 'Дате',
+  date: 'Дата',
   lat: 'Широта',
   lng: 'Долгота',
   takeoff_time: 'Время взлета',
@@ -16,24 +17,6 @@ const columnNamesRu = {
   region: 'Регион',
   durationMinutes: 'Длительность полета(мин)',
 };
-
-function compareDates(a, b) {
-  // Для формата YYYY-MM-DD
-  if (typeof a === 'string' && typeof b === 'string' && a.includes('-') && b.includes('-')) {
-    // Сравнение дат в формате YYYY-MM-DD
-    return new Date(a) - new Date(b);
-  }
-
-  // Разделение строки на день и месяц для старого формата
-  const [dayA, monthA] = a.split(':').map(Number);
-  const [dayB, monthB] = b.split(':').map(Number);
-
-  // Преобразование даты в общее число для сравнения
-  const dateValueA = monthA * 100 + dayA;
-  const dateValueB = monthB * 100 + dayB;
-
-  return dateValueA - dateValueB;
-}
 
 // Web Worker для фильтрации данных
 const createFilterWorker = () => {
@@ -68,7 +51,6 @@ const TableMain = ({ data = [], showSizeChanger = true }) => {
   const [expandedRowKeys, setExpandedRowKeys] = useState([]);
   const [searchText, setSearchText] = useState('');
   const [filteredRowsData, setFilteredRowsData] = useState([]);
-  const [isFiltering, setIsFiltering] = useState(false);
   const [pageSize, setPageSize] = useState(5);
 
   const workerRef = useRef(null);
@@ -76,7 +58,7 @@ const TableMain = ({ data = [], showSizeChanger = true }) => {
 
   // Используем useMemo для оптимизации вычислений
   const rowsData = useMemo(() => {
-    return data?.map((el) => ({ key: el.id, ...el })) || [];
+    return data?.map((el) => ({ ...el, key: el.id, date: rebuildDateView(el.date) })) || [];
   }, [data]);
 
   // Инициализация Web Worker
@@ -85,7 +67,6 @@ const TableMain = ({ data = [], showSizeChanger = true }) => {
 
     workerRef.current.onmessage = function (e) {
       setFilteredRowsData(e.data);
-      setIsFiltering(false);
     };
 
     return () => {
@@ -103,8 +84,6 @@ const TableMain = ({ data = [], showSizeChanger = true }) => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
-
-    setIsFiltering(true);
 
     timeoutRef.current = setTimeout(() => {
       if (workerRef.current) {
@@ -157,18 +136,6 @@ const TableMain = ({ data = [], showSizeChanger = true }) => {
         switch (key) {
           case 'id':
             obj.sorter = (a, b) => +a.id - +b.id;
-            break;
-          case 'lat':
-            obj.sorter = (a, b) => +a.lat - +b.lat;
-            break;
-          case 'lng':
-            obj.sorter = (a, b) => +a.lng - +b.lng;
-            break;
-          case 'takeoff_time':
-            obj.sorter = (a, b) => compareDates(a.takeoff_time, b.takeoff_time);
-            break;
-          case 'landing_time':
-            obj.sorter = (a, b) => compareDates(a.landing_time, b.landing_time);
             break;
           case 'date':
             obj.sorter = (a, b) => compareDates(a.date, b.date);
@@ -271,7 +238,6 @@ const TableMain = ({ data = [], showSizeChanger = true }) => {
           containerClass={{ width: 300, marginRight: '10px' }}
           onChange={(e) => setSearchText(e.target.value)}
         />
-        {/* {isFiltering && <span style={{ marginLeft: '10px', color: '#64ffda' }}>Поиск...</span>} */}
       </div>
       <Table
         columns={columnsData}
