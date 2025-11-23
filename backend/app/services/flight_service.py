@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
 from sqlalchemy.engine.result import ChunkedIteratorResult
 
+from backend.app.logging import logger
 from backend.app.models.flight import Flight
 from backend.app.models.region import Region
 
@@ -120,7 +121,7 @@ class FlightService:
         )
 
     @staticmethod
-    def create_csv_gzip_sync(flights_data) -> bytes:
+    def create_csv_gzip_sync(flights_data: ChunkedIteratorResult) -> bytes:
         """Синхронная версия для executor"""
         csv_buffer = StringIO()
         writer = csv.writer(csv_buffer)
@@ -169,3 +170,35 @@ class FlightService:
             f_out.write(csv_buffer.getvalue().encode("utf-8"))
 
         return gz_buffer.getvalue()
+
+    @staticmethod
+    async def get_cached_flights_data(
+            db: AsyncSession,
+            region_id: Optional[int] = None,
+            from_date: Optional[date] = None,
+            to_date: Optional[date] = None
+    ) -> bytes:
+        """Получить данные из кэша или сгенерировать новые"""
+        from backend.app.services.flight_cache_manager import flight_cache_manager
+        cached_data = await flight_cache_manager.get_cached_data(
+            region_id, from_date, to_date
+        )
+
+        if cached_data is not None:
+            logger.info("Данные получены из кэша")
+            return cached_data
+
+        logger.info("Данные не найдены в кэше, генерация...")
+        await flight_cache_manager.update_cache(db, region_id, from_date, to_date)
+
+        cached_data = await flight_cache_manager.get_cached_data(
+            region_id, from_date, to_date
+        )
+
+        if cached_data is None:
+            flights_data = await FlightService.get_data(
+                db, region_id=region_id, from_date=from_date, to_date=to_date
+            )
+            cached_data = await FlightService.create_csv_gzip_async(flights_data)
+
+        return cached_data
