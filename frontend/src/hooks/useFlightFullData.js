@@ -1,4 +1,3 @@
-// hooks/useFlightFullData.js
 import { useMemo } from 'react';
 
 import { useFlightCoreData } from './useFlightCoreData';

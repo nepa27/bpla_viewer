@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 
-import { updateMapPoints } from './utils/mapPointsProcessor';
+import { updateMapPoints } from '../utils/utils/mapPointsProcessor';
 
 export const useMapPoints = ({ mapInstance, ymapsReady, points }) => {
   const pointsRef = useRef([]);

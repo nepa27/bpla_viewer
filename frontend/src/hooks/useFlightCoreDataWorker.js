@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useState, useRef } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 export const createFlightWorker = () => {
   const workerScript = `
@@ -210,8 +210,9 @@ export const createFlightWorker = () => {
   `;
 
   const blob = new Blob([workerScript], { type: 'application/javascript' });
+  console.log(URL.createObjectURL(blob))
   return new Worker(URL.createObjectURL(blob));
-};
+};   
 
 // Throttle функция для ограничения частоты вызовов
 function throttle(func, limit) {
@@ -221,9 +222,9 @@ function throttle(func, limit) {
     if (!inThrottle) {
       func.apply(context, args);
       inThrottle = true;
-      setTimeout(() => inThrottle = false, limit);
+      setTimeout(() => (inThrottle = false), limit);
     }
-  }
+  };
 }
 
 export const useFlightCoreDataWorker = (flightsData, dateRange = null) => {
@@ -234,7 +235,7 @@ export const useFlightCoreDataWorker = (flightsData, dateRange = null) => {
   const [isLoading, setIsLoading] = useState(false);
   const [worker, setWorker] = useState(null);
   const [workerReady, setWorkerReady] = useState(false);
-  
+
   // Ref для хранения throttled функции
   const throttledWorkerRef = useRef(null);
 
