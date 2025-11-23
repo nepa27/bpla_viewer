@@ -1,6 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { useAuth } from '../hooks/useAuth';
+import { setCookiesFromHeader } from '../utils/functions';
+import ROUTES from '../utils/routes';
 
 // Конфигурация базового URL
 const BASE_URL =
@@ -54,7 +56,7 @@ export const useSignupMutation = () => {
 
   return useMutation({
     mutationFn: async (userData) => {
-      const response = await fetch(`${BASE_URL}/signup`, {
+      const response = await fetch(`${BASE_URL}${ROUTES.SIGN_UP}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -66,7 +68,12 @@ export const useSignupMutation = () => {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Registration failed');
       }
-
+      // @TODO
+      const setCookieHeader = response.headers.get('Set-Cookie');
+      if (setCookieHeader) {
+        setCookiesFromHeader(setCookieHeader);
+      }
+      //=================
       return response.json();
     },
     onSuccess: (data) => {
@@ -84,7 +91,7 @@ export const useLoginMutation = () => {
 
   return useMutation({
     mutationFn: async (authData) => {
-      const response = await fetch(`${BASE_URL}/login`, {
+      const response = await fetch(`${BASE_URL}${ROUTES.SIGN_IN}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -126,7 +133,12 @@ export const useFaceLoginMutation = () => {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Face login failed');
       }
-
+      // @TODO
+      const setCookieHeader = response.headers.get('Set-Cookie');
+      if (setCookieHeader) {
+        setCookiesFromHeader(setCookieHeader);
+      }
+      //================
       return response.json();
     },
     onSuccess: (data) => {
