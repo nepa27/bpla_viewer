@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import { Outlet } from 'react-router-dom';
 
@@ -9,9 +9,9 @@ import style from './Layout.module.css';
 const Layout = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
-  const toggleDrawer = () => {
-    setIsDrawerOpen(!isDrawerOpen);
-  };
+  const toggleDrawer = useCallback(() => {
+    setIsDrawerOpen((prev) => !prev);
+  }, []);
 
   return (
     <div className={style.layout}>
@@ -27,11 +27,7 @@ const Layout = () => {
         <Outlet />
       </main>
 
-      <Drawer
-        isOpen={isDrawerOpen}
-        onClose={() => setIsDrawerOpen(false)}
-        onToggle={toggleDrawer}
-      />
+      <Drawer isOpen={isDrawerOpen} onToggle={toggleDrawer} />
     </div>
   );
 };

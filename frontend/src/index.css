@@ -85,7 +85,6 @@ body {
 
 .chart-container:hover {
   border-color: var(--accent-blue-dark);
-  transform: translateY(-2px);
 }
 
 .map-container {
@@ -238,11 +237,6 @@ body {
   color: var(--accent-blue, #64ffda) !important;
 }
 
-/* Цвет стрелок в шапке календаря */
-.ant-picker-header button {
-  color: var(--accent-blue, #64ffda) !important;
-}
-
 /* Цвет текста в календаре */
 .ant-picker-cell .ant-picker-cell-inner,
 .ant-picker-header-view button {
@@ -299,4 +293,638 @@ body {
   background-color: var(--secondary-dark, #112240) !important;
   border-color: var(--border-color, rgba(136, 146, 176, 0.2)) !important;
   box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3) !important;
+}
+
+.anticon-swap-right {
+  color: #52c4b9 !important;
+  font-size: large;
+}
+
+.ant-picker-clear:hover {
+  color: #52c4b9 !important;
+}
+
+/* 
+TABLE
+*/
+
+/* Стили для таблицы */
+.table-wrapper {
+  background: rgba(17, 34, 64, 0.7) !important;
+  border-radius: 12px !important;
+  border: 1px solid rgba(136, 146, 176, 0.1) !important;
+  box-shadow: 0 10px 30px rgba(2, 12, 27, 0.7) !important;
+  overflow: hidden !important;
+  transition: all 0.3s ease !important;
+  width: 100% !important;
+  overflow-y: auto !important; /* Вертикальный скролл только если нужно */
+}
+
+.table-wrapper:hover {
+  box-shadow: 0 12px 40px rgba(2, 12, 27, 0.8) !important;
+}
+
+/* Стили для самой таблицы */
+.custom-table {
+  background: transparent !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  box-shadow: none !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  table-layout: fixed !important;
+}
+
+/* Стили для заголовков таблицы */
+.custom-table thead tr th {
+  background: rgba(10, 25, 47, 0.8) !important;
+  color: #64ffda !important;
+  font-weight: 600 !important;
+  text-align: center !important;
+  padding: 14px 8px !important;
+  border: 1px solid rgba(136, 146, 176, 0.1) !important;
+  border-bottom: 1px solid rgba(136, 146, 176, 0.2) !important;
+  text-shadow: 0 0 5px rgba(100, 255, 218, 0.3) !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 10 !important;
+  font-size: 1rem !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Стили для тела таблицы */
+.custom-table tbody tr td {
+  background: rgba(17, 34, 64, 0.7) !important;
+  color: #ccd6f6 !important;
+  padding: 12px 8px !important;
+  border: 1px solid rgba(136, 146, 176, 0.1) !important;
+  border-top: none !important;
+  text-align: center !important;
+  transition: all 0.2s ease !important;
+  font-size: 0.95rem !important;
+  white-space: normal !important;
+  word-break: break-word !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  line-height: 1.4 !important;
+  min-height: 40px !important;
+}
+
+/* Стили для четных строк */
+.custom-table tbody tr:nth-child(even) td {
+  background: rgba(10, 25, 47, 0.6) !important;
+}
+
+/* Стили для hover строк */
+.custom-table tbody tr:hover td {
+  background: rgba(100, 255, 218, 0.2) !important;
+  border-color: rgba(100, 255, 218, 0.4) !important;
+  color: #0a192f !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 8px rgba(100, 255, 218, 0.1) !important;
+  z-index: 1 !important;
+  position: relative !important;
+}
+
+/* Стили для пагинации */
+.custom-table .ant-pagination {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  margin: 20px 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+}
+
+.custom-table .ant-pagination-item,
+.custom-table .ant-pagination-prev,
+.custom-table .ant-pagination-next,
+.custom-table .ant-pagination-jump-prev,
+.custom-table .ant-pagination-jump-next {
+  background: #8abeb3 !important;
+  border: 1px solid rgba(136, 146, 176, 0.2) !important;
+  color: #64ffda !important;
+  margin: 0 !important;
+  min-width: 36px !important;
+  height: 36px !important;
+  line-height: 34px !important;
+  border-radius: 8px !important;
+  transition: all 0.2s ease !important;
+  font-size: 0.9rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0 2px 6px rgba(2, 12, 27, 0.3) !important;
+  font-weight: 500 !important;
+  position: relative !important;
+  overflow: visible !important;
+}
+
+.custom-table .ant-pagination-item-ellipsis {
+  color: #64ffda !important;
+}
+
+.custom-table .anticon,
+.custom-table .anticon-double-right,
+.custom-table .anticon-double-left,
+.custom-table .ant-pagination-item-link-icon {
+  color: #64ffda !important;
+}
+
+/* Активная страница */
+.custom-table .ant-pagination-item-active {
+  background: #64ffda !important;
+  color: #0a192f !important;
+  border-color: #64ffda !important;
+  box-shadow: 0 0 10px rgba(100, 255, 218, 0.5) !important;
+  font-weight: 600 !important;
+}
+
+/* Hover для активной страницы */
+.custom-table .ant-pagination-item-active:hover {
+  background: #52c4b9 !important;
+  color: #0a192f !important;
+}
+
+/* Hover для обычных элементов */
+.custom-table .ant-pagination-item:hover {
+  background: rgba(100, 255, 218, 0.3) !important;
+  border-color: #64ffda !important;
+  color: #64ffda !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 10px rgba(100, 255, 218, 0.2) !important;
+}
+
+/* Неактивные элементы пагинации */
+.custom-table .ant-pagination-disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+  background: rgba(10, 25, 47, 0.5) !important;
+  border-color: rgba(136, 146, 176, 0.1) !important;
+  color: #8892b0 !important;
+}
+
+.custom-table .ant-pagination-disabled .ant-pagination-item-link {
+  color: #8892b0 !important;
+  background: rgba(10, 25, 47, 0.5) !important;
+  border-color: rgba(136, 146, 176, 0.1) !important;
+}
+
+/* Стили для текста пагинации */
+.custom-table .ant-pagination-total-text {
+  color: #64ffda !important;
+  font-weight: 500 !important;
+  margin: 0 15px !important;
+  font-size: 0.9rem !important;
+  white-space: nowrap !important;
+}
+
+/* Стили для кнопки "Go to" */
+.custom-table .ant-pagination-options {
+  color: #64ffda !important;
+  margin-left: 15px !important;
+  display: flex !important;
+  align-items: center !important;
+  font-weight: 500 !important;
+  white-space: nowrap !important;
+}
+
+.custom-table .ant-pagination-options .ant-select-selector {
+  background: rgba(10, 25, 47, 0.8) !important;
+  border: 1px solid rgba(136, 146, 176, 0.2) !important;
+  color: #64ffda !important;
+  border-radius: 8px !important;
+  min-width: 80px !important;
+  height: 36px !important;
+}
+
+.custom-table .ant-pagination-options .ant-select-selection-item {
+  color: #64ffda !important;
+  font-weight: 500 !important;
+}
+
+.custom-table .ant-pagination-options .ant-select-arrow {
+  color: #64ffda !important;
+}
+
+/* Стили для пунктирных элементов */
+.custom-table .ant-pagination-jump-prev,
+.custom-table .ant-pagination-jump-next {
+  background: rgba(10, 25, 47, 0.8) !important;
+  border: 1px solid rgba(136, 146, 176, 0.2) !important;
+  color: #64ffda !important;
+  border-radius: 8px !important;
+  min-width: 36px !important;
+  height: 36px !important;
+  line-height: 34px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0 2px 6px rgba(2, 12, 27, 0.3) !important;
+  font-weight: 500 !important;
+}
+
+.custom-table .ant-pagination-jump-prev:hover,
+.custom-table .ant-pagination-jump-next:hover {
+  background: rgba(100, 255, 218, 0.3) !important;
+  border-color: #64ffda !important;
+  color: #64ffda !important;
+}
+
+/* Стили для сортировки */
+.custom-table .ant-table-column-sorter {
+  color: #8892b0 !important;
+}
+
+.custom-table .ant-table-column-sorter-up.active,
+.custom-table .ant-table-column-sorter-down.active {
+  color: #64ffda !important;
+}
+
+/* Стили для фильтров */
+.custom-table .ant-table-filter-column-title {
+  color: #64ffda !important;
+}
+
+.custom-table .ant-dropdown-menu {
+  background: rgba(10, 25, 47, 0.9) !important;
+  border: 1px solid rgba(136, 146, 176, 0.2) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 10px 30px rgba(2, 12, 27, 0.7) !important;
+  min-width: 150px !important;
+}
+
+.custom-table .ant-dropdown-menu-item {
+  color: #ccd6f6 !important;
+  padding: 8px 12px !important;
+  transition: all 0.2s ease !important;
+}
+
+.custom-table .ant-dropdown-menu-item:hover {
+  background: rgba(100, 255, 218, 0.2) !important;
+  color: #64ffda !important;
+  border-radius: 6px !important;
+}
+
+/* Стили для скроллбара */
+.custom-table ::-webkit-scrollbar {
+  width: 8px !important;
+  height: 8px !important;
+}
+
+.custom-table ::-webkit-scrollbar-track {
+  background: rgba(10, 25, 47, 0.3) !important;
+  border-radius: 4px !important;
+}
+
+.custom-table ::-webkit-scrollbar-thumb {
+  background: #52c4b9 !important;
+  border-radius: 4px !important;
+  transition: all 0.3s ease !important;
+}
+
+.custom-table ::-webkit-scrollbar-thumb:hover {
+  background: #64ffda !important;
+}
+
+/* Пустое состояние */
+.table-empty-state {
+  text-align: center !important;
+  padding: 40px 20px !important;
+  color: #8892b0 !important;
+  background: rgba(17, 34, 64, 0.7) !important;
+  border-radius: 12px !important;
+  border: 1px solid rgba(136, 146, 176, 0.1) !important;
+  box-shadow: 0 10px 30px rgba(2, 12, 27, 0.7) !important;
+  margin-top: 20px !important;
+  font-size: 1.1rem !important;
+  width: 100% !important;
+}
+
+/* Адаптивность для мобильных устройств */
+@media (max-width: 1024px) {
+  .custom-table thead tr th,
+  .custom-table tbody tr td {
+    padding: 10px 6px !important;
+    font-size: 0.9rem !important;
+    min-width: 80px !important;
+  }
+
+  .custom-table .ant-pagination-item,
+  .custom-table .ant-pagination-prev,
+  .custom-table .ant-pagination-next {
+    min-width: 32px !important;
+    height: 32px !important;
+    line-height: 30px !important;
+    font-size: 0.9rem !important;
+  }
+
+  .custom-table .ant-pagination-options {
+    display: none !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .custom-table thead tr th,
+  .custom-table tbody tr td {
+    padding: 8px 4px !important;
+    font-size: 0.8rem !important;
+    min-width: 60px !important;
+  }
+
+  .custom-table .ant-pagination-item,
+  .custom-table .ant-pagination-prev,
+  .custom-table .ant-pagination-next {
+    min-width: 30px !important;
+    height: 30px !important;
+    line-height: 28px !important;
+    font-size: 0.8rem !important;
+  }
+
+  .custom-table .ant-pagination-jump-prev,
+  .custom-table .ant-pagination-jump-next {
+    display: none !important;
+  }
+
+  .table-wrapper {
+    border-radius: 10px !important;
+  }
+
+  .custom-table thead tr th {
+    padding: 8px 4px !important;
+    font-size: 0.75rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .custom-table thead tr th,
+  .custom-table tbody tr td {
+    padding: 6px 3px !important;
+    font-size: 0.7rem !important;
+    min-width: 50px !important;
+  }
+
+  .custom-table .ant-pagination-item,
+  .custom-table .ant-pagination-prev,
+  .custom-table .ant-pagination-next {
+    min-width: 28px !important;
+    height: 28px !important;
+    line-height: 26px !important;
+    font-size: 0.7rem !important;
+    margin: 0 1px !important;
+  }
+
+  .table-wrapper {
+    border-radius: 8px !important;
+  }
+
+  .custom-table {
+    font-size: 0.8rem !important;
+  }
+
+  .table-empty-state {
+    padding: 30px 15px !important;
+    font-size: 1rem !important;
+  }
+}
+
+/* Адаптивность для очень маленьких экранов */
+@media (max-width: 360px) {
+  .custom-table thead tr th,
+  .custom-table tbody tr td {
+    padding: 5px 2px !important;
+    font-size: 0.65rem !important;
+    min-width: 40px !important;
+  }
+
+  .custom-table .ant-pagination-item,
+  .custom-table .ant-pagination-prev,
+  .custom-table .ant-pagination-next {
+    min-width: 26px !important;
+    height: 26px !important;
+    font-size: 0.65rem !important;
+  }
+}
+
+/* Анимации */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.table-wrapper {
+  animation: fadeIn 0.5s ease-out !important;
+}
+
+/* Улучшенная читаемость на мобильных устройствах */
+@media (max-width: 768px) {
+  .custom-table .ant-table-tbody .ant-table-row td {
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    word-break: break-word !important;
+    max-width: none !important;
+  }
+
+  .custom-table .ant-table-tbody .ant-table-row td:first-child,
+  .custom-table .ant-table-tbody .ant-table-row td:last-child {
+    max-width: none !important;
+  }
+}
+
+/* Стили для столбца регион */
+.custom-table .ant-table-column-title {
+  font-weight: 600 !important;
+}
+
+/* Стили для активной строки */
+.custom-table tbody tr.ant-table-row-active td {
+  background: rgba(100, 255, 218, 0.15) !important;
+  border-color: rgba(100, 255, 218, 0.4) !important;
+}
+
+/* Стили для фильтрации */
+.custom-table .ant-table-filter-dropdown {
+  background: rgba(10, 25, 47, 0.95) !important;
+  border: 1px solid rgba(136, 146, 176, 0.2) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 10px 30px rgba(2, 12, 27, 0.8) !important;
+}
+
+.custom-table .ant-table-filter-dropdown .ant-dropdown-menu {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.custom-table .ant-table-filter-dropdown .ant-dropdown-menu-item {
+  padding: 8px 12px !important;
+}
+
+/* Стили для кнопок фильтрации */
+.custom-table .ant-table-filter-trigger {
+  color: #8892b0 !important;
+  background: rgba(10, 25, 47, 0.5) !important;
+  border: 1px solid rgba(136, 146, 176, 0.2) !important;
+  border-radius: 4px !important;
+  transition: all 0.2s ease !important;
+  padding: 0 8px !important;
+  height: 24px !important;
+  line-height: 22px !important;
+  min-width: 24px !important;
+  min-height: 34px !important;
+  display: flex;
+  align-self: center;
+}
+
+.custom-table .ant-table-filter-trigger:hover {
+  color: #64ffda !important;
+  background: rgba(100, 255, 218, 0.1) !important;
+  border-color: #64ffda !important;
+}
+
+.custom-table .ant-table-filter-trigger.active {
+  color: #64ffda !important;
+  background: rgba(100, 255, 218, 0.2) !important;
+  border-color: #64ffda !important;
+}
+
+/* Стили для фильтрации в мобильном режиме */
+@media (max-width: 768px) {
+  .custom-table .ant-table-filter-trigger {
+    padding: 0 6px !important;
+    height: 22px !important;
+    line-height: 20px !important;
+    font-size: 0.8rem !important;
+    min-width: 22px !important;
+  }
+}
+
+/* Специфичные стили для корректной работы с Ant Design */
+.custom-table .ant-table-thead > tr > th {
+  border-bottom: 1px solid rgba(136, 146, 176, 0.2) !important;
+}
+
+.custom-table .ant-table-tbody > tr > td {
+  border-bottom: 1px solid rgba(136, 146, 176, 0.1) !important;
+}
+
+.custom-table .ant-table-tbody > tr:last-child > td {
+  border-bottom: none !important;
+}
+
+.custom-table .ant-table-pagination {
+  margin: 20px 0 !important;
+  justify-content: center !important;
+}
+
+/* Улучшенная контрастность при наведении */
+.custom-table tbody tr:hover td {
+  color: #0a192f !important;
+  background: rgba(100, 255, 218, 0.3) !important;
+  box-shadow: 0 2px 10px rgba(100, 255, 218, 0.2) !important;
+  z-index: 2 !important;
+  position: relative !important;
+}
+
+/* Стили для лучшей читаемости */
+.custom-table tbody tr:hover td:first-child,
+.custom-table tbody tr:hover td:last-child {
+  color: #0a192f !important;
+}
+
+/* Стили для неактивных элементов пагинации */
+.custom-table
+  .ant-pagination-item:not(.ant-pagination-item-active):not(.ant-pagination-disabled):hover {
+  background: rgba(100, 255, 218, 0.3) !important;
+  border-color: #64ffda !important;
+  color: #64ffda !important;
+  transform: translateY(-2px) !important;
+}
+
+/* Стили для неактивных элементов пагинации */
+.custom-table .ant-pagination-disabled .ant-pagination-item-link {
+  color: #8892b0 !important;
+  background: rgba(10, 25, 47, 0.5) !important;
+  border-color: rgba(136, 146, 176, 0.1) !important;
+  cursor: not-allowed !important;
+}
+
+/* Улучшенная читаемость строк */
+.custom-table tbody tr td {
+  line-height: 1.5 !important;
+  padding: 10px 8px !important;
+  min-height: 36px !important;
+}
+
+/* Стили для горизонтального скролла */
+.custom-table ::-webkit-scrollbar {
+  height: 8px !important;
+  background: rgba(10, 25, 47, 0.3) !important;
+  border-radius: 4px !important;
+}
+
+.custom-table ::-webkit-scrollbar-track {
+  background: rgba(10, 25, 47, 0.3) !important;
+  border-radius: 4px !important;
+}
+
+.custom-table ::-webkit-scrollbar-thumb {
+  background: #52c4b9 !important;
+  border-radius: 4px !important;
+  transition: all 0.3s ease !important;
+}
+
+.custom-table ::-webkit-scrollbar-thumb:hover {
+  background: #64ffda !important;
+  border-radius: 4px !important;
+}
+
+/* Стили для фиксированной ширины колонок при скролле */
+.custom-table .ant-table-container {
+  scrollbar-width: thin !important;
+  scrollbar-color: #52c4b9 rgba(10, 25, 47, 0.3) !important;
+}
+
+/* Адаптивные стили для скролла */
+@media (max-width: 768px) {
+  .custom-table ::-webkit-scrollbar {
+    height: 6px !important;
+  }
+
+  .custom-table ::-webkit-scrollbar-thumb {
+    background: #52c4b9 !important;
+    border-radius: 3px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .custom-table ::-webkit-scrollbar {
+    height: 4px !important;
+  }
+
+  .custom-table ::-webkit-scrollbar-thumb {
+    background: #52c4b9 !important;
+    border-radius: 2px !important;
+  }
+}
+
+.custom-table .ant-pagination .ant-pagination-jump-next .ant-pagination-item-container,
+.custom-table .ant-pagination .ant-pagination-jump-prev .ant-pagination-item-container {
+  position: static !important;
+}
+
+.custom-table .ant-select {
+  display: flex;
+  align-items: center;
 }

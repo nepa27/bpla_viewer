@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { memo, useCallback, useRef, useState } from 'react';
+import { lazy, memo, useCallback, useRef, useState } from 'react';
 
 import { useNavigate } from 'react-router';
 
@@ -9,6 +9,8 @@ import { useYandexMap } from '../../hooks/useYandexMap';
 import ROUTES from '../../utils/routes';
 import FallBackMap from '../FallBackMap/FallBackMap';
 import style from './MapComponent.module.css';
+
+// const FallBackMap = lazy(() => import('../FallBackMap/FallBackMap'));
 
 const MapComponent = memo(
   ({ regionsData, points = [], errorLoadYmaps, center = [69, 100], zoom = 3 }) => {

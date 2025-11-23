@@ -1,16 +1,15 @@
 /* eslint-disable no-unused-vars */
-import { Skeleton, Space } from 'antd';
-
 import { memo, useCallback } from 'react';
 
 import { BrushableBarChart } from '../../components/BrushableBarChart';
 import { RegionDurationChart } from '../../components/RegionDurationChart/RegionDurationChart';
 import { RegionFlightsChart } from '../../components/RegionFlightsChart/RegionFlightsChart';
-import { ChartsSkeletonStatistics } from '../../utils/skeletons';
+import DateRangeShower from '../../ui/DateRangeShower/DateRangeShower';
+import { ChartsSkeletonStatistics } from '../../utils/skeletons/skeletons';
 import style from './FlightStatistics.module.css';
 
 const FlightStatistics = memo(
-  ({ dailyFlights, flightsByRegion, flightsDurationByRegion, onDateRangeChange }) => {
+  ({ dailyFlights, dateRange, flightsByRegion, flightsDurationByRegion, onDateRangeChange }) => {
     const handleBrush = useCallback(
       (range) => {
         onDateRangeChange(range);
@@ -28,6 +27,7 @@ const FlightStatistics = memo(
         {hasData ? (
           <>
             <h3 className={style['chart-title']}>Количество полетов по датам</h3>
+            {dateRange && <DateRangeShower dateRange={dateRange} />}
             <BrushableBarChart data={dailyFlights} onBrush={handleBrush} />
 
             <h3 className={style['chart-title']}>Количество полетов по регионам</h3>
