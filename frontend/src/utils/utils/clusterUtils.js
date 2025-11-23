@@ -1,4 +1,3 @@
-// utils/clusterUtils.js
 export const clusterPointsFast = (pointsArray, zoomLevel) => {
   const clusters = new Map();
   const gridSize = Math.max(1, Math.min(100, 12 - zoomLevel));

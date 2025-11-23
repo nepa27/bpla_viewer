@@ -456,8 +456,9 @@ export const exportStatisticsSlide = async (regionName, statistics, date) => {
 // ==============================
 export const exportAllRegionCharts = async (
   regionName,
-  { dailyFlights, peakHourlyFlights, flightsByTimeOfDay, statistics, flightData },
+  { dailyFlights, peakHourlyFlights, flightsByTimeOfDay, statistics, flightDurationByDate },
   date,
+  base64Image,
 ) => {
   if (!statistics) {
     console.warn('Статистика отсутствует');
@@ -473,6 +474,20 @@ export const exportAllRegionCharts = async (
 
     addRegionTitleSlide(pptx, regionName, date);
     addStatisticsSlide(pptx, statistics, date);
+
+    // Слайд с изображением (полный слайд)
+    const imageSlide = pptx.addSlide();
+    imageSlide.background = { color: '002B5B' };
+
+    imageSlide.addImage({
+      data: base64Image,
+      type: 'base64',
+      x: '5%',
+      y: '5%',
+      w: '90%',
+      h: '90%',
+      sizing: { fit: 'contain' },
+    });
 
     // Слайд: Полёты по датам
     const slide1 = pptx.addSlide();
@@ -493,11 +508,38 @@ export const exportAllRegionCharts = async (
       color: '#FF6F61',
     });
 
-    // Слайд: Пиковая нагрузка
+    // Слайд: Суммарная длительность по датам
     const slide2 = pptx.addSlide();
     slide2.background = { color: 'FFFFFF' };
 
-    slide2.addText('Пиковая нагрузка по дням', {
+    slide2.addText('Суммарная длительность полетов по датам', {
+      x: 0.5,
+      y: 0.5,
+      w: '90%',
+      fontSize: 20,
+      color: '002B5B',
+      bold: true,
+      align: 'center',
+      fontFace: 'Arial',
+    });
+
+    const data3 = prepareLineChartData(flightDurationByDate || [], 'date', 'value', 'Длительность');
+
+    slide2.addChart('line', data3, {
+      x: 0.3,
+      y: 1.1,
+      w: '94%',
+      h: 5.4,
+      chartColors: ['#50C878'],
+      valAxisLabelFontSize: 10,
+      catAxisLabelFontSize: 9,
+    });
+
+    // Слайд: Пиковая нагрузка
+    const slide3 = pptx.addSlide();
+    slide3.background = { color: 'FFFFFF' };
+
+    slide3.addText('Пиковая нагрузка по дням', {
       x: 0.5,
       y: 0.5,
       w: '90%',
@@ -510,96 +552,12 @@ export const exportAllRegionCharts = async (
 
     const data2 = prepareLineChartData(peakHourlyFlights, 'date', 'maxFlights', 'Пик');
 
-    slide2.addChart('line', data2, {
+    slide3.addChart('line', data2, {
       x: 0.3,
       y: 1.1,
       w: '94%',
       h: 5.4,
       chartColors: ['#FF6F61'],
-      valAxisLabelFontSize: 10,
-      catAxisLabelFontSize: 9,
-    });
-
-    // Слайд: Суммарная длительность по датам
-    const slide3 = pptx.addSlide();
-    slide3.background = { color: 'FFFFFF' };
-
-    slide3.addText('Суммарная длительность полетов по датам', {
-      x: 0.5,
-      y: 0.5,
-      w: '90%',
-      fontSize: 20,
-      color: '002B5B',
-      bold: true,
-      align: 'center',
-      fontFace: 'Arial',
-    });
-
-    if (!flightData || !Array.isArray(flightData) || flightData.length === 0) {
-      console.error('Нет данных для экспорта суммарной длительности');
-      slide3.addText('Нет данных для отображения', {
-        x: 0.5,
-        y: 3.0,
-        w: 9,
-        h: 1.0,
-        fontSize: 16,
-        color: 'FF0000',
-        align: 'center',
-      });
-
-      pptx.writeFile({ fileName: `flight_duration_by_date_${regionName}.pptx` });
-      return { success: true };
-    }
-
-    // Группируем данные по датам и суммируем длительность
-    const groupedData = {};
-
-    flightData.forEach((item) => {
-      // Проверяем, что у элемента есть нужные поля
-      if (item && item.date && typeof item.durationMinutes === 'number') {
-        const dateString = item.date; // '2025-04-27'
-        if (!groupedData[dateString]) {
-          groupedData[dateString] = 0;
-        }
-        groupedData[dateString] += item.durationMinutes;
-      }
-    });
-
-    // Преобразуем в массив для графика
-    const processedData = Object.entries(groupedData).map(([date, totalDuration]) => ({
-      date: date,
-      totalDurationMinutes: totalDuration,
-    }));
-
-    if (processedData.length === 0) {
-      console.error('Нет валидных данных для графика');
-      slide3.addText('Нет данных для отображения', {
-        x: 0.5,
-        y: 3.0,
-        w: 9,
-        h: 1.0,
-        fontSize: 16,
-        color: 'FF0000',
-        align: 'center',
-      });
-
-      pptx.writeFile({ fileName: `flight_duration_by_date_${regionName}.pptx` });
-      return { success: true };
-    }
-
-    const data3 = prepareLineChartData(
-      processedData,
-      'date',
-      'totalDurationMinutes',
-      'Длительность',
-    );
-
-    slide3.addChart('line', data3, {
-      x: 0.3,
-      y: 1.1,
-      w: '94%',
-      h: 5.4,
-      chartColors: ['#50C878'],
       valAxisLabelFontSize: 10,
       catAxisLabelFontSize: 9,
     });
@@ -695,7 +653,7 @@ export const exportAllRegionCharts = async (
 // ==============================
 // Экспорт: Суммарная длительность полетов по датам (линейная)
 // ==============================
-export const exportDurationByDateChart = async (regionName, flightData, date) => {
+export const exportDurationByDateChart = async (regionName, flightDurationByDate, date) => {
   try {
     const { default: PptxGenJS } = await import('pptxgenjs');
     const pptx = new PptxGenJS();
@@ -720,9 +678,12 @@ export const exportDurationByDateChart = async (regionName, flightData, date) =>
       fontFace: 'Arial',
     });
 
-    if (!flightData || !Array.isArray(flightData) || flightData.length === 0) {
-      console.error('Нет данных для экспорта суммарной длительности');
-
+    if (
+      !flightDurationByDate ||
+      !Array.isArray(flightDurationByDate) ||
+      flightDurationByDate.length === 0
+    ) {
+      console.warn('Нет данных для экспорта суммарной длительности');
       slide.addText('Нет данных для отображения', {
         x: 0.5,
         y: 3.0,
@@ -737,44 +698,11 @@ export const exportDurationByDateChart = async (regionName, flightData, date) =>
       return { success: true };
     }
 
-    // Группируем данные по датам и суммируем длительность
-    const groupedData = {};
-
-    flightData.forEach((item) => {
-      if (item && item.date && typeof item.durationMinutes === 'number') {
-        const dateString = item.date; // '2025-04-27'
-        if (!groupedData[dateString]) {
-          groupedData[dateString] = 0;
-        }
-        groupedData[dateString] += item.durationMinutes;
-      }
-    });
-
-    const processedData = Object.entries(groupedData).map(([date, totalDuration]) => ({
-      date: date,
-      totalDurationMinutes: totalDuration,
-    }));
-
-    if (processedData.length === 0) {
-      console.error('Нет валидных данных для графика');
-      slide.addText('Нет данных для отображения', {
-        x: 0.5,
-        y: 3.0,
-        w: 9,
-        h: 1.0,
-        fontSize: 16,
-        color: 'FF0000',
-        align: 'center',
-      });
-
-      pptx.writeFile({ fileName: `flight_duration_by_date_${regionName}.pptx` });
-      return { success: true };
-    }
-
+    // Готовые данные — используем напрямую
     const chartData = prepareLineChartData(
-      processedData,
+      flightDurationByDate,
       'date',
-      'totalDurationMinutes',
+      'value', // ← ключ из flightDurationByDate
       'Длительность',
     );
 
@@ -795,12 +723,11 @@ export const exportDurationByDateChart = async (regionName, flightData, date) =>
     return { success: false, error: error.message };
   }
 };
-
 // ==============================
 // Универсальный экспорт для региона
 // ==============================
-export const exportRegionChartByType = async (type, regionName, chartsData, date) => {
-  const { dailyFlights, peakHourlyFlights, flightsByTimeOfDay, statistics, flightData } =
+export const exportRegionChartByType = async (type, regionName, chartsData, date, base64Image) => {
+  const { dailyFlights, peakHourlyFlights, flightsByTimeOfDay, statistics, flightDurationByDate } =
     chartsData;
 
   switch (type) {
@@ -811,11 +738,11 @@ export const exportRegionChartByType = async (type, regionName, chartsData, date
     case 'timeofday':
       return exportTimeOfDayChart(regionName, flightsByTimeOfDay, date);
     case 'duration-by-date':
-      return exportDurationByDateChart(regionName, flightData, date);
+      return exportDurationByDateChart(regionName, flightDurationByDate, date);
     case 'stats':
       return exportStatisticsSlide(regionName, statistics, date);
     case 'all-region':
     default:
-      return exportAllRegionCharts(regionName, chartsData, date);
+      return exportAllRegionCharts(regionName, chartsData, date, base64Image);
   }
 };

@@ -1,8 +1,11 @@
+/* eslint-disable no-unused-vars */
+import { memo } from 'react';
+
 import { Link, useLocation } from 'react-router-dom';
 
 import './RegionsList.css';
 
-export const RegionsList = ({ regions, searchTerm, onClose }) => {
+export const RegionsList = memo(({ regions, searchTerm, onClose }) => {
   const location = useLocation();
 
   return (
@@ -20,7 +23,7 @@ export const RegionsList = ({ regions, searchTerm, onClose }) => {
           </li>
         ))}
 
-      {searchTerm && regions.length === 0 && (
+      {searchTerm && !regions.length && (
         <li className="drawer-menu-item">
           <div className="drawer-no-results">Регионы не найдены</div>
         </li>
@@ -33,4 +36,4 @@ export const RegionsList = ({ regions, searchTerm, onClose }) => {
       )}
     </>
   );
-};
+});

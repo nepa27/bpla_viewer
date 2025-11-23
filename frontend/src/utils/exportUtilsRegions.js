@@ -171,6 +171,7 @@ export const exportChartsToPPTX = async (
   chartsData,
   fileName = 'flight_statistics_all.pptx',
   date,
+  base64Image,
 ) => {
   try {
     const { default: PptxGenJS } = await import('pptxgenjs');
@@ -181,6 +182,20 @@ export const exportChartsToPPTX = async (
     pptx.layout = PPTX_CONFIG.LAYOUT;
 
     addTitleSlide(pptx, date);
+
+    // Слайд с изображением (полный слайд)
+    const imageSlide = pptx.addSlide();
+    imageSlide.background = { color: '002B5B' };
+
+    imageSlide.addImage({
+      data: base64Image,
+      type: 'base64',
+      x: '5%',
+      y: '5%',
+      w: '90%',
+      h: '90%',
+      sizing: { fit: 'contain' },
+    });
 
     // Слайд 2: Регионы
     const slide1 = pptx.addSlide();
@@ -242,7 +257,7 @@ export const exportChartsToPPTX = async (
 // ==============================
 // 5. Универсальный экспорт по типу
 // ==============================
-export const exportChartByType = async (type, chartsData, date) => {
+export const exportChartByType = async (type, chartsData, date, base64Image) => {
   switch (type) {
     case 'regions':
       return exportRegionsChart(chartsData, date);
@@ -252,6 +267,6 @@ export const exportChartByType = async (type, chartsData, date) => {
       return exportMonthlyChart(chartsData.dailyFlights, date);
     case 'all':
     default:
-      return exportChartsToPPTX(chartsData, 'flight_statistics_all.pptx', date);
+      return exportChartsToPPTX(chartsData, 'flight_statistics_all.pptx', date, base64Image);
   }
 };

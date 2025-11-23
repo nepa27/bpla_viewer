@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { ConfigProvider, DatePicker } from 'antd';
 import 'antd/dist/reset.css';
 import ruRU from 'antd/locale/ru_RU';
@@ -33,3 +34,5 @@ const DateRangeFieldForm = memo(({ dateRange, setDateRange }) => {
 });
 
 export default DateRangeFieldForm;
+
+

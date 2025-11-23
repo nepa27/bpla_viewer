@@ -1,6 +1,9 @@
+// RegionsSearch.jsx
+import { memo } from 'react';
+
 import './RegionsSearch.css';
 
-export const RegionsSearch = ({ searchTerm, setSearchTerm, clearSearch }) => {
+export const RegionsSearch = memo(({ searchTerm, setSearchTerm, clearSearch }) => {
   return (
     <li className="drawer-search-item">
       <div className="drawer-search-container">
@@ -19,4 +22,4 @@ export const RegionsSearch = ({ searchTerm, setSearchTerm, clearSearch }) => {
       </div>
     </li>
   );
-};
+});

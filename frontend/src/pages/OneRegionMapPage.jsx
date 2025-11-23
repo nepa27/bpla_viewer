@@ -1,13 +1,13 @@
-import { Skeleton, Space } from 'antd';
-import dayjs from 'dayjs';
-
-import { useEffect, useState } from 'react';
+/* eslint-disable no-unused-vars */
+import { useMemo, useState } from 'react';
 
 import { useParams } from 'react-router';
 
 import ChartExportSelectorRegion from '../components/ChartExportSelectorRegion/ChartExportSelectorRegion';
 import DateRangePicker from '../components/DatePicker/DatePicker';
-import { useFlightData } from '../hooks/useFlightData';
+import ErrorDisplay from '../components/ErrorDisplay/ErrorDisplay';
+import TableMain from '../components/Table/Table';
+import { useFlightFullData } from '../hooks/useFlightFullData';
 import { useGzipPolygonsData } from '../hooks/useGzipPolygonsData';
 import { useGzipRegionFlightData } from '../hooks/useGzipRegionFlightData';
 import { useYmapsLoader } from '../hooks/useYmapsLoader';
@@ -16,8 +16,8 @@ import MapComponent from '../modules/MapComponent/MapComponent';
 import ButtonGoBack from '../ui/ButtonGoBack/ButtonGoBack';
 import { initialDateRange } from '../utils/constant';
 import { timeToDateConverter } from '../utils/functions';
-import { loadYmapsScript } from '../utils/loadYmaps';
-import { FlightStatsSkeleton, MapSkeleton } from '../utils/skeletons';
+import ROUTES from '../utils/routes';
+import { ChartsSkeletonStatistics, MapSkeleton } from '../utils/skeletons/skeletons';
 
 export const OneRegionMapPage = () => {
   const { id } = useParams();
@@ -25,9 +25,11 @@ export const OneRegionMapPage = () => {
   const [dateRange, setDateRange] = useState(null);
   const [dateQuery, setDateQuery] = useState(initialDateRange);
 
-  const from = timeToDateConverter(dateQuery[0].toDate());
-  const to = timeToDateConverter(dateQuery[1].toDate());
- 
+  const [from, to] = useMemo(() => {
+    if (!dateQuery) return ['', ''];
+    return [timeToDateConverter(dateQuery[0].toDate()), timeToDateConverter(dateQuery[1].toDate())];
+  }, [dateQuery]);
+
   const {
     data: flightData,
     loading: flightLoading,
@@ -47,7 +49,8 @@ export const OneRegionMapPage = () => {
     flightsDurationByRegion,
     flightsByTimeOfDay,
     statistics,
-  } = useFlightData(flightData, dateRange);
+    flightDurationByDate,
+  } = useFlightFullData(flightData, dateRange);
 
   const oneRegionData = regionsPolygons?.features?.find(
     (obj) => String(obj.properties?.region_id) === String(id),
@@ -59,6 +62,19 @@ export const OneRegionMapPage = () => {
   const loading = ymapsLoading || flightLoading || regionsLoading;
   const error = flightError || regionsError;
 
+  const chartsDataForExport = useMemo(
+    () => ({
+      dailyFlights,
+      flightDurationByDate,
+      peakHourlyFlights,
+      flightsByTimeOfDay,
+      statistics,
+    }),
+    [dailyFlights, flightDurationByDate, peakHourlyFlights, flightsByTimeOfDay, statistics],
+  );
+
+  const regionName = oneRegionData?.properties?.region || 'Регион России';
+
   if (loading) {
     return (
       <div className="main">
@@ -68,9 +84,8 @@ export const OneRegionMapPage = () => {
             <h1>Загрузка региона...</h1>
           </div>
         </div>
-
         <MapSkeleton />
-        <FlightStatsSkeleton />
+        <ChartsSkeletonStatistics count={3} />
       </div>
     );
   }
@@ -84,7 +99,6 @@ export const OneRegionMapPage = () => {
             <h1>Загрузка карты...</h1>
           </div>
         </div>
-
         <MapSkeleton />
       </div>
     );
@@ -99,7 +113,6 @@ export const OneRegionMapPage = () => {
             <h1>Регион не найден</h1>
           </div>
         </div>
-
         <div
           style={{
             height: '600px',
@@ -120,31 +133,19 @@ export const OneRegionMapPage = () => {
         <div className="btn-back-container">
           <ButtonGoBack />
           <div className="header-region">
-            <h1>{oneRegionData?.properties?.region || 'Регион России'}</h1>
+            <h1>{regionName}</h1>
           </div>
         </div>
-        <div
-          style={{
-            height: '600px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          {`Ошибка: ${error}`}
-        </div>
+        <ErrorDisplay
+          errorCode="400"
+          errorMessage="Ошибка загрузки данных"
+          errorSubmessage={error}
+          buttonText="Вернуться к карте России"
+          linkTo={ROUTES.HOME}
+        />
       </div>
     );
   }
-  const regionName = oneRegionData?.properties?.region || 'Регион России';
-
-  const chartsDataForExport = {
-    dailyFlights,
-    flightData,
-    peakHourlyFlights,
-    flightsByTimeOfDay,
-    statistics,
-  };
 
   return (
     <div className="main">
@@ -160,23 +161,28 @@ export const OneRegionMapPage = () => {
         chartsData={chartsDataForExport}
         dateRange={dateQuery}
       />
+
       <MapComponent
         regionsData={oneRegionData}
-        points={filteredFlights}
+        points={filteredFlights || []}
         errorLoadYmaps={errorLoadYmaps}
         center={regionCenter}
         zoom={6}
       />
+
       <DateRangePicker dateRange={dateQuery} setDateRange={setDateQuery} />
 
+      <TableMain data={filteredFlights} />
+
       <FlightStatisticsOneReg
-        dailyFlights={dailyFlights}
-        flightsData={flightData}
         dateRange={dateRange}
+        statistics={statistics}
+        dailyFlights={dailyFlights}
         onDateRangeChange={setDateRange}
         peakHourlyFlights={peakHourlyFlights}
         flightsByTimeOfDay={flightsByTimeOfDay}
         flightsDurationByRegion={flightsDurationByRegion}
+        flightDurationByDate={flightDurationByDate}
       />
     </div>
   );

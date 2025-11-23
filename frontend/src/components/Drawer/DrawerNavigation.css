@@ -8,7 +8,7 @@
   padding: 0;
   margin: 0;
 }
-
+/* 
 .drawer-menu-item {
   border-bottom: 1px solid rgba(136, 146, 176, 0.1);
 }
@@ -36,7 +36,7 @@
   color: var(--accent-blue);
   border-left: 3px solid var(--accent-blue);
   padding-left: 17px;
-}
+} */
 
 /* Стили для разделителя */
 .drawer-menu-divider {

@@ -1,4 +1,3 @@
-// utils/loadYmaps.js
 export const loadYmapsScript = () => {
   // Проверяем, не загружен ли уже скрипт
   if (window.ymaps) {

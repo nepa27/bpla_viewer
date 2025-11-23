@@ -1,8 +1,7 @@
-// Рабочий код
-// components/RegionFlightsChart/RegionFlightsChart.jsx
+/* eslint-disable no-unused-vars */
 import * as d3 from 'd3';
 
-import { forwardRef, memo, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 
 import { SORT_OPTIONS_KEY } from '../../utils/constant';
 import ChartSortSelect from '../ChartSortSelect/ChartSortSelect';
@@ -30,7 +29,7 @@ export const RegionFlightsChart = memo(({ data, onBrush = null }) => {
       case SORT_OPTIONS_KEY.asc:
         return sortedData.sort((a, b) => a.count - b.count).slice(0, 10);
       case SORT_OPTIONS_KEY.all:
-      // return sortedData.sort((a, b) => b.count - a.count).slice(0, 10);
+        return sortedData.sort((a, b) => b.count - a.count);
       default:
         return sortedData.sort((a, b) => b.count - a.count);
     }

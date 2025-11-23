@@ -1,10 +1,14 @@
-import { Skeleton, Space, Spin } from 'antd';
+// eslint-disable-next-line no-unused-vars
+import { Skeleton, Space } from 'antd';
+
+import styles from './MapSkeleton.module.css';
 
 export const MapSkeleton = () => (
-  <div className="map-container">
-    <Skeleton active paragraph={{ rows: 0 }} style={{ height: '600px' }}>
-      <Spin>Загрузка...</Spin>
-    </Skeleton>
+  <div
+    className="map-container"
+    style={{ height: '600px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+  >
+    <span className={styles['loader']}></span>
   </div>
 );
 

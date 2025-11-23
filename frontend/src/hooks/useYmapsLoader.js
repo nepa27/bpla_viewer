@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useLayoutEffect, useState } from 'react';
 
 import { loadYmapsScript } from '../utils/loadYmaps';
 
@@ -6,7 +6,7 @@ export const useYmapsLoader = () => {
   const [errorLoadYmaps, setErrorLoadYmaps] = useState(false);
   const [ymapsLoading, setYmapsLoading] = useState(true);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     let isMounted = true;
 
     setYmapsLoading(true);

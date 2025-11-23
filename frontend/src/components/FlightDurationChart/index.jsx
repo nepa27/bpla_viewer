@@ -19,14 +19,13 @@ import { FlightDurationMarks } from './FlightDurationMarks';
 
 timeFormatDefaultLocale(timeFormatDefaultRussia);
 
-export const FlightDurationChart = memo(({ flightData, dateRange }) => {
+export const FlightDurationChart = memo(({ data }) => {
   const svgRef = useRef();
   const containerRef = useRef();
 
   useEffect(() => {
-    if (!flightData?.length || !svgRef.current) return;
+    if (!data?.length || !svgRef.current) return;
 
-    // Адаптивные размеры
     const containerWidth = containerRef.current?.clientWidth || 900;
     const isMobile = containerWidth < 768;
     const isTablet = containerWidth >= 768 && containerWidth < 1024;
@@ -50,50 +49,13 @@ export const FlightDurationChart = memo(({ flightData, dateRange }) => {
 
     const g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`);
 
-    // Группировка по дате и суммирование длительности
-    const aggregatedData = new Map();
-
-    for (const flight of flightData) {
-      const dateStr = flight.date;
-      const duration = flight.durationMinutes || 0;
-      const date = new Date(dateStr);
-
-      if (dateRange && Array.isArray(dateRange) && dateRange.length === 2) {
-        const [startDate, endDate] = dateRange;
-        if (startDate && endDate) {
-          const startCompareDate = new Date(startDate);
-          const endCompareDate = new Date(endDate);
-
-          startCompareDate.setHours(0, 0, 0, 0);
-          endCompareDate.setHours(23, 59, 59, 999);
-
-          if (date < startCompareDate || date > endCompareDate) continue;
-        }
-      }
-
-      if (!aggregatedData.has(dateStr)) {
-        aggregatedData.set(dateStr, { date, totalDuration: 0 });
-      }
-
-      aggregatedData.get(dateStr).totalDuration += duration;
-    }
-
-    const chartData = Array.from(aggregatedData.values())
-      .map((d) => ({
-        date: d.date,
-        value: d.totalDuration,
-      }))
-      .sort((a, b) => a.date - b.date);
-
-    if (chartData.length === 0) return;
-
     // Шкалы
     const x = scaleTime()
-      .domain(extent(chartData, (d) => d.date))
+      .domain(extent(data, (d) => d.date))
       .range([0, width]);
 
     const y = scaleLinear()
-      .domain([0, max(chartData, (d) => d.value)])
+      .domain([0, max(data, (d) => d.value)])
       .nice()
       .range([height, 0]);
 
@@ -105,13 +67,11 @@ export const FlightDurationChart = memo(({ flightData, dateRange }) => {
 
     g.append('g').attr('class', 'grid').call(axisLeft(y).tickSize(-width).tickFormat(''));
 
-    // Ось X
+    // Оси
     FlightDurationAxisBottom(g, x, height, width);
-
-    // Ось Y
     FlightDurationAxisLeft(g, y);
 
-    // Подписи осей
+    // Подписи
     g.append('text')
       .attr('transform', 'rotate(-90)')
       .attr('y', 0 - margin.left + 20)
@@ -125,9 +85,8 @@ export const FlightDurationChart = memo(({ flightData, dateRange }) => {
       .attr('class', 'axis-label')
       .text('Дата');
 
-    // Рендер точек и линии
-    FlightDurationMarks(g, chartData, x, y, height, width, isMobile);
-  }, [flightData, dateRange]);
+    FlightDurationMarks(g, data, x, y, height, width, isMobile);
+  }, [data]);
 
   return (
     <div ref={containerRef} className="flight-duration-chart-container">

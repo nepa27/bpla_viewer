@@ -17,14 +17,25 @@ export function timeToDateConverter(dateStr) {
 
 /**
  * Получает текущую дату в формате DD.MM.YYYY
+ * @param {string} dateStr Дата в ISO формате
  * @returns {string} Текущая дата в формате DD.MM.YYYY (например, "25.12.2023")
  */
-export function getDateNow() {
-  const date = new Date();
+export function getDateNow(dateStr = Date.now()) {
+  const date = new Date(dateStr);
   const day = String(date.getDate()).padStart(2, '0');
   const month = String(date.getMonth() + 1).padStart(2, '0'); // Месяцы с 0 до 11
   const year = date.getFullYear();
 
+  return `${day}.${month}.${year}`;
+}
+
+/**
+ * Получает текущую дату в формате YYYY-MM-DD => DD.MM.YYYY
+ * @param {string} dateStr Дата в формате YYYY-MM-DD
+ * @returns {string} Дата в формате DD.MM.YYYY (например, "25.12.2023")
+ */
+export function rebuildDateView(dateStr = '') {
+  const [year, month, day] = dateStr.split('-');
   return `${day}.${month}.${year}`;
 }
 
@@ -37,6 +48,24 @@ export function getDateStartYear() {
   const year = date.getFullYear();
 
   return `01.01.${year}`;
+}
+
+export function compareDates(a, b) {
+  // Для формата DD.MM.YYYY
+  if (typeof a === 'string' && typeof b === 'string' && a.includes('.') && b.includes('.')) {
+    // Сравнение дат в формате DD.MM.YYYY
+    return new Date(a) - new Date(b);
+  }
+
+  // Разделение строки на день и месяц для старого формата
+  const [dayA, monthA] = a.split(':').map(Number);
+  const [dayB, monthB] = b.split(':').map(Number);
+
+  // Преобразование даты в общее число для сравнения
+  const dateValueA = monthA * 100 + dayA;
+  const dateValueB = monthB * 100 + dayB;
+
+  return dateValueA - dateValueB;
 }
 
 /**
@@ -343,4 +372,77 @@ export function convertDatesToReadableFormat(dates) {
     from: fromDayjs.format('DD MMMM YYYY'),
     to: toDayjs.format('DD MMMM YYYY'),
   };
+}
+
+export const getUpperCaseStartedWord = (word) => {
+  if (!word) return;
+  return word[0].toUpperCase() + word.slice(1).toLowerCase();
+};
+
+export function setCookiesFromHeader(cookieHeader) {
+  // Разбиваем заголовок на отдельные куки (если их несколько)
+  const cookies = cookieHeader.split(', ');
+
+  cookies.forEach((cookie) => {
+    // Парсим каждую куку
+    const [cookiePart, ...restParts] = cookie.split('; ');
+
+    if (!cookiePart) return;
+
+    // Разбиваем имя и значение
+    const [name, value] = cookiePart.split('=');
+
+    // Объект для параметров куки
+    let options = {
+      name,
+      value: decodeURIComponent(value),
+      path: '/',
+      secure: false,
+      httpOnly: true,
+      sameSite: 'lax',
+      maxAge: null,
+      expires: null,
+    };
+
+    // Парсим остальные параметры
+    restParts.forEach((part) => {
+      const [key, value] = part.split('=');
+
+      switch (key.toLowerCase()) {
+        case 'path':
+          options.path = value;
+          break;
+        case 'secure':
+          options.secure = true;
+          break;
+        case 'httponly':
+          options.httpOnly = true;
+          break;
+        case 'samesite':
+          options.sameSite = value.toLowerCase();
+          break;
+        case 'max-age':
+          options.maxAge = parseInt(value, 10);
+          break;
+        case 'expires':
+          options.expires = new Date(value);
+          break;
+      }
+    });
+
+    // Формируем строку для установки куки
+    const cookieStr = `${options.name}=${encodeURIComponent(options.value)}`;
+
+    // Добавляем параметры
+    let optionsStr = '';
+    if (options.path) optionsStr += `; Path=${options.path}`;
+    if (options.secure) optionsStr += '; Secure';
+    if (options.httpOnly) optionsStr += '; HttpOnly';
+    if (options.sameSite) optionsStr += `; SameSite=${options.sameSite.toUpperCase()}`;
+    if (typeof options.maxAge === 'number') optionsStr += `; Max-Age=${options.maxAge}`;
+    if (options.expires instanceof Date) optionsStr += `; Expires=${options.expires.toUTCString()}`;
+
+    // Устанавливаем куку
+    document.cookie = cookieStr + optionsStr;
+  });
 }

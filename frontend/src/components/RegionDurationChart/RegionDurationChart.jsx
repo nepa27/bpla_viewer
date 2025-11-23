@@ -1,4 +1,4 @@
-// components/RegionDurationChart/RegionDurationChart.jsx
+/* eslint-disable no-unused-vars */
 import * as d3 from 'd3';
 
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
@@ -244,6 +244,8 @@ export const RegionDurationChart = memo(({ data, onBrush }) => {
         brushGroup.on('brush end', null);
       };
     }
+    // @TODO
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [processedData, onBrush, margin, isMobile]);
 
   if (!data || !Array.isArray(data) || data.length === 0) {

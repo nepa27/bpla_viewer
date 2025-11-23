@@ -1,4 +1,3 @@
-// utils/mapPointsProcessor.js
 import { clusterPoints } from './clusterUtils';
 import { createClusterer, createPlacemark } from './geoObjectUtils';
 import { getClusterHash } from './hashUtils';
@@ -7,12 +6,6 @@ export const processPoints = (pointsArray, zoomLevel) => {
   if (!pointsArray || pointsArray.length === 0) return [];
 
   const clustered = clusterPoints(pointsArray, zoomLevel);
-
-  //   const totalCount = clustered.reduce((sum, cluster) => sum + cluster.count, 0);
-
-  //   console.log(
-  //     `Кластеризовано ${pointsArray.length} точек -> ${clustered.length} кластеров (${totalCount} полетов)`,
-  //   );
 
   return clustered;
 };
@@ -31,21 +24,27 @@ export const createGeoObjects = (clusteredPoints) => {
   return geoObjects;
 };
 
-export const updateMapPoints = (mapInstance, points, zoom, pointsRef, clustererRef) => {
+export const updateMapPoints = (
+  mapInstance,
+  points,
+  zoom,
+  pointsRef,
+  clustererRef,
+  pointsHashRef,
+) => {
   const clusteredPoints = processPoints(points, zoom);
   const newHash = getClusterHash(clusteredPoints);
-  const currentHash = pointsRef.current.hash || '';
 
-  if (currentHash === newHash && pointsRef.current.length > 0) {
+  if (pointsHashRef.current === newHash && pointsRef.current.length > 0) {
     return;
   }
 
-  try {
-    if (clustererRef.current && mapInstance.geoObjects) {
+  if (clustererRef.current && mapInstance?.geoObjects) {
+    try {
       mapInstance.geoObjects.remove(clustererRef.current);
+    } catch (e) {
+      console.warn('Ошибка удаления кластера:', e);
     }
-  } catch (e) {
-    // Игнорируем ошибки очистки
   }
 
   const clusterer = createClusterer();
@@ -56,5 +55,5 @@ export const updateMapPoints = (mapInstance, points, zoom, pointsRef, clustererR
 
   clustererRef.current = clusterer;
   pointsRef.current = clusteredPoints;
-  pointsRef.current.hash = newHash;
+  pointsHashRef.current = newHash;
 };

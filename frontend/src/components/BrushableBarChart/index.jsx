@@ -1,6 +1,6 @@
 import { axisBottom, axisLeft, brushX, max, scaleBand, scaleLinear, select } from 'd3';
 
-import { memo, useCallback, useEffect, useRef } from 'react';
+import { memo, useEffect, useMemo, useRef } from 'react';
 
 import { AxisBottom } from './AxisBottom';
 import { AxisLeft } from './AxisLeft';
@@ -13,7 +13,7 @@ export const BrushableBarChart = memo(({ data, onBrush = () => {} }) => {
   const brushRef = useRef();
 
   // Группируем данные по месяцам
-  const monthlyData = useCallback(() => {
+  const groupedMonthlyData = useMemo(() => {
     if (!data?.length) return [];
 
     const groupedData = {};
@@ -34,8 +34,6 @@ export const BrushableBarChart = memo(({ data, onBrush = () => {} }) => {
 
   useEffect(() => {
     if (!data?.length || !svgRef.current) return;
-
-    const groupedMonthlyData = monthlyData();
 
     // Адаптивные размеры
     const containerWidth = containerRef.current?.clientWidth || 900;
@@ -110,14 +108,77 @@ export const BrushableBarChart = memo(({ data, onBrush = () => {} }) => {
           onBrush?.(null);
           return;
         }
+
         const [x0, x1] = event.selection;
         const dates = groupedMonthlyData.map((d) => d.date.getTime());
-        const startIndex = Math.floor((x0 / width) * dates.length);
-        const endIndex = Math.ceil((x1 / width) * dates.length);
-        const startDate = new Date(dates[Math.max(0, startIndex)]);
-        const endDate = new Date(dates[Math.min(dates.length - 1, endIndex)]);
-        const extendedEndDate = new Date(endDate.getFullYear(), endDate.getMonth() + 1, 0);
-        onBrush?.([startDate, extendedEndDate]);
+
+        const startIndex = Math.max(0, Math.floor(x0 / x.step()));
+        const endIndex = Math.min(dates.length - 1, Math.floor(x1 / x.step()));
+
+        // Если выделен только один месяц
+        if (startIndex === endIndex) {
+          const startDate = new Date(dates[startIndex]);
+
+          const bandWidth = x.bandwidth();
+          const positionInBand = x0 - startIndex * x.step();
+          const fraction = positionInBand / bandWidth;
+
+          const daysInMonth = new Date(
+            startDate.getFullYear(),
+            startDate.getMonth() + 1,
+            0,
+          ).getDate();
+
+          const startDay = Math.max(1, Math.round(fraction * daysInMonth));
+          const endDay = Math.min(
+            daysInMonth,
+            Math.round(((x1 - startIndex * x.step()) / bandWidth) * daysInMonth),
+          );
+
+          const finalStartDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDay);
+          const finalEndDate = new Date(startDate.getFullYear(), startDate.getMonth(), endDay);
+
+          if (finalStartDate <= finalEndDate) {
+            onBrush?.([finalStartDate, finalEndDate]);
+          } else {
+            onBrush?.([finalEndDate, finalStartDate]);
+          }
+          return;
+        }
+
+        // Для нескольких месяцев
+        const startDate = new Date(dates[startIndex]);
+        const endDate = new Date(dates[endIndex]);
+
+        const startBandWidth = x.bandwidth();
+        const startPositionInBand = x0 - startIndex * x.step();
+        const startFraction = startPositionInBand / startBandWidth;
+        const daysInStartMonth = new Date(
+          startDate.getFullYear(),
+          startDate.getMonth() + 1,
+          0,
+        ).getDate();
+        const startDay = Math.max(
+          1,
+          Math.min(Math.round(startFraction * daysInStartMonth), daysInStartMonth),
+        );
+
+        const endPositionInBand = x1 - endIndex * x.step();
+        const endFraction = endPositionInBand / startBandWidth;
+        const daysInEndMonth = new Date(endDate.getFullYear(), endDate.getMonth() + 1, 0).getDate();
+        const endDay = Math.max(
+          1,
+          Math.min(Math.round(endFraction * daysInEndMonth), daysInEndMonth),
+        );
+
+        const finalStartDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDay);
+        const finalEndDate = new Date(endDate.getFullYear(), endDate.getMonth(), endDay);
+
+        if (finalStartDate <= finalEndDate) {
+          onBrush?.([finalStartDate, finalEndDate]);
+        } else {
+          onBrush?.([finalEndDate, finalStartDate]);
+        }
       });
 
     brushRef.current = brush;
@@ -127,7 +188,8 @@ export const BrushableBarChart = memo(({ data, onBrush = () => {} }) => {
     return () => {
       brushGroup.on('brush end', null);
     };
-  }, [data, onBrush, monthlyData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data, onBrush]);
 
   if (!data || !Array.isArray(data) || data.length === 0) {
     return (

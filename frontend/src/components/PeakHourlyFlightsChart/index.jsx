@@ -19,7 +19,7 @@ import { PeakHourlyFlightsMarks } from './PeakHourlyFlightsMarks';
 
 timeFormatDefaultLocale(timeFormatDefaultRussia);
 
-export const PeakHourlyFlightsChart = memo(({ peakHourlyFlightsData, onBrush = () => {} }) => {
+export const PeakHourlyFlightsChart = memo(({ peakHourlyFlightsData }) => {
   const svgRef = useRef();
   const containerRef = useRef();
 

@@ -1,0 +1,17 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`DrawerHeader > renders correctly 1`] = `
+<div
+  class="drawer-header"
+>
+  <h2>
+    Навигация
+  </h2>
+  <button
+    aria-label="Закрыть меню"
+    class="drawer-close-button"
+  >
+    ×
+  </button>
+</div>
+`;
